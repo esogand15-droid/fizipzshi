@@ -1,21 +1,6 @@
-[06] duration=24.4min chunks=2 todo=2
-[06] model loaded in 4s
-[0;93m2026-10-01 10:35:02.178314963 [W:onnxruntime:Default, device_discovery.cc:146 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
-[06] chunk 0 done in 20.1min (20.0min audio, x1.00 realtime)
-[out#0/wav @ 0x55e2bc86a880] Error opening output work/tmp_media/06_001.wav: No such file or directory
-Error opening output file work/tmp_media/06_001.wav.
-Error opening output files: No such file or directory
-Traceback (most recent call last):
-  File "/home/runner/work/fizipzshi/fizipzshi/tools/transcribe_one.py", line 156, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "/home/runner/work/fizipzshi/fizipzshi/tools/transcribe_one.py", line 108, in main
-    extract_audio(video, wav, s, d)
-  File "/home/runner/work/fizipzshi/fizipzshi/tools/transcribe_one.py", line 51, in extract_audio
-    sh(cmd)
-  File "/home/runner/work/fizipzshi/fizipzshi/tools/transcribe_one.py", line 28, in sh
-    return subprocess.run(cmd, check=True, **kw)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-subprocess.CalledProcessError: Command '['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-ss', '1200.0', '-i', 'work/media/06.mp4', '-t', '266.3592060000001', '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', 'work/tmp_media/06_001.wav']' returned non-zero exit status 254.
+[06] duration=24.4min chunks=2 todo=1
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[06] model loaded in 9s
+[0;93m2026-10-01 11:16:21.822628834 [W:onnxruntime:Default, device_discovery.cc:146 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+[06] chunk 1 done in 2.5min (4.4min audio, x0.56 realtime)
+merged 330 segments -> work/transcripts/06/raw.json
