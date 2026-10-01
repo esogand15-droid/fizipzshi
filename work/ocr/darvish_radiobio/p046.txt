@@ -1,0 +1,19 @@
+Measuring radiation damage
+‏انداز ه گیری آسیب تشعشع‎
+Example 2:
+
+Expose cultured cells to increasing doses of radiation and
+measure the number of ‘surviving cells’
+
+سلول های کشت شده را در معرض افزایش دوز تابش قرار دهید و تعداد "سلول های
+زنده مانده" را اندازه گیری کنید.
+
+dose 1 ۳
+dose 2 a
+
+dose 3
+
+dose 4
+
+PEER ERE
+

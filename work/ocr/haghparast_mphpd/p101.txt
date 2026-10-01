@@ -1,0 +1,11 @@
+| Doppler Shift Equation
+2vf
+
+C
+2vf COS@P
+
+Cc
+
+eo
+Io
+
