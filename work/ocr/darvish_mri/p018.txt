@@ -1,0 +1,5 @@
+Measuring Tissue Magnetization:
+
+Mo is “tipped” into the transverse plane by a burst of
+electromagnetic radiation, commonly called an RF Pulse.
+
