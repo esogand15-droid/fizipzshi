@@ -1,0 +1,10 @@
+LET and RBE
+
+LET (Linear Energy Transfer) - rate at which
+energy of radiation is transferred to medium in
+units of keV/micron
+
+‎LET‏ (انتقال خطی انرژی) : مقدار انرژی پرتو که در واحد طول مسیر به
+محیط ‎Jain‏ می شود.( واحد ‎(keV/micron‏
+
+‎Se ee ‏سم عم‎ es |
