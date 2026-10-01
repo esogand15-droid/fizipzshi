@@ -1,0 +1,7 @@
+A-mode scan and display
+
+A, Three interfaces.
+B, Corresponding display of the interface.
+
+| ۸
+
