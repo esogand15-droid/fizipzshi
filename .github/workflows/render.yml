@@ -76,6 +76,14 @@ jobs:
           gh release view "$REL" >/dev/null 2>&1 || gh release create "$REL" --title "HumsYar جزوه فیزیک پزشکی" --notes "Rendered jozve builds" || true
           gh release upload "$REL" HumsYar_MedPhysics_Jozve.pdf --clobber || true
 
+      - name: clean intermediates
+        if: always()
+        run: |
+          # the built PDF stays at the repo root (committed by relay_push.sh, so the
+          # deliverable survives runner resets); only drop the throwaway pass files.
+          rm -f render/pass1.pdf
+          ls -la HumsYar_MedPhysics_Jozve.pdf || true
+
       - name: commit results
         if: always()
         run: bash tools/relay_push.sh render-done
