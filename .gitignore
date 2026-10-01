@@ -10,3 +10,5 @@ work/tmp/
 __pycache__/
 .venv/
 work/videos/
+images/raw/
+work/review/
