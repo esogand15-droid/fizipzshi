@@ -210,14 +210,7 @@ BLOCKS = [
  "type": "h2",
  "text": "۱۲. شکل‌های منبع: اصول و تجهیزات حفاظت"
 },
- {
- "type": "figure",
- "file": "images/fig/fig06_dst_wheel.jpg",
- "width": "56%",
- "caption": "شکل — سه اصل کاهش پرتوگیری خارجی در یک نگاه: فاصله ([[Distance]])، حفاظ ([[Shield]]) و زمان ([[Time]]).",
- "src": "جزوه دکتر افضلی‌پور — ص۸۹، ۹۳، ۹۹، ۱۰۹، ۱۲۲ (ص۸۹)"
-},
- {
+  {
  "type": "figure",
  "file": "images/fig/fig06_dose_distance.jpg",
  "width": "82%",

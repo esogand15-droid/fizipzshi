@@ -92,8 +92,11 @@ def load_fig_place():
     spec.loader.exec_module(mod)
     after = getattr(mod, "FIG_AFTER", {}) or {}
     move = getattr(mod, "FIG_MOVE", {}) or {}
+    drop = getattr(mod, "FIG_DROP", []) or []
+    caption = getattr(mod, "FIG_CAPTION", {}) or {}
     after = {str(k): (int(v[0]), str(v[1])) for k, v in after.items()}
-    return after, {str(k): int(v) for k, v in move.items()}
+    return (after, {str(k): int(v) for k, v in move.items()},
+            {str(x) for x in drop}, {str(k): str(v) for k, v in caption.items()})
 
 
 def load_overlay():
@@ -161,7 +164,7 @@ def _tokens(text: str) -> set[str]:
 
 
 def apply_overlay(no: int, blocks: list[dict], overlay: dict,
-                  fig_after: dict | None = None) -> list[dict]:
+                  fig_after: dict | None = None, fig_caption: dict | None = None) -> list[dict]:
     """Insert each overlay figure right after the block its source page talks about.
 
     The figure carries the *source page text* in `match`; the best block is the one
@@ -177,6 +180,9 @@ def apply_overlay(no: int, blocks: list[dict], overlay: dict,
         if any(b.get("file") == fig.get("file") for b in out):
             continue                       # idempotent
         needle = (fig.pop("match", "") or "").strip()
+        cap_fix = (fig_caption or {}).get(str(fig.get("file")))
+        if cap_fix:
+            fig["caption"] = cap_fix
         manual = fig_after.get(str(fig.get("file")))
         if manual and manual[0] == no:
             idx = None
@@ -270,6 +276,112 @@ def dedupe_figures(blocks: list[dict], threshold: int = 10) -> tuple[list[dict],
         return blocks, 0
     return [b for k, b in enumerate(blocks) if k not in drop], len(drop)
 
+def figures_after_text(blocks: list[dict]) -> tuple[list[dict], int]:
+    """شکل‌ها نباید بلافاصله بعد از سرفصل بیایند.
+
+    دانشجو اول باید متن بخش را بخواند و بعد شکل را ببیند؛ اگر شکل بلافاصله بعد
+    از یک سرفصل افتاده باشد، به بعد از نخستین بلوک توضیحی همان بخش منتقل می‌شود.
+    بخش «شکل‌های منبع» از این قاعده مستثناست (گالری شکل است و ترتیب ندارد).
+    """
+    out = list(blocks)
+    moved = 0
+    i = 0
+    while i < len(out):
+        if out[i].get("type") != "figure":
+            i += 1
+            continue
+        # سر سرفصلِ بخش؟
+        j = i - 1
+        while j >= 0 and out[j].get("type") == "figure":
+            j -= 1
+        if j < 0 or out[j].get("type") not in ("h2", "h3"):
+            i += 1
+            continue
+        if "شکل‌های منبع" in (out[j].get("text") or ""):
+            i += 1
+            continue
+        # طول ران شکل‌ها
+        k = i
+        while k < len(out) and out[k].get("type") == "figure":
+            k += 1
+        run = out[i:k]
+        rest = out[k:]
+        # نخستین بلوک توضیحی پس از شکل‌ها
+        t = 0
+        while t < len(rest) and rest[t].get("type") in ("h2", "h3", "figure"):
+            t += 1
+        if t >= len(rest):
+            i = k
+            continue
+        out = out[:i] + rest[:t + 1] + run + rest[t + 1:]
+        moved += len(run)
+        i += t + len(run) + 1
+    return out, moved
+
+
+def normalise_captions(blocks: list[dict]) -> int:
+    """شماره‌های شکل که از خودِ منبع آمده‌اند را روشن کن.
+
+    شرح‌هایی مثل «شکل ۵ — ...» در واقع شماره شکل در کتاب/اسلاید منبع‌اند؛ چون
+    جزوه شکل‌های خودش را شماره نمی‌زند، این عدد وهم‌انگیز است. آن‌ها را به
+    «شکل منبع ۵ — ...» تبدیل می‌کنیم تا مرجع‌بودنشان روشن بماند.
+    """
+    n = 0
+    for b in blocks:
+        if b.get("type") != "figure":
+            continue
+        cap = b.get("caption") or ""
+        m = re.match(r"^\s*شکل\s*([۰-۹0-9]+)\s*[—–-]\s*", cap)
+        if m:
+            b["caption"] = "شکل منبع " + m.group(1) + " — " + cap[m.end():]
+            n += 1
+    return n
+
+
+def relocate_figures(no: int, blocks: list[dict], fig_after: dict) -> tuple[list[dict], int]:
+    """شکل‌هایی که در فایل محتوا جای نامناسبی دارند را کنار بلوک مرجعشان می‌برد.
+
+    هر ورودی FIG_AFTER: file -> (chapter, anchor). اگر شکل در آن فصل باشد ولی
+    بی‌واسطه بعد از بلوک حاوی لنگر نباشد، برداشته و آنجا درج می‌شود (پس از
+    هر شکل‌های همان گروه تا ترتیب شکل‌ها به‌هم نریزد).
+    """
+    moves = {f: a for f, a in (fig_after or {}).items() if a and a[0] == no}
+    if not moves:
+        return blocks, 0
+    out = list(blocks)
+    moved = 0
+    for fname, (_ch, anchor) in sorted(moves.items()):
+        cur = next((i for i, b in enumerate(out)
+                    if b.get("type") == "figure" and str(b.get("file")) == fname), None)
+        if cur is None:
+            continue
+        tgt = None
+        for i, b in enumerate(out):
+            if b.get("type") == "figure":
+                continue
+            if anchor in json.dumps(b, ensure_ascii=False):
+                tgt = i
+                break
+        if tgt is None:
+            continue
+        # already sitting in the figure run just after the anchor?
+        j = tgt + 1
+        run = []
+        while j < len(out) and out[j].get("type") == "figure":
+            run.append(j)
+            j += 1
+        if cur in run:
+            continue
+        entry = out.pop(cur)
+        if cur < tgt:
+            tgt -= 1
+        j = tgt + 1
+        while j < len(out) and out[j].get("type") == "figure":
+            j += 1
+        out.insert(j, entry)
+        moved += 1
+    return out, moved
+
 
 def load_module(name: str):
     path = CONTENT / f"{name}.py"
@@ -286,7 +398,7 @@ def main() -> int:
     LOCK.mkdir(exist_ok=True)
     built = 0
     overlay = load_overlay()
-    fig_after, fig_move = load_fig_place()
+    fig_after, fig_move, fig_drop, fig_caption = load_fig_place()
     if fig_move:
         lookup = {}
         for ch_no, entries in overlay.items():
@@ -301,6 +413,11 @@ def main() -> int:
                 continue
             overlay[src].remove(entry)
             overlay.setdefault(target, []).append(entry)
+    if fig_drop:
+        # شکل‌هایی که عیناً جای دیگری چاپ شده‌اند یا اسلاید عنوان/فهرست‌اند
+        for ch_no in list(overlay):
+            overlay[ch_no] = [e for e in overlay[ch_no]
+                              if str(e.get("file")) not in fig_drop]
     video_extra = load_video_extra()
     for no, meta in CHAPTERS.items():
         if only and no not in only:
@@ -309,8 +426,18 @@ def main() -> int:
         if mod is None:
             print(f"ch{no:02d}: module missing ({meta['module']})")
             continue
-        blocks = apply_overlay(no, list(mod.BLOCKS), overlay, fig_after)
+        blocks = apply_overlay(no, list(mod.BLOCKS), overlay, fig_after, fig_caption)
+        if fig_drop:
+            blocks = [b for b in blocks if str(b.get("file")) not in fig_drop]
+            for b in blocks:
+                if b.get("type") == "figure":
+                    fix = fig_caption.get(str(b.get("file")))
+                    if fix:
+                        b["caption"] = fix
         blocks = apply_video_extra(no, blocks, video_extra)
+        normalise_captions(blocks)
+        blocks, relocated = relocate_figures(no, blocks, fig_after)
+        blocks, detached = figures_after_text(blocks)
         blocks, dropped_figs = dedupe_figures(blocks)
         ch = {"no": no, "session": meta["session"], "title": meta["title"],
               "prof": meta["prof"], "icon": meta["icon"], "blocks": blocks}
@@ -320,7 +447,14 @@ def main() -> int:
             json.dumps(ch, ensure_ascii=False, indent=1), encoding="utf-8")
         src = sum(1 for b in ch["blocks"] if b.get("src"))
         figs = sum(1 for b in ch["blocks"] if b.get("type") == "figure")
-        extra = f", {dropped_figs} تکراری حذف شد" if dropped_figs else ""
+        notes = []
+        if relocated:
+            notes.append(f"{relocated} جابه‌جا")
+        if detached:
+            notes.append(f"{detached} شکل پس از متن")
+        if dropped_figs:
+            notes.append(f"{dropped_figs} تکراری حذف شد")
+        extra = (", " + "، ".join(notes)) if notes else ""
         print(f"ch{no:02d}: {len(ch['blocks'])} blocks, {figs} figures, {src} with src{extra}")
         built += 1
     print("built", built)
