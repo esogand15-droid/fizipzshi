@@ -1,0 +1,15 @@
+name: connectivity-test
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fetch-sources.yml'
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe filebin
+        run: |
+          echo "runner online"
+          curl -sS -I --max-time 30 "https://filebin.net/811lna3jdjwdzr6d" | head -5
+          curl -sS -o /dev/null -w "size=%{size_download} code=%{http_code}\n" -r 0-1000 --max-time 60 "https://filebin.net/811lna3jdjwdzr6d/%d9%81%db%8c%d8%b2%db%8c%da%a9%20%d9%be%d8%b2%d8%b4%da%a9%db%8c.rar"
