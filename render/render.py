@@ -140,7 +140,12 @@ def blk_h2(b: dict) -> str:
         flag = '<span class="flag badge-exam">در امتحان می‌آید</span>'
     elif kind == "nonexam":
         flag = '<span class="flag badge-nonexam">خارج از حذفیات امتحان — مطالعه تکمیلی</span>'
-    anchor = f'<a id="{esc(b["anchor"])}"></a>' if b.get("anchor") else ""
+    anchor = ""
+    if b.get("anchor"):
+        anchor = f'<a id="{esc(b["anchor"])}"></a>'
+        idx = ANCHOR_MARK.get(b["anchor"])
+        if idx is not None:
+            anchor += f'<span class="marker">JZG{idx:02d}MARK</span>'""
     return (f'{anchor}<div class="subhead"><span class="sd"></span>'
             f'<span class="st">{inline(b.get("text",""))}</span>{flag}<span class="sl"></span></div>')
 
@@ -217,6 +222,9 @@ RENDER = {
 }
 
 
+ANCHOR_MARK: dict[str, int] = {}
+
+
 def render_blocks(blocks: list[dict]) -> str:
     out = []
     for b in blocks:
@@ -287,9 +295,13 @@ def guide_html(rows: list[dict]) -> str:
     trs = []
     for r in rows:
         pg = r.get("pages")
-        pgcell = (f'<a href="#{esc(r["anchors"][0])}"><span class="pgpill">'
-                  f'صفحه {fa_digits(pg[0])} تا {fa_digits(pg[1])}</span></a>') if pg else \
-                 '<span class="pgpill">—</span>'
+        if pg and pg[0] != pg[1]:
+            label = f'صفحه {fa_digits(pg[0])} تا {fa_digits(pg[1])}'
+        elif pg:
+            label = f'صفحه {fa_digits(pg[0])}'
+        else:
+            label = '—'
+        pgcell = (f'<a href="#{esc(r["anchors"][0])}"><span class="pgpill">{label}</span></a>')
         trs.append(f"<tr><td>{inline(r['topic'])}</td><td>{inline(r['where'])}</td>"
                    f"<td>{pgcell}</td><td>{inline(r['source'])}</td></tr>")
     return f"""<div class="guide">
@@ -313,6 +325,7 @@ def section_cover(ch: dict, i: int, n: int, pages: tuple[int, int] | None) -> st
     rng = f"صفحه‌های {fa_digits(pages[0])} تا {fa_digits(pages[1])}" if pages else ""
     return f"""
 <div class="seccover"><div class="seccover-inner">
+  <span class="marker">JZC{ch['no']:02d}MARK</span>
   <span class="pill">فصل {fa_digits(i)} از {fa_digits(n)}</span>
   <table class="icnt"><tr><td class="icn">{icon_svg(ch.get('icon','radiation'))}</td></tr></table>
   <div class="sess">{inline(ch.get('session', ''))}</div>
@@ -344,6 +357,12 @@ def end_html(n_pages: str, n_fig: str, n_videos: str, hours: str) -> str:
 
 def build_html(page_map: dict | None = None, total_pages: str = "—") -> str:
     chapters = load_chapters()
+    guide_rows = json.loads((LOCK / "guide.json").read_text(encoding="utf-8")) \
+        if (LOCK / "guide.json").exists() else []
+    ANCHOR_MARK.clear()
+    for gi, r in enumerate(guide_rows):
+        for a in r.get("anchors", []):
+            ANCHOR_MARK[a] = gi
     n = len(chapters)
     n_fig = sum(1 for ch in chapters for b in ch["blocks"] if b.get("type") == "figure")
 
@@ -357,20 +376,14 @@ def build_html(page_map: dict | None = None, total_pages: str = "—") -> str:
                 body_start = blk["start"] + 1  # section cover page
                 toc_pages[ch["no"]] = (body_start, blk["end"])
 
-    guide_rows = json.loads((LOCK / "guide.json").read_text(encoding="utf-8")) if (LOCK / "guide.json").exists() else []
     if page_map:
-        for r in guide_rows:
-            got = [page_map[a] for a in r.get("anchors", []) if a in page_map]
-            r["pages"] = (min(g[0] for g in got), max(g[1] for g in got)) if got else None
+        for gi, r in enumerate(guide_rows):
+            r["pages"] = page_map.get(f"guide:{gi}")
 
     parts = [cover_html(total_pages, n, n_fig)]
-    parts.append('<div class="marker">JZP00MARKJZT00MARK</div>')
     parts.append(toc_html(chapters, toc_pages))
-    parts.append('<div class="marker">JZP01MARK</div>')
     parts.append(guide_html(guide_rows))
     for i, ch in enumerate(chapters, 1):
-        parts.append(f'<div class="marker">JZP{ch["no"] + 1:02d}MARK'
-                     f'JZT{ch["no"]:02d}MARK</div>')
         parts.append(section_cover(ch, i, n, sec_pages.get(ch["no"])))
         parts.append('<div class="chbody">' + render_blocks(ch["blocks"]) + "</div>")
     parts.append(end_html(total_pages, n_fig, "۱۹", "۷"))
@@ -382,8 +395,8 @@ def build_html(page_map: dict | None = None, total_pages: str = "—") -> str:
 # --------------------------------------------------------------------------- #
 # page scan (two-pass page numbers)
 # --------------------------------------------------------------------------- #
-MARKER_RE = re.compile(r"JZP(\d\d)MARK")
-TITLE_RE = re.compile(r"JZT(\d\d)MARK")
+CH_MARK = re.compile(r"JZC(\d\d)MARK")
+GUIDE_MARK = re.compile(r"JZG(\d\d)MARK")
 
 
 def scan_pages(pdf_path: Path, chapters: list[dict], guide_rows: list[dict]) -> dict:
@@ -405,35 +418,35 @@ def scan_pages(pdf_path: Path, chapters: list[dict], guide_rows: list[dict]) -> 
         return None
 
     out: dict = {}
-    by_title: dict[int, int] = {}
+    ch_start: dict[int, int] = {}
     for pno, t in enumerate(page_txt, 1):
-        for m in TITLE_RE.finditer(t):
-            by_title.setdefault(int(m.group(1)), pno)
+        for m in CH_MARK.finditer(t):
+            ch_start.setdefault(int(m.group(1)), pno)
+    guide_pages: dict[int, int] = {}
+    for pno, t in enumerate(page_txt, 1):
+        for m in GUIDE_MARK.finditer(t):
+            guide_pages.setdefault(int(m.group(1)), pno)
+
     for ch in chapters:
-        title = re.sub(r"\[\[|\]\]|\*\*", "", ch["title"])[:28]
-        sec_start = by_title.get(ch["no"]) or find([title])
-        if sec_start is None:
+        start = ch_start.get(ch["no"])
+        if start is None:
+            start = find([re.sub(r"\[\[|\]\]|\*\*", "", ch["title"])[:28]])
+        if start is None:
             continue
-        # end of chapter = start of next section cover (search title of chapter after)
-        nxt = None
-        for ch2 in chapters:
-            if ch2["no"] == ch["no"] + 1:
-                nxt = by_title.get(ch2["no"]) or find(
-                    [re.sub(r"\[\[|\]\]|\*\*", "", ch2["title"])[:28]], start=sec_start + 1)
-        out[f"ch{ch['no']}"] = {"start": sec_start,
-                                "end": (nxt - 1) if nxt else total}
-        nxt = None
-    for pno, t in enumerate(page_txt, 1):
-        for m in MARKER_RE.finditer(t):
-            out[m.group(1)] = (pno, pno)
-    for r in guide_rows:
+        nxt = ch_start.get(ch["no"] + 1)
+        out[f"ch{ch['no']}"] = {"start": start, "end": (nxt - 1) if nxt else total}
+
+    for gi, r in enumerate(guide_rows):
+        pages = []
+        if gi in guide_pages:
+            pages.append(guide_pages[gi])
         for a in r.get("anchors", []):
-            if out.get(a):
-                continue
             needles = r.get("needles_by_anchor", {}).get(a) or r.get("needles", [])
             got = find(needles)
             if got:
-                out[a] = (got, got)
+                pages.append(got)
+        if pages:
+            out[f"guide:{gi}"] = (min(pages), max(pages))
     return out
 
 
