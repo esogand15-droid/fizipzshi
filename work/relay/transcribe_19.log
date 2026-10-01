@@ -3,3 +3,4 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 [19] model loaded in 10s
 [0;93m2026-10-01 11:18:15.537540963 [W:onnxruntime:Default, device_discovery.cc:146 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
 [19] chunk 0 done in 10.9min (20.0min audio, x0.54 realtime)
+[19] chunk 1 done in 7.4min (13.9min audio, x0.53 realtime)
