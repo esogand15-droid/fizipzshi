@@ -223,6 +223,53 @@ def apply_overlay(no: int, blocks: list[dict], overlay: dict,
             out.insert(idx, entry)
     return out
 
+def _ahash(path: str, size: int = 16) -> str:
+    """average hash of an image (lazy PIL import; empty string when unavailable)."""
+    try:
+        from PIL import Image
+    except Exception:                      # pragma: no cover - pillow is present locally
+        sys.stderr.write("warning: pillow missing — duplicate-figure check skipped\n")
+        return ""
+    try:
+        im = Image.open(path).convert("L").resize((size, size))
+        px = list(im.getdata())
+    except Exception:
+        return ""
+    avg = sum(px) / len(px)
+    return "".join("1" if v > avg else "0" for v in px)
+
+
+def dedupe_figures(blocks: list[dict], threshold: int = 10) -> tuple[list[dict], int]:
+    """Drop auto slide crops whose picture already exists as a curated figure.
+
+    The curated ``figNN_*`` images come from the same slide decks; when a slide crop
+    and a curated figure are the same picture (average-hash distance <= threshold),
+    the slide crop is redundant and is removed.  Only ``slide*`` files are dropped,
+    never curated ones, and only against figures of the *same chapter*.
+    """
+    import os as _os
+    idx = [i for i, b in enumerate(blocks) if b.get("type") == "figure"]
+    hashes = {i: _ahash(blocks[i].get("file", "")) for i in idx}
+    drop = set()
+    for i in idx:
+        h = hashes.get(i) or ""
+        name = _os.path.basename(blocks[i].get("file", ""))
+        if not h or not name.startswith("slide"):
+            continue
+        for j in idx:
+            if j == i or j in drop or not hashes.get(j):
+                continue
+            other = _os.path.basename(blocks[j].get("file", ""))
+            if other.startswith("slide"):
+                continue                   # slide-vs-slide was deduped when cropping
+            d = sum(1 for x, y in zip(h, hashes[j]) if x != y)
+            if d <= threshold:
+                drop.add(i)
+                break
+    if not drop:
+        return blocks, 0
+    return [b for k, b in enumerate(blocks) if k not in drop], len(drop)
+
 
 def load_module(name: str):
     path = CONTENT / f"{name}.py"
@@ -264,6 +311,7 @@ def main() -> int:
             continue
         blocks = apply_overlay(no, list(mod.BLOCKS), overlay, fig_after)
         blocks = apply_video_extra(no, blocks, video_extra)
+        blocks, dropped_figs = dedupe_figures(blocks)
         ch = {"no": no, "session": meta["session"], "title": meta["title"],
               "prof": meta["prof"], "icon": meta["icon"], "blocks": blocks}
         if meta.get("exam_flag"):
@@ -272,7 +320,8 @@ def main() -> int:
             json.dumps(ch, ensure_ascii=False, indent=1), encoding="utf-8")
         src = sum(1 for b in ch["blocks"] if b.get("src"))
         figs = sum(1 for b in ch["blocks"] if b.get("type") == "figure")
-        print(f"ch{no:02d}: {len(ch['blocks'])} blocks, {figs} figures, {src} with src")
+        extra = f", {dropped_figs} تکراری حذف شد" if dropped_figs else ""
+        print(f"ch{no:02d}: {len(ch['blocks'])} blocks, {figs} figures, {src} with src{extra}")
         built += 1
     print("built", built)
     return 0
