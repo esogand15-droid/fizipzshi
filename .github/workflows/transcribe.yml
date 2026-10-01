@@ -15,6 +15,9 @@ on:
         description: 'max parallel jobs'
         default: '6'
         type: string
+  push:
+    paths:
+      - '.github/workflows/transcribe.yml'
 
 permissions:
   contents: write
@@ -35,16 +38,16 @@ jobs:
           ref: arena/01a0f6eb-fizipzshi
           fetch-depth: 1
       - id: m
-        run: python3 tools/plan_matrix.py "${{ inputs.slugs }}"
+        run: python3 tools/plan_matrix.py "${{ inputs.slugs || 'all' }}"
 
   transcribe:
     needs: plan
-    if: needs.plan.outputs.count != '0'
+    if: github.event_name == 'workflow_dispatch' && needs.plan.outputs.count != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
       fail-fast: false
-      max-parallel: ${{ fromJSON(inputs.maxpar) }}
+      max-parallel: ${{ fromJSON(inputs.maxpar || '6') }}
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     name: w-${{ matrix.slug }}-p${{ matrix.part }}
     steps:
@@ -75,12 +78,13 @@ jobs:
           ls -la work/media
 
       - name: transcribe
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python3 tools/transcribe_one.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4" \
-            --model "${{ inputs.model }}" --offset-min "${{ matrix.offset }}" --limit-min "${{ matrix.limit }}" \
+            --model "${{ inputs.model || 'large-v3' }}" --offset-min "${{ matrix.offset }}" --limit-min "${{ matrix.limit }}" \
             2>&1 | tail -40
         continue-on-error: true
 
       - name: final push
-        if: always()
+        if: always() && github.event_name == 'workflow_dispatch'
         run: bash tools/relay_push.sh "transcribe-${{ matrix.slug }}-p${{ matrix.part }}-end"
