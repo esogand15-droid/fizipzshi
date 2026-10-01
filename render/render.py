@@ -364,9 +364,13 @@ def build_html(page_map: dict | None = None, total_pages: str = "—") -> str:
             r["pages"] = (min(g[0] for g in got), max(g[1] for g in got)) if got else None
 
     parts = [cover_html(total_pages, n, n_fig)]
+    parts.append('<div class="marker">JZP00MARKJZT00MARK</div>')
     parts.append(toc_html(chapters, toc_pages))
+    parts.append('<div class="marker">JZP01MARK</div>')
     parts.append(guide_html(guide_rows))
     for i, ch in enumerate(chapters, 1):
+        parts.append(f'<div class="marker">JZP{ch["no"] + 1:02d}MARK'
+                     f'JZT{ch["no"]:02d}MARK</div>')
         parts.append(section_cover(ch, i, n, sec_pages.get(ch["no"])))
         parts.append('<div class="chbody">' + render_blocks(ch["blocks"]) + "</div>")
     parts.append(end_html(total_pages, n_fig, "۱۹", "۷"))
@@ -378,6 +382,10 @@ def build_html(page_map: dict | None = None, total_pages: str = "—") -> str:
 # --------------------------------------------------------------------------- #
 # page scan (two-pass page numbers)
 # --------------------------------------------------------------------------- #
+MARKER_RE = re.compile(r"JZP(\d\d)MARK")
+TITLE_RE = re.compile(r"JZT(\d\d)MARK")
+
+
 def scan_pages(pdf_path: Path, chapters: list[dict], guide_rows: list[dict]) -> dict:
     import pypdfium2 as pdfium
 
@@ -397,20 +405,31 @@ def scan_pages(pdf_path: Path, chapters: list[dict], guide_rows: list[dict]) -> 
         return None
 
     out: dict = {}
+    by_title: dict[int, int] = {}
+    for pno, t in enumerate(page_txt, 1):
+        for m in TITLE_RE.finditer(t):
+            by_title.setdefault(int(m.group(1)), pno)
     for ch in chapters:
         title = re.sub(r"\[\[|\]\]|\*\*", "", ch["title"])[:28]
-        sec_start = find([title])
+        sec_start = by_title.get(ch["no"]) or find([title])
         if sec_start is None:
             continue
         # end of chapter = start of next section cover (search title of chapter after)
         nxt = None
         for ch2 in chapters:
             if ch2["no"] == ch["no"] + 1:
-                nxt = find([re.sub(r"\[\[|\]\]|\*\*", "", ch2["title"])[:28]], start=sec_start + 1)
+                nxt = by_title.get(ch2["no"]) or find(
+                    [re.sub(r"\[\[|\]\]|\*\*", "", ch2["title"])[:28]], start=sec_start + 1)
         out[f"ch{ch['no']}"] = {"start": sec_start,
                                 "end": (nxt - 1) if nxt else total}
+        nxt = None
+    for pno, t in enumerate(page_txt, 1):
+        for m in MARKER_RE.finditer(t):
+            out[m.group(1)] = (pno, pno)
     for r in guide_rows:
         for a in r.get("anchors", []):
+            if out.get(a):
+                continue
             needles = r.get("needles_by_anchor", {}).get(a) or r.get("needles", [])
             got = find(needles)
             if got:

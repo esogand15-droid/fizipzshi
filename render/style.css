@@ -152,3 +152,5 @@ table.dt tr:nth-child(even) td { background: #f8fafc; }
 .endpage .t1 { color: #ffffff; font-size: 20pt; font-weight: bold; margin-bottom: 6mm; }
 .endpage .t2 { color: #a5f3fc; font-size: 11.5pt; line-height: 2.1; }
 .endpage .t3 { color: #94a3b8; font-size: 9.5pt; margin-top: 14mm; line-height: 2; }
+
+.marker { color: #f0f6ff; font-size: 1pt; line-height: 1; }
