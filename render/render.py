@@ -327,7 +327,14 @@ def section_cover(ch: dict, i: int, n: int, pages: tuple[int, int] | None) -> st
     n_blocks = len(ch["blocks"])
     n_fig = sum(1 for b in ch["blocks"] if b.get("type") == "figure")
     n_tab = sum(1 for b in ch["blocks"] if b.get("type") == "table")
-    rng = f"صفحه‌های {fa_digits(pages[0])} تا {fa_digits(pages[1])}" if pages else ""
+    # pages[0] is the section-cover page itself; content starts on the next page
+    # (same convention as the TOC and the Darvish study guide).
+    if pages and pages[1] > pages[0]:
+        rng = f"صفحه‌های {fa_digits(pages[0] + 1)} تا {fa_digits(pages[1])}"
+    elif pages:
+        rng = f"صفحه {fa_digits(pages[0])}"
+    else:
+        rng = ""
     return f"""
 <div class="seccover"><div class="seccover-inner">
   <span class="marker">JZC{ch['no']:02d}MARK</span>

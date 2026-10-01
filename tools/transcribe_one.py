@@ -41,6 +41,8 @@ def audio_duration(path: Path) -> float:
 
 
 def extract_audio(video: Path, wav: Path, start: float | None = None, dur: float | None = None) -> None:
+    # an earlier relay push can drop the (git-ignored) tmp dir mid-run; recreate it here
+    wav.parent.mkdir(parents=True, exist_ok=True)
     cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y"]
     if start:
         cmd += ["-ss", str(start)]
