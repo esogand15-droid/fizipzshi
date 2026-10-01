@@ -133,6 +133,11 @@ def src_line(src: str | None) -> str:
     return f'<div class="src">منبع: {LTR_DIGITS(src)}</div>'
 
 
+def blk_h3(b: dict) -> str:
+    return (f'<div class="subhead3"><span class="st3">{inline(b.get("text",""))}</span></div>'
+            + src_line(b.get("src")))
+
+
 def blk_h2(b: dict) -> str:
     flag = ""
     kind = b.get("flag")
@@ -215,7 +220,7 @@ def blk_review(b: dict) -> str:
 
 
 RENDER = {
-    "h2": blk_h2, "p": blk_p, "bullets": blk_bullets, "table": blk_table,
+    "h2": blk_h2, "h3": blk_h3, "p": blk_p, "bullets": blk_bullets, "table": blk_table,
     "formula": blk_formula, "figure": blk_figure, "key": blk_key,
     "examtip": blk_examtip, "conflict": blk_conflict, "note": blk_note,
     "quickreview": blk_review,
