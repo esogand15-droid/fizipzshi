@@ -36,6 +36,14 @@ STOP = set("""
 آن‌ها یکی دیگر کنید کنیم دهیم بدهیم بگیریم بگوییم شده‌اند شده‌است نخست زیر
 """.split())
 
+# الگوهای محاوره‌ای: هر واژه با مرز نویسه‌های فارسی محصور می‌شود تا «مدارهای»،
+# «می‌دهند» و مانند آن‌ها اشتباهاً محاوره‌ای شمرده نشوند.
+COLLOQUIAL_WORDS = ["می‌کنن", "می‌دن", "می‌گن", "می‌گه", "می‌شه", "نمی‌شه", "می‌خواد",
+                    "می‌تونه", "نمی‌تونه", "دیگه", "باشه", "داره", "اینا", "بچه‌ها",
+                    "عزیزان", "خدمتتون", "خوبید", "چطورید"]
+COLLOQUIAL = [rf"(?<![\u0600-\u06ff]){re.escape(w)}(?![\u0600-\u06ff])"
+              for w in COLLOQUIAL_WORDS] + ["استاد گفت", "خدمت شما"]
+
 ISSUES: list[tuple[str, str, str]] = []
 LINES: list[str] = []
 
@@ -159,11 +167,12 @@ def check_text(chs: dict) -> None:
                 issue("هشدار", "متن", f"ch{no}[{i}] بلوک بدون متن فارسی: {t[:70]}")
             if re.search(r"(.)\1{5,}", t):
                 issue("هشدار", "متن", f"ch{no}[{i}] تکرار حرف: {t[:60]}")
-            # جمله‌های محاوره‌ای و نشانی‌های رونویسی خام
-            for bad in ("می‌کنن", "می‌ده", "دیگه", "باشه", "بچه‌ها", "عزیزان", "خدمتتون", "خدمت شما",
-                        "استاد گفت", "میشه", "داره", "اینا"):
-                if bad in t:
-                    issue("هشدار", "متن", f"ch{no}[{i}] لحن محاوره‌ای «{bad}»: {t[:60]}")
+            # جمله‌های محاوره‌ای (فقط صورت‌های محاوره‌ایِ مستقل، نه واژه‌های کتابی مانند
+            # «می‌دهد» یا «مدارهای»)
+            for bad in COLLOQUIAL:
+                if re.search(bad, t):
+                    issue("هشدار", "متن",
+                          f"ch{no}[{i}] لحن محاوره‌ای «{bad}»: {t[:60]}")
                     break
     line("- براکت، کاراکتر عرض‌نمایشی، کشیده، حروف عربی، لحن محاوره‌ای، تکرار بررسی شد.")
     line()
@@ -219,18 +228,28 @@ def _idf(secs, blocks):
 
 
 def check_placement(chs: dict) -> None:
+    """آیا شکل‌ها و بلوک‌های ویدیویی در همان بخشی هستند که دربارهٔ موضوعشان حرف می‌زند؟
+
+    سنجه: پوشش وزنی (IDF) واژه‌های شرح هر شکل با واژه‌های همهٔ بلوک‌های متنی همان بخش
+    (از سرفصل تا سرفصل بعدی). اگر شرح شکل هیچ پشتوانهٔ متنی در بخش خودش نداشته باشد
+    ولی در بخش دیگری داشته باشد، به‌عنوان «جای‌گذاری مشکوک» گزارش می‌شود.
+    """
     line("## ۵) جای شکل‌ها و بلوک‌های ویدیویی نسبت به متن بخش")
     for no, ch in sorted(chs.items()):
         blocks = ch["blocks"]
-        secs = []
-        for i, b in enumerate(blocks):
-            if b.get("type") == "h2":
-                secs.append([i, b["text"]])
+        secs = [[i, b["text"]] for i, b in enumerate(blocks) if b.get("type") == "h2"]
         for k, s in enumerate(secs):
             s.append(secs[k + 1][0] if k + 1 < len(secs) else len(blocks))
         if not secs:
             continue
         idf = _idf(secs, blocks)
+        sec_txt = []
+        for st, _, en in secs:
+            acc = set()
+            for j in range(st + 1, en):
+                if blocks[j].get("type") not in ("figure", "table"):
+                    acc |= toks(btext(blocks[j]))
+            sec_txt.append(acc)
         bad = 0
         for i, b in enumerate(blocks):
             isfig = b.get("type") == "figure"
@@ -238,32 +257,29 @@ def check_placement(chs: dict) -> None:
             if not (isfig or isvid):
                 continue
             tk = toks(b.get("caption") or btext(b))
-            if not tk:
+            if len(tk) < 3:
                 continue
-            win = set()
-            for d in range(1, 5):
-                for j in (i - d, i + d):
-                    if 0 <= j < len(blocks) and blocks[j].get("type") != "figure":
-                        win |= toks(btext(blocks[j]))
-            local = sum(idf(w) for w in tk & win)
-            best, bj = 0.0, None
-            for j in range(len(blocks)):
-                if abs(j - i) <= 3:
+            total = sum(idf(w) for w in tk) or 1.0
+            si = next((k for k, s in enumerate(secs) if s[0] <= i < s[2]), None)
+            if si is None:
+                continue
+            here = sum(idf(w) for w in tk & sec_txt[si]) / total
+            there, tj = 0.0, None
+            for k, acc in enumerate(sec_txt):
+                if k == si:
                     continue
-                w2 = set()
-                for d in range(0, 3):
-                    if j + d < len(blocks) and blocks[j + d].get("type") != "figure":
-                        w2 |= toks(btext(blocks[j + d]))
-                sc = sum(idf(w) for w in tk & w2)
-                if sc > best:
-                    best, bj = sc, j
-            if best > local * 1.5 and best > 2.0 and bj is not None:
+                sc = sum(idf(w) for w in tk & acc) / total
+                if sc > there:
+                    there, tj = sc, k
+            # فقط وقتی هشدار می‌دهیم که در بخش خودش تقریباً هیچ پشتوانه‌ای نباشد
+            # ولی در بخش دیگری پشتوانهٔ روشنی داشته باشد.
+            if here < 0.30 and there > 0.55 and tj is not None:
                 bad += 1
-                ci = next((s for s in secs if s[0] <= i < s[2]), None)
-                bi = next((s for s in secs if s[0] <= bj < s[2]), None)
                 issue("بررسی", "جای‌گذاری",
-                      f"ch{no}[{i}] {'شکل' if isfig else 'ویدیو'} در «{ci[1][:30] if ci else '—'}» "
-                      f"ولی متن مشابه در «{bi[1][:30] if bi else '—'}» است: {(b.get('caption') or btext(b))[:45]}")
+                      f"ch{no}[{i}] {'شکل' if isfig else 'ویدیو'} در «{secs[si][1][:28]}» "
+                      f"(پوشش {here*100:.0f}٪) ولی در «{secs[tj][1][:28]}» "
+                      f"(پوشش {there*100:.0f}٪) پشتوانهٔ بیشتر دارد: "
+                      f"{(b.get('caption') or btext(b))[:40]}")
         line(f"- فصل {no}: {bad} مورد نیازمند بررسی دستی")
     line()
 
