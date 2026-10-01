@@ -73,7 +73,12 @@ def apply_video_extra(no: int, blocks: list[dict], extra: dict) -> list[dict]:
                            len(out))
                 out.insert(idx, entry)
             else:
-                out.insert(pos + 1, entry)
+                # skip over any figures attached to the anchored block so the added
+                # text stays next to the section it belongs to (not after its picture)
+                j = pos + 1
+                while j < len(out) and out[j].get("type") == "figure":
+                    j += 1
+                out.insert(j, entry)
     return out
 
 
