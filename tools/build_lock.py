@@ -23,7 +23,7 @@ CHAPTERS = {
     3: dict(session="فصل ۳", title="تشکیل تصویر رادیوگرافی، فلوروسکوپی و سی‌تی‌اسکن",
             prof="دکتر رضا افضلی‌پور", icon="chart", module="ch03_imaging"),
     4: dict(session="فصل ۴", title="رادیواکتیویته، واپاشی‌ها و پزشکی هسته‌ای", prof="دکتر حق‌پرست",
-            icon="atom", module="ch04_radioactivity"),
+            icon="atom", module="ch04_nuclear"),
     5: dict(session="فصل ۵", title="واحدهای سنجش پرتو و دزیمتری", prof="دکتر حق‌پرست",
             icon="dose", module="ch05_dosimetry"),
     6: dict(session="فصل ۶", title="حفاظت در برابر پرتو", prof="دکتر حق‌پرست",
