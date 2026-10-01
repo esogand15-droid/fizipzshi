@@ -13,7 +13,11 @@ PART_MIN = 80.0  # split videos longer than this into parts
 
 
 def main() -> int:
-    selector = (sys.argv[1] if len(sys.argv) > 1 else "all").strip()
+    selector = (sys.argv[1] if len(sys.argv) > 1 else "").strip()
+    if not selector or selector == "all":
+        want = Path("work/relay/want.txt")
+        if want.exists():
+            selector = want.read_text(encoding="utf-8").strip() or "all"
     rows = json.loads(MANIFEST.read_text(encoding="utf-8"))
     if selector and selector != "all":
         want = {s.strip() for s in selector.split(",") if s.strip()}
