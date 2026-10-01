@@ -4,6 +4,6 @@
  "duration": 1235.0987,
  "offset": 0.0,
  "end": 1235.0987,
- "model": "large-v3",
+ "model": "large-v3-turbo",
  "chunk_min": 20.0
 }
