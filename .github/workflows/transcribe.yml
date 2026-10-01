@@ -62,7 +62,9 @@ jobs:
           sudo apt-get install -y -qq ffmpeg
           mkdir -p work/media work/relay
           echo "[$(date -u)] transcribe ${{ matrix.slug }} part ${{ matrix.part }} start" >> work/relay/status.log
-          { echo "== pip =="; python3 -m pip install faster-whisper 2>&1 | tail -6;
+          { echo "== pip =="; # PyAV 19 (2026-09-29) removed the metadata_errors kwarg that faster-whisper 1.2.1 passes to av.open;
+            # pin av<19 until faster-whisper ships the fix (SYSTRAN/faster-whisper#1495).
+            python3 -m pip install faster-whisper "av>=11,<19" 2>&1 | tail -6;
             echo "== imports ==";
             python3 - <<'PYP'
           import traceback
