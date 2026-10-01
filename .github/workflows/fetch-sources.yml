@@ -44,7 +44,7 @@ jobs:
 
       - name: push-state-0
         if: always()
-        run: bash tools/relay_push.sh "state0: setup done"
+        run: bash tools/relay_push.sh state0-setup-done
 
       - name: fetch master prompt md
         if: always()
@@ -56,7 +56,7 @@ jobs:
 
       - name: push-state-1
         if: always()
-        run: bash tools/relay_push.sh "state1: prompt md fetched"
+        run: bash tools/relay_push.sh state1-prompt-md-fetched
 
       - name: download rar
         if: always()
@@ -73,7 +73,7 @@ jobs:
 
       - name: push-state-2
         if: always()
-        run: bash tools/relay_push.sh "state2: rar downloaded"
+        run: bash tools/relay_push.sh state2-rar-downloaded
 
       - name: verify and list archive
         if: always()
@@ -86,7 +86,7 @@ jobs:
 
       - name: push-state-3
         if: always()
-        run: bash tools/relay_push.sh "state3: archive listed"
+        run: bash tools/relay_push.sh state3-archive-listed
 
       - name: extract
         if: always()
@@ -99,7 +99,7 @@ jobs:
 
       - name: push-state-4
         if: always()
-        run: bash tools/relay_push.sh "state4: extracted"
+        run: bash tools/relay_push.sh state4-extracted
 
       - name: inventory
         if: always()
@@ -109,7 +109,7 @@ jobs:
 
       - name: push-state-5
         if: always()
-        run: bash tools/relay_push.sh "state5: inventory made"
+        run: bash tools/relay_push.sh state5-inventory-made
 
       - name: commit small sources
         if: always()
@@ -129,4 +129,4 @@ jobs:
 
       - name: push-state-6-final
         if: always()
-        run: bash tools/relay_push.sh "state6: sources committed"
+        run: bash tools/relay_push.sh state6-sources-committed
