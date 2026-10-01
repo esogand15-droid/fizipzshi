@@ -11,6 +11,9 @@ on:
         description: 'max parallel jobs'
         default: '5'
         type: string
+  push:
+    paths:
+      - '.github/workflows/frames.yml'
 
 permissions:
   contents: write
@@ -31,16 +34,16 @@ jobs:
           ref: arena/01a0f6eb-fizipzshi
           fetch-depth: 1
       - id: m
-        run: python3 tools/plan_matrix.py "${{ inputs.slugs }}"
+        run: python3 tools/plan_matrix.py "${{ inputs.slugs || 'all' }}"
 
   frames:
     needs: plan
-    if: needs.plan.outputs.count != '0' && matrix.part == 0
+    if: needs.plan.outputs.count != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: ${{ fromJSON(inputs.maxpar) }}
+      max-parallel: ${{ fromJSON(inputs.maxpar || '6') }}
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     name: f-${{ matrix.slug }}-p${{ matrix.part }}
     steps:
@@ -63,6 +66,7 @@ jobs:
         run: gh release download "$REL" --pattern "${{ matrix.slug }}.mp4" -D work/media --clobber
 
       - name: extract frames
+        if: matrix.part == 0
         run: python3 tools/extract_frames.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4"
         continue-on-error: true
 
