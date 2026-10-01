@@ -60,9 +60,21 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          python3 -m pip install --quiet faster-whisper
           mkdir -p work/media work/relay
           echo "[$(date -u)] transcribe ${{ matrix.slug }} part ${{ matrix.part }} start" >> work/relay/status.log
+          { echo "== pip =="; python3 -m pip install faster-whisper 2>&1 | tail -6;
+            echo "== imports ==";
+            python3 - <<'PYP'
+          import traceback
+          try:
+              import ctranslate2, faster_whisper
+              print("ctranslate2", ctranslate2.__version__)
+              print("faster_whisper ok")
+          except Exception:
+              traceback.print_exc()
+          PYP
+          } > "work/relay/setup_${{ matrix.slug }}.log" 2>&1
+          tail -20 "work/relay/setup_${{ matrix.slug }}.log"
 
       - name: cache whisper model
         uses: actions/cache@v4
@@ -79,9 +91,10 @@ jobs:
 
       - name: transcribe
         run: |
+          set -o pipefail
           python3 tools/transcribe_one.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4" \
             --model "${{ inputs.model || 'large-v3' }}" --offset-min "${{ matrix.offset }}" --limit-min "${{ matrix.limit }}" \
-            2>&1 | tail -40
+            2>&1 | tee "work/relay/transcribe_${{ matrix.slug }}.log" | tail -30
         continue-on-error: true
 
       - name: final push
