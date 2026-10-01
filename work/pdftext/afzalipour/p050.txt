@@ -1,0 +1,4 @@
+mA
+• mA - milliamperage: Number of electrons traveling 
+from cathode to anode.
+• mA describes x-ray tube current. 

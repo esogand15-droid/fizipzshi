@@ -1,0 +1,31 @@
+Characteristic X-ray Production
+L
+K
+M
+High-speed electron 
+with at least 70 keV 
+of energy (must be 
+more than the 
+binding energy of k￾shell Tungsten atom) 
+strikes electron in 
+the K shell, knocking 
+it out of its orbit
+Ejected electron 
+leaves atom
+Recoil electron 
+(with very little 
+energy) exits 
+atom
+vacancy
+X-ray with 59 
+keV of energy 
+produced. 70 
+(binding 
+energy of K￾shell electron) 
+minus 11 
+(binding 
+energy of L￾shell electron) 
+= 59.
+Electron in L-shell 
+drops down to fill 
+vacancy in K-shell

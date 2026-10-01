@@ -1,0 +1,5 @@
+Reflection: fat/kidney
+Zfat = 1.38 Zkidney = 1.62
+1
+.064
+.934

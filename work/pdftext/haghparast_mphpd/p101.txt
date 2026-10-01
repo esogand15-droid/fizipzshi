@@ -1,0 +1,11 @@
+Doppler Shift Equation
+c
+vf f
+c
+vf f
+D
+D
+2 cos
+2
+=
+=

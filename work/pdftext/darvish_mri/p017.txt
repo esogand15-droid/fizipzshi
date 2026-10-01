@@ -1,0 +1,4 @@
+Measuring Tissue Magnetization:
+When Mo is aligned to the magnetic field Bo it is very difficult
+to measure since Bo itself is millions of times stronger than Mo.
+Mo may be measured by “tipping” it perpendicular to Bo.

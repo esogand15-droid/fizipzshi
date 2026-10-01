@@ -1,0 +1,12 @@
+RBE )نسبی بیولوژیکی اثر(
+• High-LET results in high RBE
+• RBE = dose of 250-keV x-ray to produce 
+same effect divided by dose of test 
+radiation to produce same effect
+• Same biological endpoint (effect) is 
+constant; not doses
+.شود می باال RBE به منجر High-LET •
+ اثر یک ایجاد برای ولت الکترون کیلو 250 ایکس پرتو دوز = RBE •
+ برای( دیگر تابش )شده آزمایش تابش دوز بر تقسیم مشابه بیولوژکی
+اثر همان ایجاد
+.نیست ثابت دوز اما است ثابت بیولوژیکی اثر• 

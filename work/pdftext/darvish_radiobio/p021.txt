@@ -1,0 +1,13 @@
+Direct Interaction of Radiation
+تابش مستقیم برهمکنش
+• Energy of radiation is deposited directly in critical target 
+resulting in excitation or ionization. Starts a chain 
+reaction which may or may not be fatal to cell (e.g., may 
+be repaired)
+• More likely to occur with high-LET radiation such as 
+particles or neutrons
+ یا تحریک به منجر که میکند رسوب حیاتی هدف در ًمستقیما تشعشع انرژی• 
+ است ممکن که کند می شروع را ای زنجیره واکنش یک .شود می یونیزاسیون
+ ترمیم یا شود ترمیم است ممکن ًمثال )نباشد کشنده یا باشد کشنده سلول برای
+ نوترون یا باردار ذرات مانند باال LET تشعشعات با زیاد احتمال به .(نشود
+.دهد می رخ ها

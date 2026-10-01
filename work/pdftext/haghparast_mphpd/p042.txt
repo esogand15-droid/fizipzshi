@@ -1,0 +1,4 @@
+Is the time taken for half of the
+radioactive substance to decay.
+The half life can range from a millionth
+of a second to millions of years.

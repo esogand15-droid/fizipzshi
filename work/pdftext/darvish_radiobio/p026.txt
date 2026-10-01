@@ -1,0 +1,11 @@
+Linear Energy Transfer 
+(LET)
+In Water (keV/micron)
+Radiation LET
+X-ray, Gamma < 3.5 
+Electrons (Betas) < 3.5
+Alpha approx 175
+Neutrons
+- thermal approx 5
+- 0.01 MeV > 53
+- 0.1 MeV > 175

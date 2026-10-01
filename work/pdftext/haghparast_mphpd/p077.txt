@@ -1,0 +1,19 @@
+Reflection coefficient
+% 100
+2
+2 1
+2 1
+ 
+
+
+
+
+
+
+
++
+−
+=
+Z Z
+Z Z
+R

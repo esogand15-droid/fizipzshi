@@ -1,0 +1,95 @@
+name: ocr
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ocr.yml'
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: arena/01a0f6eb-fizipzshi
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+      - id: m
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, glob
+          rows = []
+          for f in sorted(glob.glob('src/extracted/**/*.pdf', recursive=True)):
+              if 'بانک سوالات' in f or 'Medical Physics' in f:
+                  continue
+              rows.append(f)
+          print("matrix=" + json.dumps({"include": [{"pdf": r} for r in rows]}, ensure_ascii=False))
+          PY
+
+  ocr:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+
+      - name: setup
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-fas tesseract-ocr-eng
+          tesseract --list-langs
+
+      - name: ocr pdf
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, re, subprocess, json
+          pdf = os.environ['PDF']
+          # ASCII slug from the rar folder name
+          mapping = {
+            'M.Ph.P.D': 'haghparast_mphpd',
+            'جزوه فیزیک تشعشع': 'haghparast_tashasho',
+            'جزوه فیزیک سونوگرافی': 'haghparast_sono',
+            'جزوه لیلی درویش': 'darvish_radiobio',
+            '22MRI': 'darvish_mri',
+            'جزوه افضلی پور': 'afzalipour',
+          }
+          slug = next(v for k, v in mapping.items() if k in pdf)
+          work = pathlib.Path('work/ocr_tmp'); work.mkdir(parents=True, exist_ok=True)
+          out = pathlib.Path('work/ocr') / slug; out.mkdir(parents=True, exist_ok=True)
+          subprocess.run(['pdftoppm','-r','300','-gray','-png', pdf, str(work/'pg')], check=True)
+          parts = []
+          pages = sorted(work.glob('pg-*.png'))
+          for i, png in enumerate(pages, 1):
+              txt = out / f'p{i:03d}.txt'
+              if not txt.exists():
+                  subprocess.run(['tesseract', str(png), str(out/f'p{i:03d}'), '-l', 'fas+eng',
+                                  '--psm', '3'], check=False,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+              png.unlink()
+              if txt.exists():
+                  parts.append(f'\n\n===== page {i} =====\n' + txt.read_text(encoding='utf-8', errors='replace'))
+          (out/'all.md').write_text(''.join(parts), encoding='utf-8')
+          print(slug, len(pages), 'pages ->', out)
+          PY
+        env:
+          PDF: ${{ matrix.pdf }}
+        continue-on-error: true
+
+      - name: push ocr
+        if: always()
+        run: bash tools/relay_push.sh ocr-done

@@ -1,0 +1,29 @@
+Types of Ionizing Radiation
+Mass 
+(amu) Charge Travel Distance in Air
+Alpha
+Beta Plus
+Beta Minus
+Gamma
+X-Rays
+Neutron
+4.0000
+0.0005
+0.0005
+0.0000
+0.0000
+1.0000
++2
++1
+-1
+0
+0
+0
+few centimeters
+few meters
+few meters
+many meters
+many meters
+many meters
+Photon
+Other charged ions (e.g., protons)
