@@ -15,6 +15,7 @@ permissions:
 
 env:
   BRANCH: arena/01a0f6eb-fizipzshi
+  # nudge: keep the release asset in sync with the committed PDF
   REL: jozve-v1
 
 jobs:
