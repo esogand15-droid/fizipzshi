@@ -88,6 +88,33 @@ PLAN: dict[str, list[tuple[str, list[dict]]]] = {
              "src": f"{V8} ۳ (فایل ۰۵) — 04:23"},
         ]),
     ],
+    "ch07_sono.py": [
+        ("محاسبه عمق در [[A-mode]]", [
+            {"type": "bullets", "items": [
+                "کاربرد بالینی [[A-mode]] در چشم‌پزشکی: برای بررسی آب‌مروارید ([[cataract]]) ضخامت عدسی اندازه‌گیری می‌شود؛ زمان رفت‌وبرگشت موج فرستاده‌شده به سطح قدامی و سطح خلفی عدسی، فاصله (ضخامت) عدسی را می‌دهد.",
+                "چون بافت چشم سطحی است، فرکانس ارسالی در این کاربرد از حدود [[15]] تا [[20]] مگاهرتز انتخاب می‌شود (فرکانس بالاتر ⟶ نفوذ کمتر ولی دقت بالاتر).",
+                "کاربرد دیگر [[A-mode]] در مغز: تومورهای مغزی فشار می‌آورند و خط میانی ([[midline]]) را جابه‌جا می‌کنند؛ این جابه‌جایی با [[A-mode]] دیده می‌شود.",
+            ], "src": "منبع: ویدیو — دکتر حق‌پرست، سونوگرافی (فایل ۰۷) — 01:15 تا 03:25"},
+        ]),
+    ],
+    "ch01_basics.py": [
+        ("قدرت نفوذ (برد) پرتوهای ذره‌ای به سه عامل", [
+            {"type": "bullets", "items": [
+                "قدرت نفوذ (برد) پرتوهای ذره‌ای به جرم، بار و سرعت آن‌ها بستگی دارد: هرچه بار ذره بیشتر و جرم آن سنگین‌تر باشد، برد آن کمتر می‌شود.",
+                "به همین دلیل ذره آلفا با بار [[+2]] و جرم سنگین، کوتاه‌ترین برد را دارد (در هوا در حد سانتی‌متر و در بافت در حد میکرون) و یک برگ کاغذ آن را جذب می‌کند.",
+                "مسیر حرکت ذره آلفا مستقیم است و در میدان‌های الکتریکی و مغناطیسی منحرف می‌شود.",
+            ], "src": "منبع: ویدیو — دکتر حق‌پرست، جلسه ۲ (فایل ۱۲) — 02:57 تا 03:38"},
+        ]),
+    ],
+    "ch04_nuclear.py": [
+        ("رادیوتراپی، استفاده از پرتوهای یونیزان برای جلوگیری از رشد", [
+            {"type": "bullets", "items": [
+                "نکته بالینی ترخیص بیمار: بیمار پس از تزریق رادیودارو، پیش از ترخیص باید تا حد امکان ماده را دفع کرده باشد، چون با ترخیص او اطرافیانش نیز در معرض تابش قرار می‌گیرند (نکته عملی مطرح‌شده در ویدیو).",
+                "برای انتخاب یک رادیوداروی تشخیصی سه معیار باید هم‌زمان رعایت شود: نیمه‌عمر مناسب، انرژی مناسب و نوع پرتو مناسب.",
+                "نقشه استحاله، هم نحوه واپاشی هسته رادیواکتیو و هم امکان انتخاب ایزوتوپ مناسب برای تشخیص و درمان را نشان می‌دهد.",
+            ], "src": "منبع: ویدیو — دکتر حق‌پرست، جلسه ۵ (فایل ۱۵) — 01:15 تا 06:04"},
+        ]),
+    ],
     "ch09_mri.py": [
         ("زمان آسایش [[T1]]: مدت زمانی است که طول می‌کشد", [
             {"type": "h3less", "text": "سازوکار کنتراست: چرا بافت‌ها در T1 و T2 روشن یا تیره می‌شوند (از ویدیو)"},
@@ -145,9 +172,8 @@ def fmt_blocks(blocks: list[dict]) -> str:
     for b in blocks:
         lines = ["    {"]
         for k, v in b.items():
-            key = "h3" if k == "type" and v == "h3less" else k
             val = "h3" if v == "h3less" else v
-            lines.append(f"     {key!r}: {val!r},")
+            lines.append(f"     {k!r}: {val!r},")
         lines[-1] = lines[-1].rstrip(",")
         lines.append("     },\n")
         out.append("\n".join(lines))
@@ -161,14 +187,22 @@ def main() -> int:
         src = path.read_text(encoding="utf-8")
         added = 0
         for anchor, blocks in entries:
-            marker = blocks[0].get("text", "")[:40]
-            if marker and marker in src:
-                continue  # already inserted
+            sigs = []
+            for b in blocks:
+                if b.get("text"):
+                    sigs.append(b["text"][:48])
+                elif b.get("items"):
+                    sigs.append(b["items"][0][:48])
+                elif b.get("head"):
+                    sigs.append(b["head"][0])
+            if any(sg and sg in src for sg in sigs):
+                continue  # group already inserted (idempotent)
             idx = block_end_index(src, anchor)
             if idx is None:
                 continue
             parts = re.split(r"\n(?=    \{)", src)
-            parts[idx] = parts[idx] + fmt_blocks(blocks)
+            blob = fmt_blocks(blocks)
+            parts[idx] = parts[idx].rstrip("\n") + "\n" + blob
             src = "\n".join(parts)
             added += len(blocks)
         if added:
