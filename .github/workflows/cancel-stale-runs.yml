@@ -1,9 +1,9 @@
 name: cancel-stale-runs
 
 # One-shot helper: the agent sandbox cannot cancel runs (gh returns 403 for the
-# Actions API), but a workflow with actions:write can. These two runs are the
-# large-v3 attempts that the faster large-v3-turbo run replaces; leaving them
-# running would eat the account's ~20 concurrent-job budget.
+# Actions API), but a workflow with actions:write can. The runs listed below are
+# the slower large-v3 attempts that the large-v3-turbo run replaces; they hold
+# concurrency slots, so cancel them (with retries) and then report.
 on:
   push:
     paths:
@@ -15,15 +15,27 @@ permissions:
 jobs:
   cancel:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: cancel stale large-v3 runs
+      - name: cancel stale large-v3 runs (retry until they stop)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -x
-          for id in 36849725540 36853784051; do
-            gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/runs/${id}/cancel" -i 2>&1 | head -3 || true
+          set -u
+          ids="36849725540 36853784051"
+          for round in 1 2 3 4 5 6 7 8 9 10; do
+            alive=""
+            for id in $ids; do
+              st=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${id}" -q .status 2>/dev/null || echo unknown)
+              echo "round $round run $id status=$st"
+              if [ "$st" = "in_progress" ] || [ "$st" = "queued" ]; then
+                alive="$alive $id"
+                gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/runs/${id}/cancel" >/dev/null 2>&1 \
+                  && echo "  cancel requested" || echo "  cancel request failed"
+              fi
+            done
+            [ -z "$alive" ] && { echo "all stale runs stopped"; break; }
+            sleep 45
           done
-          sleep 20
-          gh api "repos/${GITHUB_REPOSITORY}/actions/runs?per_page=5" \
-            -q '.workflow_runs[] | "\(.id) \(.name) \(.status)/\(.conclusion // "-")"' || true
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs?per_page=8" \
+            -q '.workflow_runs[] | "\(.id) \(.name) \(.status)/\(.conclusion // "-")"'
