@@ -1,17 +1,5 @@
 [11] duration=15.0min chunks=1 todo=1
-[11] model loaded in 5s
-Traceback (most recent call last):
-  File "/home/runner/work/fizipzshi/fizipzshi/tools/transcribe_one.py", line 156, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "/home/runner/work/fizipzshi/fizipzshi/tools/transcribe_one.py", line 110, in main
-    segments, info = model.transcribe(
-                     ^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/faster_whisper/transcribe.py", line 876, in transcribe
-    audio = decode_audio(audio, sampling_rate=sampling_rate)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/faster_whisper/audio.py", line 46, in decode_audio
-    with av.open(input_file, mode="r", metadata_errors="ignore") as container:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "av/container/core.py", line 479, in av.container.core.open
-TypeError: open() got an unexpected keyword argument 'metadata_errors'
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[11] model loaded in 9s
+[0;93m2026-10-01 11:16:29.182040964 [W:onnxruntime:Default, device_discovery.cc:146 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+[11] chunk 0 done in 6.4min (15.0min audio, x0.42 realtime)
