@@ -1,0 +1,20 @@
+21
+20 LET
+
+5 ۰ X-rays and gamma rays are low-LET
+< radiations
+
+» Alpha and fast neutrons are high-LET
+4 radiations
+
+۰ LET directly related to tonization and
+5 therefore, biological damage
+<
+
+۰ پرتوهای ایکس و ‎US‏ پرتوهایی با ‎LET‏ کم هستند. 5
+‎e‏ نوترون ‎GR‏ سریع. ‎ll‏ پرتوهایی با ‎LET‏ بالا هستند.
+‎LET‏ طور مستقیم با یونیز اسیون و در نتیجه اسیب بیولوزیکی مرتبط 5
+
+. ‏است‎
+‎oF
+

@@ -1,0 +1,22 @@
+No. per cell
+1000 - 2000
+200 - 400
+~1000
+~40
+
+A Damage
+
+A damage produced in
+e cell by 1Gy X-rays
+
+Damage
+
+base damage
+
+EEE |
+
+crosslinks
+ingle-strand breaks
+
+ouble-strand breaks
+
