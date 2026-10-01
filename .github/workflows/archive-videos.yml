@@ -1,0 +1,103 @@
+name: archive-videos
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/archive-videos.yml'
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: arena/01a0f6eb-fizipzshi
+  RAR_URL: https://filebin.net/811lna3jdjwdzr6d/%d9%81%db%8c%d8%b2%db%8c%da%a9%20%d9%be%d8%b2%d8%b4%da%a9%db%8c.rar
+  REL: sources-v1
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+
+      - name: setup
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq unrar ffmpeg jq
+          mkdir -p work/tmp work/relay
+          echo "[$(date -u)] archive-videos start" >> work/relay/status.log
+
+      - name: fetch rar
+        run: |
+          for i in 1 2 3 4 5; do
+            curl -L --retry 8 --retry-delay 10 --retry-all-errors --connect-timeout 30 \
+                 --max-time 3000 -C - -o work/tmp/phys.rar "$RAR_URL" && break
+            sleep 10
+          done
+          ls -la work/tmp/ >> work/relay/status.log
+
+      - name: create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "$REL" >/dev/null 2>&1 || \
+            gh release create "$REL" --title "HumsYar MedPhysics — source media (videos)" \
+              --notes "Source lecture videos for the HumsYar medical-physics jozve, archived from the original RAR. Large binaries live here (not in git history)." || true
+          gh release view "$REL" >> work/relay/status.log 2>&1 || true
+
+      - name: extract videos and upload as release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -x
+          mkdir -p work/videos
+          unrar x -o+ -idq -n*.mp4 work/tmp/phys.rar work/videos/ || true
+          find work/videos -type f -name "*.mp4" | sort > work/relay/video_list.txt
+          wc -l work/relay/video_list.txt >> work/relay/status.log
+          : > work/relay/video_manifest.tsv
+          n=0
+          while IFS= read -r f; do
+            n=$((n+1))
+            slug=$(printf "%02d" "$n")
+            base=$(basename "$f")
+            dur=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$f" 2>/dev/null || echo 0)
+            size=$(stat -c%s "$f")
+            printf "%s\t%s\t%s\t%s\t%s\n" "$slug" "$base" "$dur" "$size" "$f" >> work/relay/video_manifest.tsv
+            cp "$f" "work/videos/${slug}.mp4"
+            gh release upload "$REL" "work/videos/${slug}.mp4" --clobber || echo "upload failed for ${slug}" >> work/relay/status.log
+          done < work/relay/video_list.txt
+          cat work/relay/video_manifest.tsv >> work/relay/status.log
+          gh release view "$REL" --json assets --jq '.assets[] | "\(.name) \(.size)"' >> work/relay/status.log 2>&1 || true
+
+      - name: update inventory with durations
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, re
+          man = pathlib.Path('work/relay/video_manifest.tsv')
+          rows = []
+          for ln in man.read_text(encoding='utf-8').splitlines():
+              p = ln.split('\t')
+              if len(p) >= 5:
+                  rows.append({'slug': p[0], 'name': p[1], 'duration': float(p[2] or 0), 'size': int(p[3]), 'path': p[4]})
+          pathlib.Path('work/relay/video_manifest.json').write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding='utf-8')
+          tot = sum(r['duration'] for r in rows)
+          with open('work/relay/status.log', 'a', encoding='utf-8') as fh:
+              fh.write(f"total video duration: {tot/3600:.2f} h over {len(rows)} files\n")
+          # rewrite INVENTORY.md video durations
+          inv = pathlib.Path('INVENTORY.md')
+          if inv.exists():
+              txt = inv.read_text(encoding='utf-8')
+              for r in rows:
+                  m = re.search(rf"(\| \d+ \| `[^`]*{re.escape(r['name'])}` \| video \| [^|]+ \| )\?(\s*\|)", txt)
+                  if m:
+                      d = f"{int(r['duration']//60)}m{int(r['duration']%60):02d}s"
+                      txt = txt[:m.start()] + m.group(1) + d + m.group(2) + txt[m.end():]
+              inv.write_text(txt, encoding='utf-8')
+          PY
+
+      - name: commit
+        run: bash tools/relay_push.sh archive-videos-done

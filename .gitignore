@@ -9,3 +9,4 @@ work/tmp/
 *.tmp
 __pycache__/
 .venv/
+work/videos/
