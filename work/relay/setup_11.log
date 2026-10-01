@@ -1,10 +1,10 @@
 == pip ==
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 15.3 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 19.9 MB/s eta 0:00:00
 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
 Downloading idna-3.20-py3-none-any.whl (69 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.6/69.6 kB 27.1 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.6/69.6 kB 17.4 MB/s eta 0:00:00
 Installing collected packages: flatbuffers, typing-extensions, tqdm, protobuf, numpy, idna, hf-xet, h11, fsspec, click, av, onnxruntime, httpcore, ctranslate2, anyio, httpx, huggingface-hub, tokenizers, faster-whisper
-Successfully installed anyio-4.15.1 av-19.0.0 click-8.5.0 ctranslate2-4.8.2 faster-whisper-1.2.1 flatbuffers-25.12.19 fsspec-2026.9.0 h11-0.16.0 hf-xet-1.6.0 httpcore-1.0.9 httpx-0.28.1 huggingface-hub-1.33.0 idna-3.20 numpy-2.5.3 onnxruntime-1.30.0 protobuf-7.36.2 tokenizers-0.23.2 tqdm-4.70.1 typing-extensions-4.16.0
+Successfully installed anyio-4.15.1 av-18.1.0 click-8.5.0 ctranslate2-4.8.2 faster-whisper-1.2.1 flatbuffers-25.12.19 fsspec-2026.9.0 h11-0.16.0 hf-xet-1.6.0 httpcore-1.0.9 httpx-0.28.1 huggingface-hub-1.33.0 idna-3.20 numpy-2.5.3 onnxruntime-1.30.0 protobuf-7.36.2 tokenizers-0.23.2 tqdm-4.70.1 typing-extensions-4.16.0
 == imports ==
 ctranslate2 4.8.2
 faster_whisper ok
