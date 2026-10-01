@@ -64,31 +64,107 @@ def inline(text: str) -> str:
 
 
 def frac(num: str, den: str) -> str:
-    return (f'<span class="frac"><span class="fn"><span>{esc(num)}</span></span>'
-            f'<span class="fd"><span>{esc(den)}</span></span></span>')
+    """num/den arrive already rendered (see mathml_like)."""
+    return (f'<span class="frac"><span class="fn"><span>{num}</span></span>'
+            f'<span class="fd"><span>{den}</span></span></span>')
 
 
-def mathml_like(tex: str) -> str:
-    """Very small formula renderer: \\frac{}{}, ^{}, _{}, greek shortcuts."""
+SYMS = {
+    "rightarrow": "\u27f6", "to": "\u2192", "leftarrow": "\u2190", "leftrightarrow": "\u2194",
+    "times": "\u00d7", "cdot": "\u00b7", "propto": "\u221d", "approx": "\u2248", "neq": "\u2260",
+    "leq": "\u2264", "geq": "\u2265", "pm": "\u00b1", "mp": "\u2213", "infty": "\u221e",
+    "circ": "\u00b0", "degree": "\u00b0", "sim": "\u223c", "sum": "\u03a3", "partial": "\u2202",
+    "int": "\u222b", "sqrt": "\u221a", "alpha": "\u03b1", "beta": "\u03b2", "gamma": "\u03b3",
+    "lambda": "\u03bb", "mu": "\u03bc", "nu": "\u03bd", "omega": "\u03c9", "pi": "\u03c0",
+    "sigma": "\u03c3", "theta": "\u03b8", "Delta": "\u0394", "rho": "\u03c1", "phi": "\u03c6",
+    "tau": "\u03c4", "eta": "\u03b7", "kappa": "\u03ba", "psi": "\u03c8", "zeta": "\u03b6",
+    "epsilon": "\u03b5", "chi": "\u03c7", "Omega": "\u03a9", "Sigma": "\u03a3", "Phi": "\u03a6",
+    "quad": " ", "qquad": "  ", "space": " ", "langle": "\u27e8", "rangle": "\u27e9",
+}
+
+# spacing commands: backslash followed by one of these characters
+SPACE_CMDS = {" ": " ", ",": " ", ";": " ", ":": " ", "!": ""}
+
+
+def _group(s: str, i: int) -> tuple[str, int]:
+    """Read a balanced {...} group that starts at s[i]; returns (inner, next index)."""
+    depth, j = 0, i
+    while j < len(s):
+        if s[j] == "{":
+            depth += 1
+        elif s[j] == "}":
+            depth -= 1
+            if depth == 0:
+                return s[i + 1:j], j + 1
+        j += 1
+    return s[i + 1:], len(s)
+
+
+def mathml_like(tex: str, _depth: int = 0) -> str:
+    """Small formula renderer: \\frac{}{}, ^{}, _{}, \\bar{}, greek/symbol shortcuts.
+
+    Groups are parsed with a real brace matcher and sub-parts are rendered
+    recursively, so nested cases such as \\frac{1}{T_{eff}} no longer leak raw LaTeX
+    into the PDF (the previous flat regexes silently failed on them).
+    """
     s = str(tex)
-    greek = {"alpha": "α", "beta": "β", "gamma": "γ", "lambda": "λ", "mu": "μ",
-             "nu": "ν", "omega": "ω", "pi": "π", "sigma": "σ", "theta": "θ",
-             "Delta": "Δ", "rho": "ρ", "phi": "φ", "tau": "τ"}
-    for k, v in greek.items():
-        s = s.replace("\\" + k, v)
-
-    def repl_frac(m):
-        return frac(m.group(1), m.group(2))
-
-    prev = None
-    while prev != s:
-        prev = s
-        s = re.sub(r"\\frac\{([^{}]*)\}\{([^{}]*)\}", repl_frac, s)
-    s = re.sub(r"\^\{([^{}]*)\}", r"<sup>\1</sup>", s)
-    s = re.sub(r"_\{([^{}]*)\}", r"<sub>\1</sub>", s)
-    s = re.sub(r"\^(\w)", r"<sup>\1</sup>", s)
-    s = re.sub(r"_(\w)", r"<sub>\1</sub>", s)
-    return s
+    out: list[str] = []
+    i = 0
+    n = len(s)
+    while i < n:
+        ch = s[i]
+        if ch == "\\" and i + 1 < n and s[i + 1] in SPACE_CMDS:
+            out.append(SPACE_CMDS[s[i + 1]])
+            i += 2
+            continue
+        if ch == "\\":
+            m = re.match(r"\\([A-Za-z]+)", s[i:])
+            if m:
+                cmd = m.group(1)
+                i += 1 + len(cmd)
+                nxt = s[i] if i < n else ""
+                if cmd in ("frac", "dfrac", "tfrac") and nxt == "{":
+                    a, i = _group(s, i)
+                    b = ""
+                    if i < n and s[i] == "{":
+                        b, i = _group(s, i)
+                    out.append(frac(mathml_like(a, _depth + 1), mathml_like(b, _depth + 1)))
+                elif cmd in ("bar", "hat", "vec", "dot", "tilde") and nxt == "{":
+                    g, i = _group(s, i)
+                    out.append(f'<span class="acc">{mathml_like(g, _depth + 1)}</span>')
+                elif cmd in ("text", "mathrm", "mathit", "operatorname") and nxt == "{":
+                    g, i = _group(s, i)
+                    out.append(esc(g))
+                elif cmd == "sqrt":
+                    if nxt == "{":
+                        g, i = _group(s, i)
+                    else:
+                        g = s[i] if i < n else ""
+                        i += 1
+                    out.append("\u221a(" + mathml_like(g, _depth + 1) + ")")
+                elif cmd in SYMS:
+                    out.append(SYMS[cmd])
+                else:
+                    out.append(cmd)          # unknown command: keep it readable
+                continue
+            i += 1
+            continue
+        if s.startswith("{}", i):
+            i += 2                            # empty group that carries the scripts
+            continue
+        if ch in "^_":
+            i += 1
+            if i < n and s[i] == "{":
+                g, i = _group(s, i)
+            else:
+                g = s[i] if i < n else ""
+                i += 1
+            tag = "sup" if ch == "^" else "sub"
+            out.append(f"<{tag}>{mathml_like(g, _depth + 1)}</{tag}>")
+            continue
+        out.append(esc(ch) if ch in "<>&" else ch)
+        i += 1
+    return "".join(out)
 
 
 def icon_svg(kind: str, size: int = 76, stroke: str = "#5eead4", sw: float = 3) -> str:

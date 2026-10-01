@@ -121,6 +121,7 @@ table.dt tr:nth-child(even) td { background: #f8fafc; }
 .fbox { background: #ffffff; border: 0.25mm solid #bfdbfe; border-radius: 3.4mm;
   padding: 4mm 5mm; margin-bottom: 4.4mm; break-inside: avoid; }
 .fbox .fx { text-align: center; font-size: 12.6pt; color: #0f172a; margin-bottom: 2.6mm; direction: ltr; }
+.fbox .acc { text-decoration: overline; }
 .fbox .fleg { font-size: 9.2pt; color: #475569; line-height: 1.9; }
 .fbox .fleg b { color: #0f766e; }
 .frac { display: inline-table; vertical-align: middle; text-align: center; margin: 0 1mm; }
