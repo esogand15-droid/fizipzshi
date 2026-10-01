@@ -13,38 +13,38 @@
  },
  "ch4": {
   "start": 28,
-  "end": 39
+  "end": 40
  },
  "ch5": {
-  "start": 40,
-  "end": 44
+  "start": 41,
+  "end": 45
  },
  "ch6": {
-  "start": 45,
-  "end": 52
+  "start": 46,
+  "end": 53
  },
  "ch7": {
-  "start": 53,
-  "end": 64
+  "start": 54,
+  "end": 66
  },
  "ch8": {
-  "start": 65,
-  "end": 81
+  "start": 67,
+  "end": 83
  },
  "ch9": {
-  "start": 82,
-  "end": 94
+  "start": 84,
+  "end": 96
  },
  "guide:0": [
-  66,
-  66
+  68,
+  68
  ],
  "guide:1": [
-  70,
-  70
+  72,
+  72
  ],
  "guide:2": [
-  88,
-  88
+  90,
+  90
  ]
 }
