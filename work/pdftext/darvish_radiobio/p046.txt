@@ -1,0 +1,12 @@
+Expose cultured cells to increasing doses of radiation and 
+measure the number of ‘surviving cells’
+های سلول "تعداد و دهید قرار تابش دوز افزایش معرض در را شده کشت های سلول
+.کنید گیری اندازه را" مانده زنده
+dose 1
+dose 2
+dose 3
+dose 4
+cells
+Measuring radiation damage
+تشعشع آسیب گیری اندازه
+Example 2:

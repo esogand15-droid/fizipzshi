@@ -1,0 +1,19 @@
+Radiation Types
+• Electromagnetic
+– Gamma rays)یونیزان)
+– X-rays)یونیزان)
+– Ultra-violet)غیریونیزان)
+– Visible light)غیریونیزان)
+– Infra red light)غیریونیزان)
+– Microwave)غیریونیزان)
+– Radio)غیریونیزان)
+– AC Power)غیریونیزان)
+• Particles ) یونیزان پرتوهای)
+– Alpha
+– Beta
+– Electrons
+– Neutron
+– Proton
+– Meson
+– Pion
+– Heavy ions

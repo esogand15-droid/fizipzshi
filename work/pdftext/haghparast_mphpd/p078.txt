@@ -1,0 +1,5 @@
+Reflection: muscle/air
+Zmuscle = 1.70 Zair = 0.0004
+1
+.999
+.001

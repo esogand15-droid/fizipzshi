@@ -1,0 +1,10 @@
+Mechanical Waves
+Similar to x-rays, sound is a physical 
+phenomena that transfers energy from one 
+point to another.
+It is different from x-rays in that it can only 
+pass through matter and not through 
+vacuum.
+f  16 Hz infra-sound
+16 Hz < f < 20000 Hz sound
+f  20 kHz ultrasound

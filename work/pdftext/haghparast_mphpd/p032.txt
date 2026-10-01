@@ -1,0 +1,39 @@
+32
+Beta
++ Decay 
++
+AX A Y + 
++
+→ +
+Z Z-1
+u
+
++
+→ u
+64Cu 64 Ni + 
++ +
+29 28
+
++
+Nickel-64
+28 p
++
+36 n
+0
+Copper-64
+T½ = 12.71 hr
+29 p
++
+35 n
+0
+
++
+u
++
+Decay Schematic
+29
+64Cu
+12.71 hr
++ (6.56 MeV)
+1.022 MeV
+Process Decay Equation

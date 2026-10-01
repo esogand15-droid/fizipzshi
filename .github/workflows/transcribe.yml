@@ -1,0 +1,86 @@
+name: transcribe
+
+on:
+  workflow_dispatch:
+    inputs:
+      slugs:
+        description: 'all | comma separated slugs (e.g. 01,02)'
+        default: 'all'
+        type: string
+      model:
+        description: 'faster-whisper model'
+        default: 'large-v3'
+        type: string
+      maxpar:
+        description: 'max parallel jobs'
+        default: '6'
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: arena/01a0f6eb-fizipzshi
+  REL: sources-v1
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+      count: ${{ steps.m.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+      - id: m
+        run: python3 tools/plan_matrix.py "${{ inputs.slugs }}"
+
+  transcribe:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJSON(inputs.maxpar) }}
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    name: w-${{ matrix.slug }}-p${{ matrix.part }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+
+      - name: setup
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet faster-whisper
+          mkdir -p work/media work/relay
+          echo "[$(date -u)] transcribe ${{ matrix.slug }} part ${{ matrix.part }} start" >> work/relay/status.log
+
+      - name: cache whisper model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-whisper-${{ inputs.model }}-v1
+
+      - name: download video
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download "$REL" --pattern "${{ matrix.slug }}.mp4" -D work/media --clobber
+          ls -la work/media
+
+      - name: transcribe
+        run: |
+          python3 tools/transcribe_one.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4" \
+            --model "${{ inputs.model }}" --offset-min "${{ matrix.offset }}" --limit-min "${{ matrix.limit }}" \
+            2>&1 | tail -40
+        continue-on-error: true
+
+      - name: final push
+        if: always()
+        run: bash tools/relay_push.sh "transcribe-${{ matrix.slug }}-p${{ matrix.part }}-end"

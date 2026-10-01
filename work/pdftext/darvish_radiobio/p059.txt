@@ -1,0 +1,13 @@
+DNA damage produced in 
+one cell by 1Gy X-rays
+Damage 
+base damage
+crosslinks
+single-strand breaks
+double-strand breaks
+No. per cell
+1000 - 2000
+200 - 400
+~1000
+~40
+DNA Damage

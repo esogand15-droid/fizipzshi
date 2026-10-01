@@ -1,0 +1,5 @@
+Transmission & Reflection
+Z1 Z2
+1
+R
+T =1-R

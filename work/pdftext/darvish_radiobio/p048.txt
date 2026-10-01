@@ -1,0 +1,24 @@
+Millar et al.
+0.1
+1
+1 2 3 4 5 6 7
+Dose / Gy
+Fraction of surviving cells
+Observations:
+:مشاهدات
+• X-rays are moderately 
+effective
+• Effect curvilinear with 
+dose 
+ .است مؤثر ًنسبتا ایکس اشعه• 
+.دارد دوز با منحنی خطی اثر• 
+• Alpha-particles are very 
+effective 
+• Effect linear with dose
+.هستند مؤثر بسیار آلفا ذرات• 
+.دارد دوز با خطی اثر• 
+Measuring radiation damage
+تشعشع آسیب گیری اندازه
+4He
+X-rays
+0

@@ -1,0 +1,27 @@
+35
+Gamma Ray Emission 
+Strontium-87m
+T½ = 2.806 hr
+38 p
++
+49 n
+0
+38 p
++
+49 n
+0
+<<energy>>
+Strontium-87
+ AmX → A X + 
+Z Z
+87mSr 87 → Sr + 
+38 38
+38
+87m
+Sr
+2.806 hr
+ ( .388 MeV)
+38
+87Sr
+Decay Schematic
+Decay Equation Process

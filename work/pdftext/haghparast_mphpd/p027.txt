@@ -1,0 +1,41 @@
+27
+Beta
+- Decay 
+−
+Nitrogen-14
+7 p
++
+7 n
+Carbon 0
+-14
+T½ = 5730 yr
+6 p
++
+8 n
+0
+
+−
+u
+AX A Y + 
+− → + 
+Z Z+1
+u
+
+−
+→
+14C 14 N + 
+− + 
+6 7
+u
+
+−
+Process Decay Equation
+6
+14C
+5730 yr
+
+−
+( .156 MeV)
+7
+14N
+Decay Schematic
