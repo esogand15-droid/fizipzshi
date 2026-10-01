@@ -82,6 +82,20 @@ def apply_video_extra(no: int, blocks: list[dict], extra: dict) -> list[dict]:
     return out
 
 
+def load_fig_place():
+    """content/fig_place.py — جای‌گذاری دستی شکل‌های باقی‌مانده اسلایدها."""
+    path = CONTENT / "fig_place.py"
+    if not path.exists():
+        return {}, {}
+    spec = importlib.util.spec_from_file_location("fig_place", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    after = getattr(mod, "FIG_AFTER", {}) or {}
+    move = getattr(mod, "FIG_MOVE", {}) or {}
+    after = {str(k): (int(v[0]), str(v[1])) for k, v in after.items()}
+    return after, {str(k): int(v) for k, v in move.items()}
+
+
 def load_overlay():
     """content/figures_slide.py — auto-generated figures inserted after a matching block."""
     path = CONTENT / "figures_slide.py"
@@ -93,32 +107,119 @@ def load_overlay():
     return getattr(mod, "SLIDE_FIGURES", {})
 
 
-def apply_overlay(no: int, blocks: list[dict], overlay: dict) -> list[dict]:
-    """Insert each overlay figure right after the block it matches best."""
+LEXICON = {
+    # english slide term -> words that appear in this book (figures are usually
+    # labelled in english while the chapters are persian)
+    "bremsstrahlung": ["ترمزی", "برمشترالونگ"], "characteristic": ["مشخصه", "اختصاصی"],
+    "anode": ["آند", "هدف"], "cathode": ["کاتد"], "filament": ["فیلامان", "رشته"],
+    "tube": ["لامپ", "لوله"], "spectrum": ["طیف"], "filtration": ["فیلتر", "صافش"],
+    "collimator": ["کولیماتور", "کولیماسیون"], "grid": ["گرید", "ضدپراکندگی"],
+    "detector": ["آشکارساز", "دتکتور"], "screen": ["صفحه", "فلورسنت"],
+    "fluoroscopy": ["فلوروسکوپی"], "radiography": ["رادیوگرافی"], "tomography": ["توموگرافی"],
+    "hounsfield": ["هانسفیلد"], "mammography": ["ماموگرافی"], "angiography": ["آنژیوگرافی"],
+    "contrast": ["کنتراست", "حاجب"], "barium": ["باریوم"], "iodine": ["ید"],
+    "decay": ["واپاشی", "استحاله"], "half-life": ["نیمه‌عمر"], "activity": ["اکتیویته"],
+    "generator": ["ژنراتور"], "annihilation": ["فنا", "محو"],
+    "positron": ["پوزیترون"], "nuclide": ["نوکلید"], "gamma": ["گاما"],
+    "dosimetry": ["دزیمتری"], "dosimeter": ["دزیمتر"], "dose": ["دوز"],
+    "gray": ["گری"], "sievert": ["سیورت"], "becquerel": ["بکرل"], "curie": ["کوری"],
+    "shielding": ["حفاظ", "حفاظت"], "apron": ["روپوش"], "gonad": ["گوناد"],
+    "occupational": ["شغلی", "پرتوکار"], "pregnancy": ["باردار", "بارداری"],
+    "ultrasound": ["اولتراسوند", "سونوگرافی", "فراصوت"], "sonography": ["سونوگرافی"],
+    "piezoelectric": ["پیزوالکتریک"], "transducer": ["ترانسدیوسر", "پروب"],
+    "impedance": ["امپدانس"], "reflection": ["بازتاب", "بازتابش"], "doppler": ["داپلر"],
+    "mode": ["حالت", "مود"], "frequency": ["فرکانس", "بسامد"], "wavelength": ["طول موج"],
+    "radiobiology": ["رادیوبیولوژی"], "chromosome": ["کروموزوم"], "chromatid": ["کروماتید"],
+    "dna": ["دی‌ان‌ای", "دنا"], "cell": ["سلول"], "survival": ["بقا", "زنده‌مانی"],
+    "apoptosis": ["اپوپتوز"], "necrosis": ["نکروز"], "stochastic": ["تصادفی", "احتمالی"],
+    "deterministic": ["قطعی", "غیراحتمالی"], "syndrome": ["سندروم", "نشانگان"],
+    "radical": ["رادیکال"], "hydrolysis": ["هیدرولیز"], "water": ["آب"],
+    "mutation": ["جهش"], "aberration": ["ناهنجاری"], "dicentric": ["دی‌سنتریک"],
+    "ring": ["حلقه"], "mitosis": ["میتوز"], "cycle": ["چرخه"],
+    "relaxation": ["آسایش"], "spin": ["اسپین"], "precession": ["تقدیمی"],
+    "gradient": ["گرادیان"], "magnetic": ["مغناطیس"], "resonance": ["تشدید"],
+    "proton": ["پروتون"], "density": ["چگالی", "دنسیتی"], "weighted": ["وزن‌دار"],
+    "hemorrhage": ["خون‌ریزی"], "tissue": ["بافت"], "signal": ["سیگنال"],
+    "sensitivity": ["حساسیت"], "protection": ["حفاظت"], "alara": ["آلارا", "alara"],
+    "exposure": ["اکسپوژر", "تابش‌گیری"], "patient": ["بیمار"], "staff": ["کارکنان", "پرسنل"],
+}
+
+
+def _expand(tokens: set[str]) -> set[str]:
+    """add the persian words this book uses for english slide terms."""
+    extra: set[str] = set()
+    for t in tokens:
+        for w in LEXICON.get(t, []):
+            extra.add(w)
+    return tokens | extra
+
+
+def _tokens(text: str) -> set[str]:
+    """significant words of a page text or a block (Persian/latin, 4+ chars)."""
+    text = re.sub(r"\[\[|\]\]", "", text).lower()
+    return {w for w in re.findall(r"[\w\u0600-\u06ff]{4,}", text)}
+
+
+def apply_overlay(no: int, blocks: list[dict], overlay: dict,
+                  fig_after: dict | None = None) -> list[dict]:
+    """Insert each overlay figure right after the block its source page talks about.
+
+    The figure carries the *source page text* in `match`; the best block is the one
+    sharing the most significant words with it (2+ words, and at least 6% of the
+    page's vocabulary, so a single accidental word never wins).
+    """
     figs = overlay.get(no) or []
     if not figs:
         return blocks
     out = list(blocks)
+    fig_after = fig_after or {}
     for fig in figs:
         if any(b.get("file") == fig.get("file") for b in out):
             continue                       # idempotent
         needle = (fig.pop("match", "") or "").strip()
-        words = {w for w in re.findall(r"\w{4,}", needle.lower())}
-        best, best_sc = None, 0
-        for i, b in enumerate(out):
-            if b.get("type") in ("figure", "quickreview"):
+        manual = fig_after.get(str(fig.get("file")))
+        if manual and manual[0] == no:
+            idx = None
+            for i, b in enumerate(out):
+                if b.get("type") == "figure" or b.get("file"):
+                    continue
+                if manual[1] in json.dumps(b, ensure_ascii=False):
+                    idx = i
+                    break
+            if idx is not None:
+                entry = {k: v for k, v in fig.items()}
+                entry.setdefault("type", "figure")
+                j = idx + 1
+                while j < len(out) and out[j].get("type") == "figure":
+                    j += 1                 # گروه شکل‌های آن بخش را به هم نزن
+                out.insert(j, entry)
                 continue
-            txt = json.dumps(b, ensure_ascii=False).lower()
-            sc = sum(1 for w in words if w in txt)
-            if sc > best_sc:
-                best, best_sc = i, sc
+        want = _expand(_tokens(needle))
+        best, best_sc = None, 0.0
+        if want:
+            need = max(2, int(0.05 * len(want)))
+            for i, b in enumerate(out):
+                if b.get("type") in ("figure", "quickreview", "h2") or b.get("file"):
+                    continue
+                have = _expand(_tokens(json.dumps({k: v for k, v in b.items() if k != "type"},
+                                                  ensure_ascii=False)))
+                sc = len(want & have)
+                if sc >= need and sc > best_sc:
+                    best, best_sc = i, sc
         entry = {k: v for k, v in fig.items()}
         entry.setdefault("type", "figure")
-        if best is not None and best_sc > 0:
+        if best is not None:
             out.insert(best + 1, entry)
         else:
-            # fall back: before the chapter's quick review, else at the end
-            idx = next((i for i, b in enumerate(out) if b.get("type") == "quickreview"), len(out))
+            # nothing matched: keep it in the chapter's source-figure appendix when the
+            # module has one, else just before «مرور سریع»
+            idx = None
+            for i, b in enumerate(out):
+                if b.get("type") == "h2" and "شکل‌های منبع" in (b.get("text") or ""):
+                    idx = i + 1
+            if idx is None:
+                idx = next((i for i, b in enumerate(out) if b.get("type") == "quickreview"),
+                           len(out))
             out.insert(idx, entry)
     return out
 
@@ -138,6 +239,21 @@ def main() -> int:
     LOCK.mkdir(exist_ok=True)
     built = 0
     overlay = load_overlay()
+    fig_after, fig_move = load_fig_place()
+    if fig_move:
+        lookup = {}
+        for ch_no, entries in overlay.items():
+            for entry in entries:
+                lookup[str(entry.get("file"))] = ch_no
+        for fname, target in fig_move.items():
+            src = lookup.get(fname)
+            if src is None or src == target:
+                continue
+            entry = next((e for e in overlay.get(src, []) if str(e.get("file")) == fname), None)
+            if entry is None:
+                continue
+            overlay[src].remove(entry)
+            overlay.setdefault(target, []).append(entry)
     video_extra = load_video_extra()
     for no, meta in CHAPTERS.items():
         if only and no not in only:
@@ -146,7 +262,7 @@ def main() -> int:
         if mod is None:
             print(f"ch{no:02d}: module missing ({meta['module']})")
             continue
-        blocks = apply_overlay(no, list(mod.BLOCKS), overlay)
+        blocks = apply_overlay(no, list(mod.BLOCKS), overlay, fig_after)
         blocks = apply_video_extra(no, blocks, video_extra)
         ch = {"no": no, "session": meta["session"], "title": meta["title"],
               "prof": meta["prof"], "icon": meta["icon"], "blocks": blocks}
