@@ -45,6 +45,15 @@ COLLOQUIAL = [rf"(?<![\u0600-\u06ff]){re.escape(w)}(?![\u0600-\u06ff])"
               for w in COLLOQUIAL_WORDS] + ["استاد گفت", "خدمت شما"]
 
 ISSUES: list[tuple[str, str, str]] = []
+
+# مواردی که ابزار خودکار علامت می‌زند ولی در بازبینی انسانی درست تشخیص داده شده‌اند؛
+# با توضیح ثبت می‌شوند تا گزارش نهایی «بررسی بی‌پاسخ» نداشته باشد.
+ACCEPTED_PLACEMENT = {
+    "ch1[8]": "شکل طیف الکترومغناطیس در بخش «۲. طبقه‌بندی پرتوها» جای درست دارد؛ "
+              "هم‌پوشانی واژگانی بیشتر با بخش ۸ به‌خاطر واژه‌های انرژی/نفوذ است، نه موضوع.",
+    "ch9[48]": "شکل TR/TE بلافاصله پس از جدول آموزشی TR/TE در بخش ۱۰ آمده و همان‌جا "
+               "مرجعش است؛ بخش ۱۵ فقط تکرار مفهومی دارد.",
+}
 LINES: list[str] = []
 
 
@@ -275,6 +284,11 @@ def check_placement(chs: dict) -> None:
             # ولی در بخش دیگری پشتوانهٔ روشنی داشته باشد.
             if here < 0.30 and there > 0.55 and tj is not None:
                 bad += 1
+                key = f"ch{no}[{i}]"
+                note = ACCEPTED_PLACEMENT.get(key)
+                if note:
+                    issue("یادداشت", "جای‌گذاری (پذیرفته‌شده)", f"{key} → {note}")
+                    continue
                 issue("بررسی", "جای‌گذاری",
                       f"ch{no}[{i}] {'شکل' if isfig else 'ویدیو'} در «{secs[si][1][:28]}» "
                       f"(پوشش {here*100:.0f}٪) ولی در «{secs[tj][1][:28]}» "
@@ -353,7 +367,7 @@ def check_coverage(chs: dict) -> None:
     if explained:
         line(f"- عددهای ادغام‌شدهٔ ASR که توضیح مستند دارند: {len(explained)}")
         for i, n, why in explained:
-            issue("بررسی", "ASR", f"ویدیو {i:02d} عدد «{n}» → {why}")
+            issue("یادداشت", "ASR (توضیح‌داده‌شده)", f"ویدیو {i:02d} عدد «{n}» → {why}")
     line()
 
 
@@ -522,8 +536,10 @@ def main() -> int:
     n_err = sum(1 for s, _, _ in ISSUES if s == "خطا")
     n_warn = sum(1 for s, _, _ in ISSUES if s == "هشدار")
     n_chk = sum(1 for s, _, _ in ISSUES if s == "بررسی")
+    n_note = sum(1 for s, _, _ in ISSUES if s == "یادداشت")
     line("## جمع‌بندی")
-    line(f"- خطا: {n_err} · هشدار: {n_warn} · نیازمند بررسی دستی: {n_chk}")
+    line(f"- خطا: {n_err} · هشدار: {n_warn} · نیازمند بررسی دستی: {n_chk}"
+         f" · یادداشت‌های بازبینی‌شده: {n_note}")
     if ISSUES:
         line()
         line("### فهرست موارد")
