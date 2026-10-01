@@ -49,20 +49,32 @@ jobs:
         run: python3 tools/figure_sheets.py
 
       - name: apply picks
-        if: ${{ inputs.pick_json != '' }}
         run: |
+          # picks come either from the manual input or from the committed
+          # work/figpicks.json (which lets a push trigger the copy step)
           python3 - <<'PY'
-          import json, os, shutil
+          import json, os, pathlib
           from PIL import Image
-          picks = json.loads(os.environ["PICK_JSON"])
+          raw = os.environ.get("PICK_JSON") or ""
+          if raw.strip():
+              picks = json.loads(raw)
+          else:
+              f = pathlib.Path("work/figpicks.json")
+              picks = json.loads(f.read_text(encoding="utf-8")) if f.exists() else []
           os.makedirs("images/fig", exist_ok=True)
           for p in picks:
               src, dst = p["raw"], "images/fig/" + p["out"]
               im = Image.open(src)
+              if im.mode in ("RGBA", "LA", "P"):
+                  bg = Image.new("RGB", im.size, "white")
+                  im = im.convert("RGBA")
+                  bg.paste(im, mask=im.split()[-1])
+                  im = bg
               if im.width > 1200:
                   im = im.resize((1200, round(im.height * 1200 / im.width)), Image.LANCZOS)
               im.convert("RGB").save(dst, "JPEG", quality=88, optimize=True)
               print("picked", src, "->", dst, im.size)
+          print("total picked:", len(picks))
           PY
         env:
           PICK_JSON: ${{ inputs.pick_json }}
