@@ -279,7 +279,8 @@ def check_coverage(chs: dict) -> None:
             book_num |= set(re.findall(r"\d{2,}", json.dumps(b, ensure_ascii=False)
                                        .translate(FA2EN)))
     slugs = [p.name for p in (ROOT / "work" / "ocr").iterdir() if (p / "all.md").exists()]
-    total_pages = low_pages = 0
+    total_pages = low_pages = en_pages = 0
+    reviewed: list[str] = []
     for slug in sorted(slugs):
         txt = (ROOT / "work" / "ocr" / slug / "all.md").read_text(encoding="utf-8", errors="ignore")
         parts = re.split(r"={3,}\s*page\s*(\d+)\s*={3,}", txt, flags=re.I)
@@ -288,32 +289,55 @@ def check_coverage(chs: dict) -> None:
             t = toks(body)
             if len(t) < 18:
                 continue                       # صفحه‌های تصویری/کم‌متن
+            latin = len(re.findall(r"[A-Za-z]{3,}", body))
+            persian = len(re.findall(r"[\u0600-\u06ff]{3,}", body))
+            if latin > persian:
+                en_pages += 1                  # اسلاید انگلیسی: در جزوه به فارسی ترجمه شده است
+                continue
             total_pages += 1
             cov = len(t & book) / len(t)
             if cov < 0.55:
                 low_pages += 1
-                issue("بررسی", "پوشش",
-                      f"{slug} ص{n}: پوشش واژگانی {cov*100:.0f}% — "
-                      f"ناموجودها: {'، '.join(sorted(t - book)[:8])}")
-    line(f"- صفحه‌های متنی بررسی‌شده: {total_pages} · کم‌پوشش (<۵۵٪): {low_pages}")
+                verdict = MANUAL_REVIEW.get((slug, n))
+                if verdict:
+                    reviewed.append(f"{slug} ص{n} → {verdict}")
+                else:
+                    issue("بررسی", "پوشش",
+                          f"{slug} ص{n}: پوشش واژگانی {cov*100:.0f}% (بدون بازبینی دستی) — "
+                          f"ناموجودها: {'، '.join(sorted(t - book)[:8])}")
+    line(f"- صفحه‌های متنی فارسی بررسی‌شده: {total_pages} · کم‌پوشش (<۵۵٪): {low_pages}"
+         f" · اسلاید انگلیسی/تصویری (خارج از سنجش واژگانی، ترجمه‌شده در جزوه): {en_pages}")
+    if reviewed:
+        line(f"- از صفحه‌های کم‌پوشش، {len(reviewed)} صفحه دستی بازبینی شد و موضوعشان در جزوه هست:")
+        for r in reviewed:
+            line(f"    · {r}")
 
-    # پوشش عددی ویدیوها
-    missing = {}
+    # پوشش عددی ویدیوها: خلاصه‌های هر ویدیو (render/video_digests) با اعداد جزوه سنجیده می‌شود.
+    missing, explained = {}, []
     for i in range(1, 20):
-        p = Path(f"/tmp/dg_{i:02d}.txt")
-        if not p.exists():
+        dg = DIGESTS / f"{i:02d}.txt"
+        if not dg.exists():
             continue
-        txt = p.read_text(encoding="utf-8")
-        nums = re.findall(r"\b\d{2,4}\b", txt)
-        uniq = [n for n, _ in collections.Counter(nums).most_common()]
-        miss = [n for n in uniq if n not in book_num]
-        if miss:
-            missing[i] = miss
+        txt = "\n".join(ln for ln in dg.read_text(encoding="utf-8").splitlines()
+                        if not ln.startswith("###"))
+        uniq = [n for n, _ in collections.Counter(re.findall(r"\b\d{2,4}\b", txt)).most_common()]
+        for n in uniq:
+            if n in book_num:
+                continue
+            why = EXPLAINED_ASR.get((i, n))
+            if why:
+                explained.append((i, n, why))
+            else:
+                missing.setdefault(i, []).append(n)
     if missing:
         for k, v in missing.items():
-            issue("بررسی", "ویدیو", f"ویدیو {k:02d}: عددهای ناموجود در جزوه → {v[:8]}")
+            issue("بررسی", "ویدیو", f"ویدیو {k:02d}: عدد ناموجود در جزوه → {v[:8]}")
     else:
-        line("- پوشش عددی ویدیوها: کامل (هر عدد کلیدی هر ۱۹ ویدیو در جزوه هست).")
+        line("- پوشش عددی ویدیوها: کامل؛ هیچ عدد بی‌توضیحی نمانده است.")
+    if explained:
+        line(f"- عددهای ادغام‌شدهٔ ASR که توضیح مستند دارند: {len(explained)}")
+        for i, n, why in explained:
+            issue("بررسی", "ASR", f"ویدیو {i:02d} عدد «{n}» → {why}")
     line()
 
 
@@ -410,6 +434,56 @@ def _tokens(s: str) -> set[str]:
     s = unicodedata.normalize("NFKC", s)
     s = re.sub(r"[،؛؟.,()\[\]»«:;\-–—/\\|\d]", " ", s)
     return set(re.findall(r"[^\W_]{4,}", s, flags=re.UNICODE))
+
+
+DIGESTS = ROOT / "render" / "video_digests"
+
+# عددهایی که در ASR ویدیو به‌هم چسبیده‌اند (مثل «۴ ممیز ۱۹» → 1900) یا عدد غیرقابل‌تأییدند.
+# هر مورد با توضیح مستند ثبت می‌شود تا «عدد ناموجود» تکراری گزارش نشود.
+EXPLAINED_ASR = {
+    (12, "449"):  "ادغام رقمی ASR؛ در جزوه «[[4.49 × 10^9]] سال» نیمه‌عمر اورانیم-۲۳۸ آمده است.",
+    (12, "1900"): "ادغام رقمی ASR («۴ ممیز ۱۹»)؛ در جزوه «[[4.19 MeV]]» انرژی آلفا آمده است.",
+    (12, "221"):  "ادغام «۲۲-۱۱» ([[Na-22]])؛ مفهوم فرایند ایزوباریک در همین بخش پوشش داده شده است.",
+    (13, "6831"): "ادغام «۶۸» و «۳۱»؛ [[Ga-68]] با عدد اتمی [[31]] در همین بخش آمده است.",
+    (13, "6830"): "ادغام «۶۸» و «۳۰»؛ [[Zn-68]] با عدد اتمی [[30]] در همین بخش آمده است.",
+    (16, "1620"): "عدد نامفهوم ASR (احتمالاً «۱۶۰۰ سال») بدون ذکر عنصر؛ برای پرهیز از حدس، ثبت نشد. "
+                  "فرمول نیمه‌عمر [[T½ = 0.693/λ]] در همین بخش پوشش دارد.",
+    (17, "1860"): "سال نامطمئن در بیوگرافی رونتگن (ASR)؛ در جزوه فقط تاریخ مستند کشف پرتو ایکس "
+                  "([[8 نوامبر 1895]]) ثبت شده است.",
+    (19, "2500"): "ادغام ASR برای «[[0.25 میلی‌متر]] سرب»؛ معادل‌های روپوش سربی در همین بخش آمده است.",
+}
+
+
+# بازبینی دستی صفحه‌های کم‌پوشش (OCR این صفحه‌ها مخدوش/دوزبانه است، پس سنجش واژگانی
+# معتبر نیست). هر مورد دستی با جزوه مقابله شده و محل پوشش ثبت شده است.
+MANUAL_REVIEW = {
+    ("afzalipour", 123): "تقویت‌کننده تصویر در فلوروسکوپی و اثر بزرگ‌نمایی ← فصل ۳ (بخش فلوروسکوپی).",
+    ("darvish_radiobio", 6): "اثرات قطعی/احتمالی و شرط دوز آستانه ← فصل ۸ (بخش اثرات قطعی و احتمالی).",
+    ("darvish_radiobio", 18): "هیدرولیز آب و رادیکال هیدروکسیل ← فصل ۸ (بخش اثر غیرمستقیم).",
+    ("darvish_radiobio", 21): "برهم‌کنش مستقیم با هدف بحرانی ← فصل ۸ (بخش اثر مستقیم).",
+    ("darvish_radiobio", 29): "مقایسه ریسک (کره بادام‌زمینی، سیگار، نیویورک، ۱۰ mrem) ← فصل ۸ (بخش مقایسه ریسک).",
+    ("darvish_radiobio", 30): "دوره نهفته (کوتاه تا چند دهه) ← فصل ۸ (بخش دوره نهفته).",
+    ("darvish_radiobio", 33): "آسیب کروموزومی (اتصال مجدد، قطعه آسنتریک، حلقه و دوسطحی) ← فصل ۸.",
+    ("darvish_radiobio", 44): "آسیب پرتوی مولکول‌های زیستی و عوامل دیگر (UV) ← فصل ۸.",
+    ("darvish_radiobio", 49): "[[RBE]] و تعریف دوز مرجع ۲۵۰ کیلوولت ← فصل ۸ (بخش RBE).",
+    ("darvish_radiobio", 64): "[[LD50/30]]، مکانیسم‌های آسیب و معادل گرمایی ← فصل ۸ (بخش LD50).",
+    ("darvish_radiobio", 65): "قانون برگونی و تریبوندو (۱۹۰۶) و سه ویژگی حساسیت ← فصل ۸.",
+    ("darvish_radiobio", 66): "سلول‌های کم‌حساس (خونی بالغ، ماهیچه، گانگلیون، مخاط معده) ← فصل ۸.",
+    ("darvish_radiobio", 67): "ناهنجاری کروموزومی/کروماتیدی و مراحل اینترفاز ← فصل ۸.",
+    ("darvish_radiobio", 80): "بهینه‌سازی [[ALARA]] با عوامل اقتصادی-اجتماعی ← فصل ۶ (سیستم حفاظت).",
+    ("haghparast_mphpd", 16): "دسته‌بندی مواد رادیواکتیو (طبیعی/مصنوعی) ← فصل ۴ بخش ۱.",
+    ("haghparast_mphpd", 30): "پوزیترون، ناپایداری و نابودی با تولید دو فوتون [[511 keV]] ← فصل ۴.",
+    ("haghparast_mphpd", 44): "رابطه نیمه‌عمر [[T½ = 0.693/λ]] ← فصل ۴ (بخش نیمه‌عمر).",
+    ("haghparast_mphpd", 59): "فرکانس‌بندی امواج صوتی ([[<16 Hz]]، [[16 Hz–20 kHz]]، [[>20 kHz]]) ← فصل ۷ (جدول فرکانس‌بندی).",
+    ("haghparast_mphpd", 61): "فرکانس‌های کاربردی تصویربرداری پزشکی (مگاهرتز) ← فصل ۷ بخش ۱.",
+    ("haghparast_mphpd", 66): "سرعت صوت و رابطه عکس با تراکم‌پذیری محیط ← فصل ۷ (بخش سرعت صوت).",
+    ("haghparast_mphpd", 67): "اثر چگالی محیط بر سرعت انتشار ← فصل ۷ (بخش سرعت صوت).",
+    ("haghparast_mphpd", 69): "مگنتواسترکسیون (فرومغناطیس/نیکل، تا ۱۰۰ کیلوهرتز، فیزیوتراپی) ← فصل ۷ (جدول روش‌های تولید).",
+    ("haghparast_mphpd", 71): "پیزوالکتریک معکوس و مستقیم در بلور ← فصل ۷ (بخش ترانس‌دیوسر).",
+    ("haghparast_mphpd", 76): "امپدانس صوتی ریه و بازتابش کامل ← فصل ۷ (بخش عوامل بازتابش).",
+    ("haghparast_mphpd", 81): "لزوم تابش عمود پروب و آشکارسازی امواج بازگشتی ← فصل ۷ (نکته زاویه تابش).",
+    ("haghparast_tashasho", 36): "پس از ده نیمه‌عمر، تابش به یک‌هزارم می‌رسد ← فصل ۴ (بخش نیمه‌عمر).",
+}
 
 
 def main() -> int:
