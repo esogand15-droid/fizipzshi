@@ -135,9 +135,6 @@ table.dt tr:nth-child(even) td { background: #f8fafc; }
 .examtip { background: linear-gradient(to left, #2563eb, #14b8a6); color: #ffffff; border-radius: 3mm;
   padding: 3.4mm 4.4mm; margin-bottom: 4.2mm; font-size: 10pt; line-height: 1.9;
   break-inside: avoid; }
-.conflict { background: #fffbeb; border: 0.25mm solid #fcd34d; border-radius: 3mm;
-  padding: 3.4mm 4.4mm; margin-bottom: 4.2mm; font-size: 9.8pt; line-height: 1.9; color: #92400e;
-  break-inside: avoid; }
 .review { background: linear-gradient(to left, #dbeafe, #ccfbf1); border: 0.25mm solid #cde8f5;
   border-radius: 4mm; padding: 4.5mm 5mm; margin: 6mm 0 4mm 0; break-inside: avoid; }
 .review h3 { margin: 0 0 3mm 0; color: #1d4ed8; font-size: 12pt; }

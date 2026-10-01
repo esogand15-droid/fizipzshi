@@ -206,8 +206,6 @@ def blk_examtip(b: dict) -> str:
     return f'<div class="examtip"><b>نکته امتحانی: </b>{inline(b.get("text",""))}</div>'
 
 
-def blk_conflict(b: dict) -> str:
-    return f'<div class="conflict"><b>⚠ اختلاف منابع: </b>{inline(b.get("text",""))}</div>'
 
 
 def blk_note(b: dict) -> str:
@@ -222,7 +220,7 @@ def blk_review(b: dict) -> str:
 RENDER = {
     "h2": blk_h2, "h3": blk_h3, "p": blk_p, "bullets": blk_bullets, "table": blk_table,
     "formula": blk_formula, "figure": blk_figure, "key": blk_key,
-    "examtip": blk_examtip, "conflict": blk_conflict, "note": blk_note,
+    "examtip": blk_examtip, "note": blk_note,
     "quickreview": blk_review,
 }
 
