@@ -45,7 +45,12 @@ def load_video_extra():
     spec = importlib.util.spec_from_file_location("video_extra", path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    return getattr(mod, "VIDEO_BLOCKS", {})
+    blocks = dict(getattr(mod, "VIDEO_BLOCKS", {}) or {})
+    # نکته‌های تکمیلی پوشش (غیر ویدیویی) با همان ساختار لنگر
+    for no, entries in (getattr(mod, "COVER_EXTRA", {}) or {}).items():
+        blocks.setdefault(no, [])
+        blocks[no] = list(blocks[no]) + list(entries)
+    return blocks
 
 
 def apply_video_extra(no: int, blocks: list[dict], extra: dict) -> list[dict]:
@@ -94,9 +99,13 @@ def load_fig_place():
     move = getattr(mod, "FIG_MOVE", {}) or {}
     drop = getattr(mod, "FIG_DROP", []) or []
     caption = getattr(mod, "FIG_CAPTION", {}) or {}
+    video_after = getattr(mod, "VIDEO_AFTER", {}) or {}
     after = {str(k): (int(v[0]), str(v[1])) for k, v in after.items()}
+    video_after = {int(k): {str(a): str(b) for a, b in v.items()}
+                   for k, v in video_after.items()}
     return (after, {str(k): int(v) for k, v in move.items()},
-            {str(x) for x in drop}, {str(k): str(v) for k, v in caption.items()})
+            {str(x) for x in drop}, {str(k): str(v) for k, v in caption.items()},
+            video_after)
 
 
 def load_overlay():
@@ -383,6 +392,80 @@ def relocate_figures(no: int, blocks: list[dict], fig_after: dict) -> tuple[list
     return out, moved
 
 
+def relocate_video(no: int, blocks: list[dict], video_after: dict) -> tuple[list[dict], int]:
+    """بلوک ویدیویی را از ته فصل به کنار بلوک مرجعش می‌برد.
+
+    کلید هر ورودی بخشی از ``src`` بلوک ویدیویی است و مقدار، متنی از بلوک مقصد.
+    """
+    moves = (video_after or {}).get(no) or {}
+    if not moves:
+        return blocks, 0
+    out = list(blocks)
+    moved = 0
+    for key, anchor_txt in moves.items():
+        cur = next((i for i, b in enumerate(out) if key in (b.get("src") or "")), None)
+        if cur is None:
+            continue
+        tgt = None
+        for i, b in enumerate(out):
+            if i == cur or b.get("type") == "figure":
+                continue
+            if anchor_txt in json.dumps(b, ensure_ascii=False):
+                tgt = i
+                break
+        if tgt is None:
+            continue
+        if cur == tgt + 1:                      # همین حالا کنار لنگر است
+            continue
+        j = tgt + 1
+        run = []
+        while j < len(out) and out[j].get("type") == "figure":
+            run.append(j)
+            j += 1
+        if cur in run:                          # در گروه شکل‌های همان بلوک است
+            continue
+        entry = out.pop(cur)
+        if cur < tgt:
+            tgt -= 1
+        j = tgt + 1
+        while j < len(out) and out[j].get("type") == "figure":
+            j += 1
+        out.insert(j, entry)
+        moved += 1
+    return out, moved
+
+
+def quickreview_last(blocks: list[dict]) -> tuple[list[dict], int]:
+    """«مرور سریع» را به انتهای محتوای فصل (قبل از گالری شکل‌های منبع) می‌برد."""
+    out = list(blocks)
+    idx = next((i for i, b in enumerate(out) if b.get("type") == "quickreview"), None)
+    if idx is None:
+        return out, 0
+    target = next((i for i, b in enumerate(out)
+                   if b.get("type") == "h2" and "شکل‌های منبع" in (b.get("text") or "")), len(out))
+    if idx + 1 >= target:
+        return out, 0
+    entry = out.pop(idx)
+    if idx < target:
+        target -= 1
+    out.insert(target, entry)
+    return out, 1
+
+
+def drop_empty_sections(blocks: list[dict]) -> tuple[list[dict], int]:
+    """سرفصل‌هایی که پس از انتقال شکل‌ها خالی مانده‌اند را حذف می‌کند."""
+    out = list(blocks)
+    heads = [i for i, b in enumerate(out) if b.get("type") == "h2"]
+    removed = 0
+    for k in range(len(heads) - 1, -1, -1):
+        i = heads[k]
+        j = heads[k + 1] if k + 1 < len(heads) else len(out)
+        if not any(b.get("type") not in ("h2", "h3") for b in out[i + 1:j]):
+            del out[i]
+            removed += 1
+    return out, removed
+
+
 def load_module(name: str):
     path = CONTENT / f"{name}.py"
     if not path.exists():
@@ -398,7 +481,7 @@ def main() -> int:
     LOCK.mkdir(exist_ok=True)
     built = 0
     overlay = load_overlay()
-    fig_after, fig_move, fig_drop, fig_caption = load_fig_place()
+    fig_after, fig_move, fig_drop, fig_caption, video_after = load_fig_place()
     if fig_move:
         lookup = {}
         for ch_no, entries in overlay.items():
@@ -435,10 +518,13 @@ def main() -> int:
                     if fix:
                         b["caption"] = fix
         blocks = apply_video_extra(no, blocks, video_extra)
+        blocks, vid_moved = relocate_video(no, blocks, video_after)
+        blocks, qr_moved = quickreview_last(blocks)
         normalise_captions(blocks)
         blocks, relocated = relocate_figures(no, blocks, fig_after)
         blocks, detached = figures_after_text(blocks)
         blocks, dropped_figs = dedupe_figures(blocks)
+        blocks, empty_sections = drop_empty_sections(blocks)
         ch = {"no": no, "session": meta["session"], "title": meta["title"],
               "prof": meta["prof"], "icon": meta["icon"], "blocks": blocks}
         if meta.get("exam_flag"):
@@ -449,11 +535,17 @@ def main() -> int:
         figs = sum(1 for b in ch["blocks"] if b.get("type") == "figure")
         notes = []
         if relocated:
-            notes.append(f"{relocated} جابه‌جا")
+            notes.append(f"{relocated} شکل جابه‌جا")
+        if vid_moved:
+            notes.append(f"{vid_moved} بلوک ویدیویی جابه‌جا")
+        if qr_moved:
+            notes.append("مرور سریع به پایان")
         if detached:
             notes.append(f"{detached} شکل پس از متن")
         if dropped_figs:
             notes.append(f"{dropped_figs} تکراری حذف شد")
+        if empty_sections:
+            notes.append(f"{empty_sections} سرفصل خالی حذف شد")
         extra = (", " + "، ".join(notes)) if notes else ""
         print(f"ch{no:02d}: {len(ch['blocks'])} blocks, {figs} figures, {src} with src{extra}")
         built += 1
