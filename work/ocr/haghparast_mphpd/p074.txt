@@ -1,0 +1,16 @@
+Acoustic lmpedance
+
+۲۱ Reflected acoustic energy at interfaces
+between tissues depend on the differing
+acoustic impedances (Z).
+
+: ۳ (| Acoustic impedance (Z) = product of
+velocity of sound (v) and physical density
+
+)0(۰
+
+1 (| The unit of acoustic impedance is the
+“Rayls.”
+
+Rayls = [(g/cm2.sec) x10° [ or [(kg/m2.sec) x10]
+
