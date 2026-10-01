@@ -47,7 +47,7 @@ jobs:
     timeout-minutes: 340
     strategy:
       fail-fast: false
-      max-parallel: ${{ fromJSON(inputs.maxpar || '6') }}
+      max-parallel: ${{ fromJSON(inputs.maxpar || '20') }}
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     name: w-${{ matrix.slug }}-p${{ matrix.part }}
     steps:
@@ -60,7 +60,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          mkdir -p work/media work/relay
+          mkdir -p work/media work/relay work/tmp_media
           echo "[$(date -u)] transcribe ${{ matrix.slug }} part ${{ matrix.part }} start" >> work/relay/status.log
           { echo "== pip =="; # PyAV 19 (2026-09-29) removed the metadata_errors kwarg that faster-whisper 1.2.1 passes to av.open;
             # pin av<19 until faster-whisper ships the fix (SYSTRAN/faster-whisper#1495).
@@ -92,11 +92,21 @@ jobs:
           ls -la work/media
 
       - name: transcribe
+        env:
+          # large-v3-turbo (deepdml/faster-whisper-large-v3-turbo-ct2) = 4 decoder layers
+          # instead of 32 -> several times faster on CPU at near large-v3 quality.
+          MODEL: ${{ inputs.model || 'large-v3-turbo' }}
         run: |
           set -o pipefail
-          python3 tools/transcribe_one.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4" \
-            --model "${{ inputs.model || 'large-v3' }}" --offset-min "${{ matrix.offset }}" --limit-min "${{ matrix.limit }}" \
-            2>&1 | tee "work/relay/transcribe_${{ matrix.slug }}.log" | tail -30
+          LOG="work/relay/transcribe_${{ matrix.slug }}.log"
+          if ! python3 tools/transcribe_one.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4" \
+                 --model "$MODEL" --offset-min "${{ matrix.offset }}" --limit-min "${{ matrix.limit }}" \
+                 2>&1 | tee "$LOG" | tail -30; then
+            echo "[fallback] $MODEL failed -> retrying with large-v3" | tee -a "$LOG"
+            python3 tools/transcribe_one.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4" \
+              --model large-v3 --offset-min "${{ matrix.offset }}" --limit-min "${{ matrix.limit }}" \
+              2>&1 | tee -a "$LOG" | tail -30
+          fi
         continue-on-error: true
 
       - name: final push
