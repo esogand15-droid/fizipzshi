@@ -350,7 +350,24 @@ def section_cover(ch: dict, i: int, n: int, pages: tuple[int, int] | None) -> st
 </div></div>"""
 
 
-def end_html(n_pages: str, n_fig: str, n_videos: str, hours: str) -> str:
+def media_stats() -> dict:
+    """Video count and teaching hours, read from the relay manifest when present."""
+    mf = ROOT / "work" / "relay" / "video_manifest.tsv"
+    n, mins = 0, 0.0
+    if mf.exists():
+        for line in mf.read_text(encoding="utf-8").splitlines():
+            f = line.split("\t")
+            if len(f) >= 3:
+                n += 1
+                try:
+                    mins += float(f[2]) / 60.0
+                except ValueError:
+                    pass
+    return {"n": n or 19, "hours": round(mins / 60.0) if mins else 7}
+
+
+def end_html(n_pages: str, n_fig: str, n_tab: str, n_blocks: str,
+             n_videos: str, hours: str) -> str:
     return f"""
 <div class="endpage">
   <div class="wordmark"><div class="wm1">{BRAND}</div><div class="wm2">H U M S &nbsp; Y A R</div></div>
@@ -358,8 +375,8 @@ def end_html(n_pages: str, n_fig: str, n_videos: str, hours: str) -> str:
   <div class="t1">پایان جزوه فیزیک پزشکی</div>
   <div class="t2">این جزوه از تلفیق جزوه‌های درسی، پاورپوینت‌های اسلاید و ویدیوهای تدریس سه استاد
   (دکتر افضلی‌پور، دکتر لیلی درویش و دکتر حق‌پرست) تهیه شده است.<br/>
-  {fa_digits(n_pages)} صفحه · {fa_digits(n_fig)} شکل · {fa_digits(n_videos)} ویدیو
-  ({fa_digits(hours)} ساعت تدریس)</div>
+  {fa_digits(n_pages)} صفحه · {fa_digits(n_blocks)} بخش · {fa_digits(n_fig)} شکل ·
+  {fa_digits(n_tab)} جدول · {fa_digits(n_videos)} ویدیو ({fa_digits(hours)} ساعت تدریس)</div>
   <div class="t3">همه مطالب با ذکر منبع (جزوه/اسلاید/ویدیو) آورده شده‌اند؛ هیچ مطلبی خارج از منابع درس افزوده نشده است.<br/>
   برای مرور نهایی: جعبه‌های «نکته کلیدی»، بخش‌های «مرور سریع» و صفحه راهنمای دکتر درویش را ببینید.</div>
 </div>"""
@@ -375,6 +392,9 @@ def build_html(page_map: dict | None = None, total_pages: str = "—") -> str:
             ANCHOR_MARK[a] = gi
     n = len(chapters)
     n_fig = sum(1 for ch in chapters for b in ch["blocks"] if b.get("type") == "figure")
+    n_tab = sum(1 for ch in chapters for b in ch["blocks"] if b.get("type") == "table")
+    n_blocks = sum(len(ch["blocks"]) for ch in chapters)
+    media = media_stats()
 
     toc_pages: dict[int, tuple[int, int]] = {}
     sec_pages: dict[int, tuple[int, int]] = {}
@@ -396,7 +416,8 @@ def build_html(page_map: dict | None = None, total_pages: str = "—") -> str:
     for i, ch in enumerate(chapters, 1):
         parts.append(section_cover(ch, i, n, sec_pages.get(ch["no"])))
         parts.append('<div class="chbody">' + render_blocks(ch["blocks"]) + "</div>")
-    parts.append(end_html(total_pages, n_fig, "۱۹", "۷"))
+    parts.append(end_html(total_pages, n_fig, n_tab, n_blocks,
+                          media["n"], media["hours"]))
     doc = ("<html dir=\"rtl\"><head><meta charset=\"utf-8\"><title>جزوه جامع فیزیک پزشکی — HumsYar</title>"
            f"<style>{css()}</style></head><body>" + "".join(parts) + "</body></html>")
     return doc
