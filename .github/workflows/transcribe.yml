@@ -60,7 +60,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          mkdir -p work/media work/relay
+          mkdir -p work/media work/relay work/tmp_media
           echo "[$(date -u)] transcribe ${{ matrix.slug }} part ${{ matrix.part }} start" >> work/relay/status.log
           { echo "== pip =="; # PyAV 19 (2026-09-29) removed the metadata_errors kwarg that faster-whisper 1.2.1 passes to av.open;
             # pin av<19 until faster-whisper ships the fix (SYSTRAN/faster-whisper#1495).

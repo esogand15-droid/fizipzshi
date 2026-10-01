@@ -23,6 +23,18 @@ def main() -> int:
         want = {s.strip() for s in selector.split(",") if s.strip()}
         rows = [r for r in rows if r["slug"] in want]
 
+    # resume: skip videos whose transcript is already complete on the branch
+    explicit = bool(selector and selector != "all")
+    skipped = []
+    if not explicit:
+        keep = []
+        for r in rows:
+            if Path(f"work/transcripts/{r['slug']}/raw.md").exists():
+                skipped.append(r["slug"])
+            else:
+                keep.append(r)
+        rows = keep
+
     include = []
     for r in rows:
         dur_min = r["duration"] / 60.0
@@ -46,6 +58,8 @@ def main() -> int:
             fh.write(f"count={len(include)}\n")
     print(text)
     print(f"entries: {len(include)}", file=sys.stderr)
+    if skipped:
+        print(f"already done, skipped: {','.join(skipped)}", file=sys.stderr)
     return 0
 
 
