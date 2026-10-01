@@ -108,6 +108,9 @@ To https://github.com/esogand15-droid/fizipzshi
    f47dacf..804377c  HEAD -> arena/01a0f6eb-fizipzshi
 [10:09:31] state6-sources-committed
 [10:17:04] ocr-done
-[10:19:36] ocr-done
-[Thu Oct  1 10:20:19 UTC 2026] frames 08 p0 start
-[10:20:40] frames-08-p0-done
+[Thu Oct  1 10:18:24 UTC 2026] transcribe 12 part 0 start
+[10:19:11] transcribe-12-p0-end
+[Thu Oct  1 10:20:49 UTC 2026] frames 09 p0 start
+[10:21:12] frames-09-p0-done
+[Thu Oct  1 10:22:42 UTC 2026] frames 16 p0 start
+[10:23:01] frames-16-p0-done

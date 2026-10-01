@@ -1,0 +1,17 @@
+oy Law of Bergonie and Tribondeau (1906)
+(1906) ‏قاتون برکونیه و تریبوندو‎
+
+٩۶ ۰ cells tend to be radiosensitive if
+they have three properties
+
+1. Cells have a high division rate.
+> 2. Cells have a long dividing future.
+
+3. Cells are of an unspecialized type
+>» ‏دارای سه ویژگی باشند. به پرتو حساس می‎ AS ‏سود ۵ در صورتی‎
+
+شوند :
+1. سلول ها سرعت تقسیم بالایی دارند. ‎py.‏
+
+2 سلول ها طول تقسیم طولانی دارند.
+3 سلول ها از نوع تمایز نيافته باشند. 5
