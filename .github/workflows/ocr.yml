@@ -93,3 +93,5 @@ jobs:
       - name: push ocr
         if: always()
         run: bash tools/relay_push.sh ocr-done
+
+# rerun 1
