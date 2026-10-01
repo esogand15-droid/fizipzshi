@@ -42,7 +42,7 @@ jobs:
 
   transcribe:
     needs: plan
-    if: github.event_name == 'workflow_dispatch' && needs.plan.outputs.count != '0'
+    if: needs.plan.outputs.count != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
@@ -78,7 +78,6 @@ jobs:
           ls -la work/media
 
       - name: transcribe
-        if: github.event_name == 'workflow_dispatch'
         run: |
           python3 tools/transcribe_one.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4" \
             --model "${{ inputs.model || 'large-v3' }}" --offset-min "${{ matrix.offset }}" --limit-min "${{ matrix.limit }}" \
@@ -86,5 +85,5 @@ jobs:
         continue-on-error: true
 
       - name: final push
-        if: always() && github.event_name == 'workflow_dispatch'
+        if: always()
         run: bash tools/relay_push.sh "transcribe-${{ matrix.slug }}-p${{ matrix.part }}-end"
