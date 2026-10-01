@@ -1,0 +1,4 @@
+[06] duration=24.4min chunks=2 todo=2
+[06] model loaded in 4s
+[0;93m2026-10-01 10:35:02.178314963 [W:onnxruntime:Default, device_discovery.cc:146 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+[06] chunk 0 done in 20.1min (20.0min audio, x1.00 realtime)
