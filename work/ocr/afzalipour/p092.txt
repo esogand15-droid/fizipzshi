@@ -1,0 +1,25 @@
+92
+
+فاصله
+
+* رعایت فاصله. ‎Ory phe‏ روش کاهش تابش گیری است.
+
+* در فاصله ۱ متری از ‎ob sos‏ کنندة ثانویه ‎(low)‏ شدت تشعشع
+فلوروسکوپی تا 0.1% ریک هزارم) مقدار اولیه کاهش می ‎ah‏
+
+* قانون عکس مجذور فاصله. بیانگر تغییرات شدت با عکس مجذور فاصله
+است که برای پرتو اولیه با منبع تشعشع نقطه ای در نظر گرفته می شود
+و یس از حدود یک متر برای تشعشع پراکندة ثانویه صادق است.
+
+DISTANCE SHIELDING
+
+Greater distance
+
+Behind shielding
+from source - less
+radiation received
+
+Less time spent
+near source - less from source - less
+radiation received radiation received
+
