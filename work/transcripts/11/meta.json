@@ -1,0 +1,9 @@
+{
+ "slug": "11",
+ "video": "work/media/11.mp4",
+ "duration": 900.199,
+ "offset": 0.0,
+ "end": 900.199,
+ "model": "large-v3",
+ "chunk_min": 20.0
+}
