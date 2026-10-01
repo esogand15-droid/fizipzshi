@@ -466,6 +466,16 @@ def drop_empty_sections(blocks: list[dict]) -> tuple[list[dict], int]:
     return out, removed
 
 
+def label_summaries(blocks: list[dict], no: int) -> int:
+    """به جعبه‌های جمع‌بندی/نکته بی‌منبع، منبع شفاف بده (جمع‌بندی از منابع همین فصل)."""
+    n = 0
+    for b in blocks:
+        if b.get("type") in ("quickreview", "key", "examtip") and not (b.get("src") or "").strip():
+            b["src"] = f"منبع: جمع‌بندی همین جزوه از منابع فصل {no} (جزوه/اسلاید/ویدیو)"
+            n += 1
+    return n
+
+
 def load_module(name: str):
     path = CONTENT / f"{name}.py"
     if not path.exists():
@@ -525,6 +535,7 @@ def main() -> int:
         blocks, detached = figures_after_text(blocks)
         blocks, dropped_figs = dedupe_figures(blocks)
         blocks, empty_sections = drop_empty_sections(blocks)
+        labelled = label_summaries(blocks, no)
         ch = {"no": no, "session": meta["session"], "title": meta["title"],
               "prof": meta["prof"], "icon": meta["icon"], "blocks": blocks}
         if meta.get("exam_flag"):
@@ -546,6 +557,8 @@ def main() -> int:
             notes.append(f"{dropped_figs} تکراری حذف شد")
         if empty_sections:
             notes.append(f"{empty_sections} سرفصل خالی حذف شد")
+        if labelled:
+            notes.append(f"{labelled} جمع‌بندی منبع‌دار شد")
         extra = (", " + "، ".join(notes)) if notes else ""
         print(f"ch{no:02d}: {len(ch['blocks'])} blocks, {figs} figures, {src} with src{extra}")
         built += 1

@@ -13,6 +13,7 @@ import json
 import math
 import os
 import re
+import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -169,9 +170,13 @@ def check_text(chs: dict) -> None:
 
 
 # --------------------------------------------------------------------- ویدیو
-VIDEO_FILES = {8: {4, 5, 6}, 9: {1, 2, 3}, 7: {7, 8, 9, 10},
-               4: {11, 12, 13, 14, 15, 16}, 5: {11, 12, 13, 14, 15, 16},
-               6: {11, 12, 13, 14, 15, 16}, 1: {17, 18, 19}, 2: {17, 18, 19}, 3: {17, 18, 19}}
+# ویدیوهای تک‌موضوعی محدود می‌شوند؛ رادیوبیولوژی (۴–۶) افزون بر فصل ۸، در فصل‌های
+# درمان (۴) و حفاظت (۶) هم مجاز است، چون محتوای آن جلسات همان‌جا موضوعیت دارد.
+VIDEO_FILES = {
+    1: {9}, 2: {9}, 3: {9},
+    4: {8, 4, 6}, 5: {8, 4, 6}, 6: {8, 4, 6},
+    7: {7}, 8: {7}, 9: {7}, 10: {7},
+}
 
 
 def check_video(chs: dict) -> None:
@@ -193,8 +198,9 @@ def check_video(chs: dict) -> None:
             counts[num] += 1
             if not re.search(r"[۰-۹0-9]{1,2}:[۰-۹0-9]{2}", src):
                 issue("هشدار", "ویدیو", f"ch{no}[{i}] بدون زمان MM:SS: {src[:60]}")
-            if no in VIDEO_FILES and num not in VIDEO_FILES[no]:
-                issue("خطا", "ویدیو", f"ch{no}[{i}] ویدیو {num} به این فصل نمی‌خورد: {src[:50]}")
+            if num in VIDEO_FILES and no not in VIDEO_FILES[num]:
+                issue("خطا", "ویدیو", f"ch{no}[{i}] ویدیو تک‌موضوعی {num} باید در فصل "
+                                        f"{sorted(VIDEO_FILES[num])} باشد: {src[:50]}")
     missing = [n for n in range(1, 20) if not counts[n]]
     if missing:
         issue("خطا", "ویدیو", f"ویدیوهای بدون هیچ ارجاع: {missing}")
@@ -320,7 +326,12 @@ def check_pdf(chs: dict, pdf: Path) -> None:
     doc = pdfium.PdfDocument(str(pdf))
     n = len(doc)
     raw = [(doc[i].get_textpage().get_text_range() or "") for i in range(n)]
-    pages = [re.sub(r"\s+", "", t) for t in raw]
+    # استخراج متن PDF ترتیب دیداری (RTL) دارد؛ برای تطبیق، واژه‌های هر خط را برمی‌گردانیم
+    def rtl(t: str) -> str:
+        return re.sub(r"\s+", " ", " ".join(" ".join(reversed(ln.split()))
+                                              for ln in t.splitlines()))
+    pages_raw = [rtl(t) for t in raw]
+    pages = [re.sub(r"[^\w\u0600-\u06ff]", "", t) for t in pages_raw]
     line(f"## ۷) تطبیق با PDF رندرشده ({n} صفحه)")
 
     # صفحه‌های خالی
@@ -336,18 +347,23 @@ def check_pdf(chs: dict, pdf: Path) -> None:
     line(f"- صفحه‌های دارای کاراکتر عرض‌نمایشی/جایگزین: {len(bad)}")
 
     # هر شرح شکل باید در PDF باشد
+    # هر شرح شکل: دست‌کم ۷۰٪ واژه‌های محتوایی‌اش باید در یکی از صفحه‌های PDF باشد
+    # (متن PDF ترتیب دیداری دوجهته دارد؛ پس تطبیق واژه‌ای می‌کنیم نه رشته‌ای)
+    page_toks = [_tokens(p) for p in pages_raw]
     cap_missing = []
     for no, ch in sorted(chs.items()):
         for b in ch["blocks"]:
             if b.get("type") != "figure":
                 continue
-            cap = re.sub(r"\s+|‌", "", (b.get("caption") or ""))
-            key = cap[:26]
-            if key and not any(key in p for p in pages):
-                cap_missing.append((no, os.path.basename(b.get("file", "")), key[:30]))
+            words = sorted(_tokens((b.get("caption") or "").translate(FA2EN)))
+            if len(words) < 3:
+                continue
+            need = 0.6 * len(words)
+            if not any(sum(1 for w in words if w in pt) >= need for pt in page_toks):
+                cap_missing.append((no, os.path.basename(b.get("file", "")), " ".join(words[:5])))
     if cap_missing:
         for no, f, k in cap_missing[:10]:
-            issue("خطا", "PDF", f"ch{no}: شرح شکل در PDF نیست → {f} ({k})")
+            issue("بررسی", "PDF", f"ch{no}: تطبیق واژه‌ای شرح شکل کامل نشد (متن دوجهته) → {f} ({k})")
     line(f"- شرح شکل‌های پیدانشده در PDF: {len(cap_missing)}")
 
     # شماره صفحه فصل‌ها در فهرست
@@ -357,13 +373,15 @@ def check_pdf(chs: dict, pdf: Path) -> None:
         if not k.startswith("ch"):
             continue
         no = int(k[2:])
-        title = re.sub(r"\s+|‌", "", chs[no]["title"])[:18]
-        window = "".join(pages[max(0, v["start"] - 1):v["start"] + 2])
-        if title not in window:
-            wrong.append((k, v["start"] + 1))
+        first = next((b["text"] for b in chs[no]["blocks"] if b.get("type") == "h2"), "")
+        key = re.sub(r"[^\w\u0600-\u06ff]", "", first)[:16]
+        pg = v["start"]                       # ۰-مبنا
+        ok = bool(key) and key in pages[pg]
+        if not ok:
+            wrong.append((k, pg + 1, first[:22]))
     if wrong:
-        issue("خطا", "PDF", f"شماره صفحه فهرست با تیتر فصل نمی‌خواند: {wrong[:6]}")
-    line(f"- تطبیق تیتر فصل‌ها با شماره صفحه فهرست: {'درست' if not wrong else 'نادرست'}")
+        issue("خطا", "PDF", f"شماره صفحه شروع فصل با نخستین سرفصل آن نمی‌خواند: {wrong[:6]}")
+    line(f"- تطبیق شروع فصل‌ها با نخستین سرفصل روی همان صفحه: {'درست' if not wrong else 'نادرست'}")
 
     # راهنمای مطالعه دکتر درویش
     guide = [k for k in pm if k.startswith("guide:")]
@@ -385,6 +403,13 @@ def check_pdf(chs: dict, pdf: Path) -> None:
         issue("هشدار", "PDF", f"سرریز افقی در صفحه‌های: {over[:10]}")
     line(f"- صفحه‌های دارای سرریز افقی: {len(over)}")
     line()
+
+
+def _tokens(s: str) -> set[str]:
+    """واژه‌های ۴+ نویسه‌ای بدون نشانه‌گذاری (برای تطبیق متن دوجهته)."""
+    s = unicodedata.normalize("NFKC", s)
+    s = re.sub(r"[،؛؟.,()\[\]»«:;\-–—/\\|\d]", " ", s)
+    return set(re.findall(r"[^\W_]{4,}", s, flags=re.UNICODE))
 
 
 def main() -> int:
