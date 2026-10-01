@@ -12,3 +12,11 @@ __pycache__/
 work/videos/
 images/raw/
 work/review/
+
+# heavy workflow intermediates (regenerable; keep history small)
+work/media/
+work/tmp_media/
+render/pass1.pdf
+render/pass1.html
+render/pass2.html
+render/HumsYar_MedPhysics_Jozve.pdf
