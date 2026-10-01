@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -37,6 +38,47 @@ CHAPTERS = {
 }
 
 
+def load_overlay():
+    """content/figures_slide.py — auto-generated figures inserted after a matching block."""
+    path = CONTENT / "figures_slide.py"
+    if not path.exists():
+        return {}
+    spec = importlib.util.spec_from_file_location("figures_slide", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return getattr(mod, "SLIDE_FIGURES", {})
+
+
+def apply_overlay(no: int, blocks: list[dict], overlay: dict) -> list[dict]:
+    """Insert each overlay figure right after the block it matches best."""
+    figs = overlay.get(no) or []
+    if not figs:
+        return blocks
+    out = list(blocks)
+    for fig in figs:
+        if any(b.get("file") == fig.get("file") for b in out):
+            continue                       # idempotent
+        needle = (fig.pop("match", "") or "").strip()
+        words = {w for w in re.findall(r"\w{4,}", needle.lower())}
+        best, best_sc = None, 0
+        for i, b in enumerate(out):
+            if b.get("type") in ("figure", "quickreview"):
+                continue
+            txt = json.dumps(b, ensure_ascii=False).lower()
+            sc = sum(1 for w in words if w in txt)
+            if sc > best_sc:
+                best, best_sc = i, sc
+        entry = {k: v for k, v in fig.items()}
+        entry.setdefault("type", "figure")
+        if best is not None and best_sc > 0:
+            out.insert(best + 1, entry)
+        else:
+            # fall back: before the chapter's quick review, else at the end
+            idx = next((i for i, b in enumerate(out) if b.get("type") == "quickreview"), len(out))
+            out.insert(idx, entry)
+    return out
+
+
 def load_module(name: str):
     path = CONTENT / f"{name}.py"
     if not path.exists():
@@ -51,6 +93,7 @@ def main() -> int:
     only = [int(x) for x in sys.argv[1:]] if len(sys.argv) > 1 else None
     LOCK.mkdir(exist_ok=True)
     built = 0
+    overlay = load_overlay()
     for no, meta in CHAPTERS.items():
         if only and no not in only:
             continue
@@ -58,8 +101,9 @@ def main() -> int:
         if mod is None:
             print(f"ch{no:02d}: module missing ({meta['module']})")
             continue
+        blocks = apply_overlay(no, list(mod.BLOCKS), overlay)
         ch = {"no": no, "session": meta["session"], "title": meta["title"],
-              "prof": meta["prof"], "icon": meta["icon"], "blocks": mod.BLOCKS}
+              "prof": meta["prof"], "icon": meta["icon"], "blocks": blocks}
         if meta.get("exam_flag"):
             ch["exam_flag"] = meta["exam_flag"]
         (LOCK / f"ch{no:02d}.json").write_text(
