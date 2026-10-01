@@ -1,0 +1,11 @@
+# large media that must never enter git (kept out by design)
+src/**/*.mp4
+src/**/*.mkv
+src/**/*.avi
+src/**/*.mov
+src/**/*.webm
+work/audio/
+work/tmp/
+*.tmp
+__pycache__/
+.venv/
