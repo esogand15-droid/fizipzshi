@@ -120,6 +120,13 @@
    "src": "اسلایدهای رادیوبیولوژی دکتر درویش ص۷ و ص۹"
   },
   {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p009_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Nonlinear Threshold Response / پاسخ آستانه غیر",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۹"
+  },
+  {
    "type": "table",
    "head": [
     "دسته اثر",
@@ -240,6 +247,13 @@
    "src": "اسلایدهای رادیوبیولوژی دکتر درویش ص۱۹"
   },
   {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p040_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Direct Ionization Damage to DNA / آسیب یونیزاسیون مستقیم بهDNA",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۴۰"
+  },
+  {
    "type": "h2",
    "text": "۷. اثر بیولوژیکی نسبی (RBE)"
   },
@@ -307,6 +321,20 @@
     "در صورت وجود اکسیژن حل‌شده ([[O2]])، مسیر واکنش‌ها می‌تواند به تشکیل [[HO2•]] و در ادامه [[H2O2]] و [[O2]] بیانجامد."
    ],
    "src": "اسلایدهای رادیوبیولوژی دکتر درویش ص۱۹ تا ص۲۲"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p020_1.jpg",
+   "width": "70%",
+   "caption": "شکل — Hydrolysis of Water / • So, free radical (OH, H ) and H2O2 are toxic",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۲۰"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p020_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Hydrolysis of Water / • So, free radical (OH, H ) and H2O2 are toxic",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۲۰"
   },
   {
    "type": "h3",
@@ -426,6 +454,13 @@
    "src": "منبع: ویدیو — دکتر درویش، رادیوبیولوژی ۲ (فایل ۰۶) — 03:12 تا 04:30"
   },
   {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p038_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Damage to Chromosomes / آسیب به کروموزوم ها",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۳۸"
+  },
+  {
    "type": "h3",
    "text": "سرنوشت سلول پس از پرتودهی (از ویدیو)"
   },
@@ -466,6 +501,41 @@
     ]
    ],
    "src": "اسلایدهای رادیوبیولوژی دکتر درویش ص۴۶ (اسلاید «[[DNA damage produced in one cell by 1 Gy X-rays]]»)"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p076_1.jpg",
+   "width": "70%",
+   "caption": "شکل — Nonlethal Breaks: / Translocation and",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۷۶"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p076_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Nonlethal Breaks: / Translocation and",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۷۶"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p073_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Lethal Chromosome Breaks: / Dicentric",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۷۳"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p071_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Lethal Chromosome Breaks: / Rings",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۷۱"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p039_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Cell replication: a complicated duplication of DNA",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۳۹"
   },
   {
    "type": "bullets",
@@ -520,6 +590,13 @@
     "ناهنجاری کروماتیدی: اگر پرتوگیری در مراحل آخر اینترفاز ([[G2]]) و پس از دوپلیکاسیون کروموزوم باشد، کروموزوم دورشته‌ای حاوی دو رشته کروماتید بوده و شکست در رشته‌های کروماتیدها اتفاق می‌افتد؛ در این حالت سلول‌های حاصل در میتوز بعدی دارای ناهنجاری کروماتیدی خواهند بود (مانند پل آنافازی یا دی‌سانتریک کروماتید)."
    ],
    "src": "اسلایدهای رادیوبیولوژی دکتر درویش ص۷۴"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p067_0.jpg",
+   "width": "70%",
+   "caption": "شکل — دوپلیكاسیون كروموزوم اتفاق افتاده و شكست در کروموزوم تک رشته ای ایجاد مي",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۶۷"
   },
   {
    "type": "h3",
@@ -604,6 +681,13 @@
     "اثرات تابش یک دوره نهفته ([[latent period]]) نشان می‌دهد که در طی آن هیچ شواهدی از آسیب وجود ندارد؛ این دوره ممکن است از چند دقیقه تا چند دهه طول بکشد (طول دوره به دوز و نوع سلول‌های درگیر بستگی دارد)."
    ],
    "src": "اسلایدهای رادیوبیولوژی دکتر درویش ص۳۲ و ص۴۱ و ص۳۵"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p036_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Membrane Leakage / نشتی غشا",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۳۶"
   },
   {
    "type": "h2",
@@ -789,6 +873,13 @@
     ]
    ],
    "src": "جزوه فیزیک تشعشع و پزشکی هسته‌ای — فصل ۱۱؛ اسلایدهای حق‌پرست"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide08_darvish_radiobio_p070_0.jpg",
+   "width": "70%",
+   "caption": "شکل — از اسلایدهای رادیوبیولوژی — دکتر درویش",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۷۰"
   },
   {
    "type": "quickreview",

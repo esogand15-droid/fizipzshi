@@ -38,6 +38,45 @@ CHAPTERS = {
 }
 
 
+def load_video_extra():
+    path = CONTENT / "video_extra.py"
+    if not path.exists():
+        return {}
+    spec = importlib.util.spec_from_file_location("video_extra", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return getattr(mod, "VIDEO_BLOCKS", {})
+
+
+def apply_video_extra(no: int, blocks: list[dict], extra: dict) -> list[dict]:
+    """Insert each video block right after the block its `after` text matches."""
+    entries = extra.get(no) or []
+    if not entries:
+        return blocks
+    out = list(blocks)
+    for ent in entries:
+        for blk in ent.get("blocks", []):
+            if any(b.get("src") == blk.get("src") and b.get("type") == blk.get("type")
+                   for b in out):
+                continue                      # idempotent
+            needle = (ent.get("after") or "").strip()
+            pos = None
+            for i, b in enumerate(out):
+                hay = json.dumps(b, ensure_ascii=False)
+                if needle and needle in hay:
+                    pos = i
+                    break
+            entry = {k: v for k, v in blk.items()}
+            if pos is None:
+                # no anchor matched: keep it in the body, just before «مرور سریع»
+                idx = next((i for i, b in enumerate(out) if b.get("type") == "quickreview"),
+                           len(out))
+                out.insert(idx, entry)
+            else:
+                out.insert(pos + 1, entry)
+    return out
+
+
 def load_overlay():
     """content/figures_slide.py — auto-generated figures inserted after a matching block."""
     path = CONTENT / "figures_slide.py"
@@ -94,6 +133,7 @@ def main() -> int:
     LOCK.mkdir(exist_ok=True)
     built = 0
     overlay = load_overlay()
+    video_extra = load_video_extra()
     for no, meta in CHAPTERS.items():
         if only and no not in only:
             continue
@@ -102,6 +142,7 @@ def main() -> int:
             print(f"ch{no:02d}: module missing ({meta['module']})")
             continue
         blocks = apply_overlay(no, list(mod.BLOCKS), overlay)
+        blocks = apply_video_extra(no, blocks, video_extra)
         ch = {"no": no, "session": meta["session"], "title": meta["title"],
               "prof": meta["prof"], "icon": meta["icon"], "blocks": blocks}
         if meta.get("exam_flag"):
