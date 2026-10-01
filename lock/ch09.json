@@ -38,13 +38,6 @@
    "text": "۲. خواص هسته‌ای لازم برای تصویربرداری (اسپین هسته)"
   },
   {
-   "type": "figure",
-   "file": "images/fig/slide09_darvish_mri_p046_0.jpg",
-   "width": "70%",
-   "caption": "شکل — 46 / تصویر",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۴۶"
-  },
-  {
    "type": "bullets",
    "items": [
     "اگر عدد جرمی ([[A]]) و عدد اتمی ([[Z]]) هسته، فرد باشد (یعنی پروتون جفت‌نشده داشته باشد)، اسپین هسته ([[I]]) مضربی از [[1/2]] خواهد بود: [[1/2, 3/2, 5/2, ...]]؛ نمونه‌ها: [[H-1]]، [[Na-23]]، [[Al-27]].",
@@ -52,13 +45,6 @@
     "در هسته‌هایی که عدد اتمی فرد و عدد جرمی زوج دارند (پروتون جفت‌نشده)، اسپین هسته عدد صحیحی است ([[1، 2، 3، 4 و ...]]): [[H-2]]، [[N-14]]."
    ],
    "src": "اسلایدهای MRI دکتر درویش اسلاید ۳ و ۴"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide09_darvish_mri_p001_0.jpg",
-   "width": "70%",
-   "caption": "شکل — تصویربرداری تشدید مغناطیسی",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۱"
   },
   {
    "type": "h2",
@@ -73,20 +59,6 @@
     "هسته مانند یک آهنربای کوچک عمل می‌کند؛ چون خودش [[I]] و [[MDM]] (ممان دوقطبی مغناطیسی) دارد، در جهت میدان قرار می‌گیرد ولی نمی‌تواند کاملاً هم‌جهت شود، پس در دو سطح قرار می‌گیرد که اختلاف سطح انرژی [[ΔE]] است."
    ],
    "src": "اسلایدهای MRI دکتر درویش اسلاید ۷ تا ۱۰"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide09_darvish_mri_p009_1.jpg",
-   "width": "70%",
-   "caption": "شکل — پروتون ها در میدان مغناطیسی / •هسته مثل یک آهنربای کوچک عمل می کند بنابراین هسته",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۹"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide09_darvish_mri_p009_0.jpg",
-   "width": "70%",
-   "caption": "شکل — پروتون ها در میدان مغناطیسی / •هسته مثل یک آهنربای کوچک عمل می کند بنابراین هسته",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۹"
   },
   {
    "type": "figure",
@@ -190,29 +162,8 @@
    "src": "اسلایدهای MRI دکتر درویش اسلاید ۱۵ و ۱۶"
   },
   {
-   "type": "figure",
-   "file": "images/fig/slide09_darvish_mri_p016_1.jpg",
-   "width": "70%",
-   "caption": "شکل — تشدید بوسیله امواج رادیویی / •امواج رادیویی که فرستاده می شود باعث تشدید می شود",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۱۶"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide09_darvish_mri_p016_0.jpg",
-   "width": "70%",
-   "caption": "شکل — تشدید بوسیله امواج رادیویی / •امواج رادیویی که فرستاده می شود باعث تشدید می شود",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۱۶"
-  },
-  {
    "type": "h2",
    "text": "۶. اندازه‌گیری مغناطش بافت (Measuring Tissue Magnetization)"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide09_darvish_mri_p017_0.jpg",
-   "width": "70%",
-   "caption": "شکل — Measuring Tissue Magnetization: / When Mo is aligned to the magnetic field Bo it",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۱۷"
   },
   {
    "type": "bullets",
@@ -296,6 +247,13 @@
    "text": "سازوکار کنتراست: چرا بافت‌ها در T1 و T2 روشن یا تیره می‌شوند (از ویدیو)"
   },
   {
+   "type": "figure",
+   "file": "images/fig/slide09_darvish_mri_p051_0.jpg",
+   "width": "70%",
+   "caption": "شکل — کنتراست خونریزی درMRI",
+   "src": "اسلایدهای MRI — دکتر درویش — ص۵۱"
+  },
+  {
    "type": "bullets",
    "items": [
     "برای ساختن تصویر [[T1]] از «چگونگی از دست دادن انرژی» استفاده می‌شود؛ برای [[T2]] از «هم‌فازی/ناهم‌فازی» پروتون‌ها استفاده می‌شود.",
@@ -365,13 +323,6 @@
     "وزن‌دهی تصویر ([[T1-weighted]]، [[T2-weighted]] و [[Proton Density]]) بر همین تفاوت زمان‌های آسایش و چگالی پروتون استوار است."
    ],
    "src": "اسلایدهای MRI دکتر درویش اسلاید ۳۵ و ۴۵ تا ۴۸"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide09_darvish_mri_p048_0.jpg",
-   "width": "70%",
-   "caption": "شکل — تصویرPROTON / DENSITY",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۴۸"
   },
   {
    "type": "table",
@@ -640,8 +591,22 @@
    "type": "figure",
    "file": "images/fig/slide09_haghparast_mphpd_p064_0.jpg",
    "width": "70%",
-   "caption": "شکل — Driving force may be sinusoidal particles oscillate back and forth / pressure",
+   "caption": "شکل — Driving force may be sinusoidal particles oscillate back and forth",
    "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۶۴"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide09_darvish_mri_p002_0.jpg",
+   "width": "70%",
+   "caption": "شکل — از اسلایدهای MRI — دکتر درویش",
+   "src": "اسلایدهای MRI — دکتر درویش — ص۲"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide09_darvish_mri_p048_0.jpg",
+   "width": "70%",
+   "caption": "شکل — تصویرPROTON",
+   "src": "اسلایدهای MRI — دکتر درویش — ص۴۸"
   },
   {
    "type": "quickreview",

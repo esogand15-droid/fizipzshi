@@ -26,6 +26,13 @@
   },
   {
    "type": "figure",
+   "file": "images/fig/slide02_afzalipour_p077_0.jpg",
+   "width": "70%",
+   "caption": "شکل — تابش گيﺮي بيمار / ",
+   "src": "اسلایدهای دکتر افضلی‌پور — ص۷۷"
+  },
+  {
+   "type": "figure",
    "file": "images/fig/fig02_xray_production.jpg",
    "width": "62%",
    "caption": "شکل — دو مکانیسم تولید پرتو ایکس: پدیده ترمزی ([[Bremsstrahlung]]) و پدیده مشخصه ([[Characteristic]]).",
@@ -57,6 +64,13 @@
     "الکترون پس از این برخورد، در جهتی دیگر مسیر خود را ادامه می‌دهد و می‌تواند با سایر اتم‌ها نیز برخورد کند تا زمانی که پیوسته‌ای از انرژی داشته باشد."
    ],
    "src": "جزوه فیزیک تشعشع و پزشکی هسته‌ای — دکتر حق‌پرست ص۹ و ص۱۰؛ اسلایدهای M.Ph.P.D — دکتر حق‌پرست اسلاید «[[Bremsstrahlung X-ray Production]]»"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide02_haghparast_mphpd_p009_0.jpg",
+   "width": "70%",
+   "caption": "شکل — X-ray Production",
+   "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۹"
   },
   {
    "type": "p",
@@ -112,6 +126,27 @@
    "type": "p",
    "text": "باریکه اشعه ایکس خروجی از لوله، ترکیبی از دو نوع تابش است: طیف پیوسته اشعه‌های ترمزی که زمینه اصلی نمودار را می‌سازد، به‌همراه چند قله مشخص و جداگانه که مربوط به اشعه‌های ایکس مشخصه است (در تنگستن: [[59 keV]] و [[67 keV]]).",
    "src": "جزوه فیزیک تشعشع و پزشکی هسته‌ای — دکتر حق‌پرست ص۱۲ و ص۱۳؛ اسلایدهای M.Ph.P.D — دکتر حق‌پرست اسلاید «[[X-ray Spectrum]]»"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide02_afzalipour_p020_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Electromagnetic Radiation / Spectrum",
+   "src": "اسلایدهای دکتر افضلی‌پور — ص۲۰"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide02_haghparast_mphpd_p006_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Electromagnetic spectrum",
+   "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۶"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide02_haghparast_mphpd_p005_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Electromagnetic Spectrum",
+   "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۵"
   },
   {
    "type": "bullets",
@@ -214,6 +249,13 @@
    "src": "جزوه دکتر افضلی‌پور ص۴۷ و ص۵۰"
   },
   {
+   "type": "figure",
+   "file": "images/fig/slide02_darvish_radiobio_p023_0.jpg",
+   "width": "70%",
+   "caption": "شکل — تصویری از برهمکنش مستقیم و غیر مستقی",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۲۳"
+  },
+  {
    "type": "table",
    "head": [
     "پارامتر",
@@ -252,8 +294,15 @@
    "type": "figure",
    "file": "images/fig/slide02_haghparast_mphpd_p013_0.jpg",
    "width": "70%",
-   "caption": "شکل — Thrall & Widmer, 1998 /",
+   "caption": "شکل — Thrall & Widmer, 1998",
    "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۱۳"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide02_haghparast_mphpd_p014_0.jpg",
+   "width": "70%",
+   "caption": "شکل — Thrall & Widmer, 1998",
+   "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۱۴"
   },
   {
    "type": "figure",
@@ -261,6 +310,27 @@
    "width": "70%",
    "caption": "شکل — فﻬﺮﺳﺖ : / پرتونگاري در پزشكي",
    "src": "اسلایدهای دکتر افضلی‌پور — ص۳"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide02_afzalipour_p019_0.jpg",
+   "width": "70%",
+   "caption": "شکل — X-ray Radiography / •",
+   "src": "اسلایدهای دکتر افضلی‌پور — ص۱۹"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide02_afzalipour_p019_1.jpg",
+   "width": "70%",
+   "caption": "شکل — X-ray Radiography / •",
+   "src": "اسلایدهای دکتر افضلی‌پور — ص۱۹"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide02_afzalipour_p087_0.jpg",
+   "width": "70%",
+   "caption": "شکل — بيمار باردار / ",
+   "src": "اسلایدهای دکتر افضلی‌پور — ص۸۷"
   },
   {
    "type": "key",

@@ -470,10 +470,24 @@
   },
   {
    "type": "figure",
-   "file": "images/fig/slide07_haghparast_mphpd_p072_0.jpg",
+   "file": "images/fig/slide07_haghparast_mphpd_p063_0.jpg",
    "width": "70%",
-   "caption": "شکل — Interaction of mechanical / waves with Matter",
-   "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۷۲"
+   "caption": "شکل — از اسلایدهای M.Ph.P.D — دکتر حق‌پرست",
+   "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۶۳"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide07_haghparast_mphpd_p091_0.jpg",
+   "width": "70%",
+   "caption": "شکل — از اسلایدهای M.Ph.P.D — دکتر حق‌پرست",
+   "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۹۱"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide07_haghparast_mphpd_p091_1.jpg",
+   "width": "70%",
+   "caption": "شکل — از اسلایدهای M.Ph.P.D — دکتر حق‌پرست",
+   "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست — ص۹۱"
   },
   {
    "type": "figure",
@@ -481,13 +495,6 @@
    "width": "70%",
    "caption": "شکل — the radiation harm that it might cause.",
    "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۷۹"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide07_darvish_mri_p019_0.jpg",
-   "width": "70%",
-   "caption": "شکل — Measuring Tissue Magnetization: / For an energy transfer to occur the RF Pulse m",
-   "src": "اسلایدهای MRI — دکتر درویش — ص۱۹"
   },
   {
    "type": "quickreview",

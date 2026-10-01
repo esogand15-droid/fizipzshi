@@ -21,6 +21,8 @@ import re
 import sys
 from pathlib import Path
 
+from PIL import Image, ImageStat
+
 ROOT = Path(__file__).resolve().parent.parent
 SLIDE_IDX = ROOT / "images" / "slide" / "INDEX.json"
 ROUTING = ROOT / "work" / "figure_routing.tsv"
@@ -31,25 +33,37 @@ LOCK = ROOT / "lock"
 FA = "۰۱۲۳۴۵۶۷۸۹"
 
 RULES = {
-    1: ["تعریف تشعشع", "یونیزان", "غیر یونیزان", "آلفا", "بتا", "رونتگن", "طبقه", "طیف الکترومغناطیس"],
-    2: ["اشعه ایکس", "x-ray", "لامپ", "لوله", "آند", "کاتد", "ترمزی", "bremsstrahlung",
-        "مشخصه", "characteristic", "طیف", "spectrum", "فیلامان", "تنگستن", "kvp", "anode"],
-    3: ["رادیوگرافی", "رادیوگراف", "فلوروسکوپی", "fluoroscopy", "سی تی", "tomography",
-        "ماموگرافی", "mammography", "گرید", "کنتراست", "آنژیو", "gantry", "آشکارساز", "باریوم"],
-    4: ["رادیواکتیو", "واپاشی", "decay", "نیمه عمر", "پزشکی هسته", "پرتوزا", "پوزیترون",
-        "positron", "pet", "تکنسیوم", "tc-99", "tc-99m", "mo-99", "اکتیویته", "activity",
-        "گاما", "رادیودارو", "کوری", "بکرل", "generator", "ژنراتور", "milking", "annihilation",
-        "radionuclide", "رادیونوکلید", "half-life", "half life"],
-    5: ["دوز", "dose", "واحد", "gray", "rem", "سیورت", "راد", "بکرل", "کوری", "دزیمتر", "اسپوژر", "رونتگن"],
-    6: ["حفاظت", "protection", "پرتوکار", "shielding", "سرب", "alara", "دز حد", "گوناد", "lead"],
-    7: ["سونوگرافی", "اولتراسوند", "ultrasound", "پیزوالکتریک", "piezoelectric", "probe", "پروب",
-        "داپلر", "doppler", "امپدانس", "impedance", "echo", "ترانسدیوسر", "transducer", "موج صوتی",
-        "a-mode", "b-mode", "m-mode", "a mode", "b mode", "display", "scan", "crt", "frame",
-        "pulse", "پالس", "مبدل", "بافت نرم"],
-    8: ["رادیوبیولوژی", "radiobiology", "اثرات زیستی", "کروموزوم", "chromosome", "dna",
-        "سلول", "cell", "survival", "بقا", "let", "rbe", "اپوپتوز", "تصادفی", "قطعی", "سندروم"],
-    9: ["mri", "ام آر آی", "امارای", "مغناطیس", "magnetic", "تشدید", "resonance", "t1", "t2",
-        "پروتون", "proton", "relaxation", "tr ", "te ", "اسپین", "spin", "rf", "گرادیان"],
+    1: ["تعریف تشعشع", "یونیزان", "غیر یونیزان", "غیریونیزان", "آلفا", "بتا", "رونتگن", "طبقه‌بندی",
+        "طیف الکترومغناطیس", "electromagnetic spectrum", "ionizing", "non-ionizing", "radiation types"],
+    2: ["اشعه ایکس", "x-ray production", "x-ray tube", "لامپ", "آند", "کاتد", "ترمزی", "bremsstrahlung",
+        "مشخصه", "characteristic", "طیف", "spectrum", "فیلامان", "تنگستن", "kvp", "anode", "cathode",
+        "filament", "rotating anode", "focal spot", "space charge"],
+    3: ["رادیوگرافی", "radiograph", "فلوروسکوپی", "fluoroscop", "سی تی", "tomograph", "ماموگرافی",
+        "mammograph", "گرید", "کنتراست", "contrast agent", "آنژیو", "angiograph", "gantry",
+        "آشکارساز", "detector", "باریوم", "barium", "intensifying screen", "cassette", "ct "],
+    4: ["رادیواکتیو", "radioactiv", "واپاشی", "decay", "نیمه عمر", "half-life", "half life",
+        "پزشکی هسته", "nuclear medicine", "پرتوزا", "radionuclide", "پوزیترون", "positron", "pet ",
+        "تکنسیوم", "technetium", "tc-99", "mo-99", "generator", "ژنراتور", "annihilation", "فنا",
+        "اکتیویته", "activity", "گاما", "gamma", "رادیودارو", "radiotracer", "molybdenum"],
+    5: ["دوز جذبی", "absorbed dose", "دوز معادل", "equivalent dose", "واحد", "unit", "gray", "rem",
+        "سیورت", "sievert", "راد", "rad ", "بکرل", "becquerel", "کوری", "curie", "دزیمتر",
+        "dosimeter", "thermoluminescent", "tld", "exposure", "اسپوژر", "رونتگن", "roentgen"],
+    6: ["حفاظت", "protection", "protect", "پرتوکار", "shielding", "shield", "سرب", "lead", "alara",
+        "گوناد", "gonad", "apron", "روپوش", "time distance", "معادل سربی", "pb", "pregnancy",
+        "باردار", "occupational", "شغلی", "کارکنان", "staff"],
+    7: ["سونوگرافی", "sonograph", "اولتراسوند", "ultrasound", "ultrasonic", "پیزوالکتریک",
+        "piezoelectric", "probe", "پروب", "داپلر", "doppler", "امپدانس", "impedance", "echo",
+        "ترانسدیوسر", "transducer", "a-mode", "b-mode", "m-mode", "a mode", "b mode", "m mode",
+        "pulse", "پالس", "بافت نرم", "acoustic", "frequency", "مگاهرتز", "mhz"],
+    8: ["رادیوبیولوژی", "radiobiolog", "اثرات زیستی", "biological effect", "کروموزوم", "chromosome",
+        "dna", "سلول", "cell", "survival", "بقا", "let", "rbe", "اپوپتوز", "apoptosis", "تصادفی",
+        "قطعی", "استوکستیک", "stochastic", "deterministic", "سندروم", "syndrome", "free radical",
+        "رادیکال آزاد", "hydrolysis", "هیدرولیز", "water", "آب", "mutation", "جهش", "chromatid",
+        "dicentric", "ring chromosome", "ناهنجاری", "aberration", "radiosensitivity", "حساسیت پرتوی",
+        "mitosis", "میتوز", "cycle", "چرخه"],
+    9: ["mri", "ام آر آی", "امارای", "magnetic resonance", "مغناطیس", "magnetic", "تشدید", "resonance",
+        "t1", "t2", "proton density", "پروتون", "proton", "relaxation", "tr ", "te ", "اسپین", "spin",
+        "rf", "گرادیان", "gradient", "nmr", "precession", "flip angle", "contrast in mri", "weighted"],
 }
 
 SLUG_FA = {
@@ -128,7 +142,9 @@ def used_pairs() -> set[tuple[str, int]]:
         "MRI": "darvish_mri",
     }
     page_re = re.compile(r"ص\s*([۰-۹0-9]+)")
-    for f in list(CONTENT.glob("*.py")) + list(LOCK.glob("ch*.json")):
+    # only the hand-written chapter modules count as "already in the book": the
+    # overlay (figures_slide.py) and lock/ are regenerated by this tool.
+    for f in sorted(CONTENT.glob("ch[0-9][0-9]_*.py")):
         txt = f.read_text(encoding="utf-8")
         for m in re.finditer(r'"src":\s*"([^"]+)"', txt):
             src = m.group(1)
@@ -191,12 +207,14 @@ def main() -> int:
         if float(e.get("cov") or 0) < args.min_cov:
             skipped_cov += 1
             continue
-        body = (e.get("heading") or "") + "\n" + ptext.get((slug, page), "")
+        body = ptext.get((slug, page), "") or (e.get("heading") or "")
         e["body"] = body
-        ch = routed.get(e["file"], 0)
-        if not ch:
-            ch, sc = score_chapter(body)
-            if not sc:
+        # a page that carries no text is decoration/photo-only: keep it only when the
+        # filename heading itself matches a chapter
+        ch, sc = score_chapter(body)
+        if sc < 3:          # one stray keyword is not enough: prefer the routed chapter
+            ch = routed.get(e["file"], 0) or (ch if sc >= 2 else 0)
+            if not ch:
                 skipped_noroute += 1
                 continue
         plan.setdefault(ch, []).append(e)
@@ -206,10 +224,65 @@ def main() -> int:
           f"| unrouted {skipped_noroute} | to add {total}")
     print("per chapter:", {k: len(v) for k, v in sorted(plan.items())})
 
+    # drop pictures that are near-duplicates of one already chosen
+    def phash(path: str) -> int:
+        img = Image.open(ROOT / path).convert("L").resize((8, 8))
+        vals = list(img.getdata())
+        avg = sum(vals) / len(vals)
+        bits = 0
+        for v in vals:
+            bits = (bits << 1) | (1 if v > avg else 0)
+        return bits
+
+    seen: list[int] = []
+    dupes = 0
+    for ch in list(plan):
+        keep = []
+        for e in plan[ch]:
+            h = phash(e["file"])
+            if any(bin(h ^ s2).count("1") <= 6 for s2 in seen):
+                dupes += 1
+                continue
+            seen.append(h)
+            keep.append(e)
+        plan[ch] = keep
+        if not plan[ch]:
+            del plan[ch]
+    print(f"duplicate pictures dropped: {dupes}")
+
+    # drop letterbox header/footer bands and blank/empty scans (contact sheets for the
+    # dropped set are written to work/review so the decision stays auditable)
+    dropped: list[tuple[int, dict, str]] = []
+    for ch in list(plan):
+        keep = []
+        for e in plan[ch]:
+            img = Image.open(ROOT / e["file"]).convert("RGB")
+            w, h = img.size
+            ar = w / h
+            gray = img.convert("L").resize((64, 64))
+            std = ImageStat.Stat(gray).stddev[0]
+            colors = len(set(img.resize((48, 48)).getdata()))
+            if ar > 3.2 or ar < 0.31:
+                dropped.append((ch, e, "band"))
+            elif std < 18 or colors < 90:
+                dropped.append((ch, e, "flat"))
+            else:
+                keep.append(e)
+        plan[ch] = keep
+        if not plan[ch]:
+            del plan[ch]
+    total = sum(len(v) for v in plan.values())
+    print(f"after quality filter: {total} figures "
+          f"({len(dropped)} dropped: {sum(1 for _, _, r in dropped if r == 'band')} bands, "
+          f"{sum(1 for _, _, r in dropped if r == 'flat')} flat)")
+    (ROOT / "work" / "review").mkdir(parents=True, exist_ok=True)
+    (ROOT / "work" / "review" / "dropped_figures.txt").write_text(
+        "\n".join(f"ch{ch}\t{e['file']}\t{reason}" for ch, e, reason in dropped),
+        encoding="utf-8")
+
     if args.dry:
         return 0
 
-    from PIL import Image
 
     FID = ROOT / "images" / "fig"
     files = []

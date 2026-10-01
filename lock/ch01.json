@@ -37,6 +37,13 @@
    "src": "جزوه دکتر افضلی‌پور ص۲۲"
   },
   {
+   "type": "figure",
+   "file": "images/fig/slide01_darvish_radiobio_p002_0.jpg",
+   "width": "70%",
+   "caption": "شکل — اثرات بیولوژیکی پرتوهای یونیزان",
+   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۲"
+  },
+  {
    "type": "bullets",
    "items": [
     "پرتوهای یونیزان: پرتوهایی که موجب یونیزه شدن اتم می‌شوند.",
@@ -153,20 +160,6 @@
     ]
    ],
    "src": "اسلایدهای M.Ph.P.D — دکتر حق‌پرست اسلاید «[[Types of Ionizing Radiation]]»؛ جزوه فیزیک تشعشع و پزشکی هسته‌ای — دکتر حق‌پرست ص۶"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide01_darvish_radiobio_p002_1.jpg",
-   "width": "70%",
-   "caption": "شکل — Biological Effects of / Ionizing Radiation",
-   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۲"
-  },
-  {
-   "type": "figure",
-   "file": "images/fig/slide01_darvish_radiobio_p002_0.jpg",
-   "width": "70%",
-   "caption": "شکل — Biological Effects of / Ionizing Radiation",
-   "src": "اسلایدهای رادیوبیولوژی — دکتر درویش — ص۲"
   },
   {
    "type": "h3",
@@ -356,6 +349,13 @@
     ]
    ],
    "src": "جزوه دکتر افضلی‌پور ص۵۳؛ جزوه فیزیک تشعشع و پزشکی هسته‌ای — دکتر حق‌پرست ص۳۹؛ اسلایدهای درویش ([[MRI]])"
+  },
+  {
+   "type": "figure",
+   "file": "images/fig/slide01_afzalipour_p065_0.jpg",
+   "width": "70%",
+   "caption": "شکل — از اسلایدهای دکتر افضلی‌پور",
+   "src": "اسلایدهای دکتر افضلی‌پور — ص۶۵"
   },
   {
    "type": "bullets",
