@@ -1,0 +1,18 @@
+X-ray Spectrum
+(variable x-ray energies)
+
+average energy of
+x-ray beam
+
+characteristic
+
+A“ | X-rays
+(59 & 67 keV)
+
+# of x-rays
+
+Bremsstrahlung
+X-rays
+
+30 60 90
+X-ray energy (keV)
