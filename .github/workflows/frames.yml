@@ -38,7 +38,7 @@ jobs:
 
   frames:
     needs: plan
-    if: github.event_name == 'workflow_dispatch' && needs.plan.outputs.count != '0'
+    if: needs.plan.outputs.count != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
@@ -66,10 +66,10 @@ jobs:
         run: gh release download "$REL" --pattern "${{ matrix.slug }}.mp4" -D work/media --clobber
 
       - name: extract frames
-        if: github.event_name == 'workflow_dispatch' && matrix.part == 0
+        if: matrix.part == 0
         run: python3 tools/extract_frames.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4"
         continue-on-error: true
 
       - name: push frames
-        if: always() && github.event_name == 'workflow_dispatch'
+        if: always()
         run: bash tools/relay_push.sh "frames-${{ matrix.slug }}-p${{ matrix.part }}-done"
