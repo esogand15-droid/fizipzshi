@@ -102,3 +102,8 @@ work/tmp/phys.rar: RAR archive data, v5
 wrote INVENTORY.md
 [10:09:19] state5-inventory-made
 [10:09:29] pushed: state5-inventory-made
+M  work/relay/status.log
+?? work/relay/big_files.txt
+To https://github.com/esogand15-droid/fizipzshi
+   f47dacf..804377c  HEAD -> arena/01a0f6eb-fizipzshi
+[10:09:31] state6-sources-committed
