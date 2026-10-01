@@ -132,5 +132,5 @@ python3 tools/make_report.py
 ## ۸) وضعیت انتشار
 
 - شاخهٔ `arena/01a0f6eb-fizipzshi` — کامیت محتوا `d55c4a8` + کامیت گزارش `6937cf9` + رلهٔ رندر `343d3d6` (CI: **run `36889078837` — success**).
-- ریلیز `jozve-v1` حاوی همان PDF نهایی (۷٬۶۷۰٬۶۳۶ بایت).
+- ریلیز `jozve-v1` حاوی همان PDF نهایی (۷٬۶۷۰٬۶۳۵ بایت).
 - PR: <https://github.com/esogand15-droid/fizipzshi/pull/1> — متن با اعداد ۱۲۹ صفحه‌ای به‌روز شد.
