@@ -1,5 +1,5 @@
-== pages: 116
+== pages: 137
 == suspected empty/near-empty pages: []
 == CJK/unknown chars: [] count: 0
-== lock blocks: 503, figures: 68, tables: 46, with src: 344
+== lock blocks: 564, figures: 110, tables: 46, with src: 405
 == lock chapters: 9
