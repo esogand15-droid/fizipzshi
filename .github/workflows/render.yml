@@ -3,6 +3,8 @@ name: render-pdf
 on:
   workflow_dispatch:
   push:
+    branches:
+      - arena/01a0fd2a-fizipzshi
     paths:
       - 'lock/**'
       - 'render/**'
@@ -14,18 +16,19 @@ permissions:
   contents: write
 
 env:
-  BRANCH: arena/01a0f6eb-fizipzshi
+  BRANCH: arena/01a0fd2a-fizipzshi
   # nudge: keep the release asset in sync with the committed PDF
   REL: jozve-v1
 
 jobs:
   render:
+    if: github.ref_name == 'arena/01a0fd2a-fizipzshi'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: arena/01a0f6eb-fizipzshi
+          ref: arena/01a0fd2a-fizipzshi
           fetch-depth: 1
 
       - name: setup
@@ -35,9 +38,12 @@ jobs:
           python3 -m pip install --quiet weasyprint pypdfium2 pillow
           python3 -c "import weasyprint; print('weasyprint', weasyprint.__version__)"
 
+      - name: content physics checks
+        run: python3 tools/audit_physics.py
+
       - name: render
         run: |
-          set -x
+          set -euo pipefail
           python3 render/render.py "$GITHUB_WORKSPACE/HumsYar_MedPhysics_Jozve.pdf" 2>&1 | tail -30
 
       - name: qc
@@ -47,7 +53,7 @@ jobs:
           cat render/qc_report.txt | tail -40
 
       - name: previews
-        if: always()
+        if: success()
         run: |
           python3 - <<'PY'
           import pypdfium2 as pdfium, pathlib, json
@@ -68,7 +74,7 @@ jobs:
         continue-on-error: true
 
       - name: publish
-        if: always()
+        if: success()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -86,5 +92,5 @@ jobs:
           ls -la HumsYar_MedPhysics_Jozve.pdf || true
 
       - name: commit results
-        if: always()
+        if: success()
         run: bash tools/relay_push.sh render-done

@@ -3,7 +3,7 @@
 # Used by GitHub Actions jobs because Actions logs are not reachable from the
 # agent sandbox (only git/API egress is allowed there).
 set -u
-BRANCH="${BRANCH:-arena/01a0f6eb-fizipzshi}"
+BRANCH="${BRANCH:-arena/01a0fd2a-fizipzshi}"
 MSG="${1:-state}"
 mkdir -p work/relay
 echo "[$(date -u +%H:%M:%S)] $MSG" >> work/relay/status.log
