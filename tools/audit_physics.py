@@ -99,8 +99,10 @@ def main() -> int:
     if "آشعه" in protection_text:
         fail("OCR typo آشعه remains in the protection chapter")
     fig_place = load_module("fig_place", "content/fig_place.py")
-    if "images/fig/slide06_afzalipour_p105_0.jpg" not in fig_place.FIG_DROP:
-        fail("redundant protection image has not been removed")
+    for redundant in ("images/fig/slide06_afzalipour_p104_0.jpg",
+                      "images/fig/slide06_afzalipour_p105_0.jpg"):
+        if redundant not in fig_place.FIG_DROP:
+            fail(f"redundant protection image has not been removed: {redundant}")
     apron_path = "images/fig/fig06_lead_apron.jpg"
     if any(b.get("type") == "figure" and b.get("file") == apron_path
            for b in protection.BLOCKS):
