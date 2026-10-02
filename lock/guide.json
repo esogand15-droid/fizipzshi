@@ -1,0 +1,28 @@
+[
+ {
+  "topic": "اثرات تصادفی و غیرتصادفی (Stochastic and non-stochastic effect)",
+  "where": "فصل ۸ — بخش‌های ۳ تا ۵ (اثرات احتمالی/قطعی، پاسخ خطی بدون آستانه، سندروم‌های حاد)",
+  "anchors": ["darvish-stochastic"],
+  "needles": ["اثرات احتمالی (تصادفی)"],
+  "needles_by_anchor": {"darvish-stochastic": ["اثرات تصادفی (احتمالی)", "Stochastic (Random) Effects"]},
+  "source": "اسلایدهای درویش ص ۵ تا ۱۳؛ ویدیو رادیوبیولوژی ۱ و ۲ (زمان‌ها پس از ترنسکریپت)"
+ },
+ {
+  "topic": "برهم‌کنش مستقیم و غیرمستقیم، آسیب بیولوژیک در کروموزوم (Direct and indirect action, Biological damage in chromosome)",
+  "where": "فصل ۸ — بخش‌های ۸ تا ۱۲",
+  "anchors": ["darvish-direct", "darvish-indirect", "darvish-chromosome"],
+  "needles": ["برهم‌کنش مستقیم"],
+  "needles_by_anchor": {"darvish-direct": ["برهم‌کنش مستقیم"],
+                        "darvish-indirect": ["برهم‌کنش غیرمستقیم"],
+                        "darvish-chromosome": ["آسیب کروموزومی"]},
+  "source": "اسلایدهای درویش ص ۱۵ تا ۳۰ و ص ۷۴؛ ویدیو رادیوبیولوژی ۱ تا ۳ (زمان‌ها پس از ترنسکریپت)"
+ },
+ {
+  "topic": "کنتراست بافت‌های مختلف در تصاویر MRI",
+  "where": "فصل ۹ — بخش‌های ۹ تا ۱۱",
+  "anchors": ["darvish-mri-contrast"],
+  "needles": ["برهم‌کنش مستقیم"],
+  "needles_by_anchor": {"darvish-mri-contrast": ["کنتراست بافت‌های مختلف در تصاویر MRI"]},
+  "source": "اسلایدهای MRI درویش ص ۳۴ تا ۵۱؛ ویدیوهای MRI ۱ تا ۳ (زمان‌ها پس از ترنسکریپت)"
+ }
+]

@@ -1,0 +1,90 @@
+name: render-pdf
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lock/**'
+      - 'render/**'
+      - 'fonts/**'
+      - 'images/fig/**'
+      - '.github/workflows/render.yml'
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: arena/01a0f6eb-fizipzshi
+  # nudge: keep the release asset in sync with the committed PDF
+  REL: jozve-v1
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+
+      - name: setup
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libffi-dev fonts-dejavu
+          python3 -m pip install --quiet weasyprint pypdfium2 pillow
+          python3 -c "import weasyprint; print('weasyprint', weasyprint.__version__)"
+
+      - name: render
+        run: |
+          set -x
+          python3 render/render.py "$GITHUB_WORKSPACE/HumsYar_MedPhysics_Jozve.pdf" 2>&1 | tail -30
+
+      - name: qc
+        run: |
+          set -x
+          python3 tools/qc_pdf.py HumsYar_MedPhysics_Jozve.pdf > render/qc_report.txt 2>&1 || true
+          cat render/qc_report.txt | tail -40
+
+      - name: previews
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import pypdfium2 as pdfium, pathlib, json
+          pdf = pdfium.PdfDocument('HumsYar_MedPhysics_Jozve.pdf')
+          out = pathlib.Path('render/preview'); out.mkdir(parents=True, exist_ok=True)
+          n = len(pdf)
+          picks = sorted(set([1, 2, 3, 4, 5, 6, 7, 8] + [n - 1, n]))
+          info = []
+          for p in picks:
+              if 1 <= p <= n:
+                  img = pdf[p-1].render(scale=1.1).to_pil()
+                  f = out / f'p{p:03d}.png'
+                  img.save(f, 'PNG', optimize=True)
+                  info.append({'page': p, 'file': str(f)})
+          pathlib.Path('render/preview/index.json').write_text(json.dumps(info, ensure_ascii=False, indent=1), encoding='utf-8')
+          print('pages:', n, 'previews:', len(info))
+          PY
+        continue-on-error: true
+
+      - name: publish
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -x
+          ls -la HumsYar_MedPhysics_Jozve.pdf || true
+          gh release view "$REL" >/dev/null 2>&1 || gh release create "$REL" --title "HumsYar جزوه فیزیک پزشکی" --notes "Rendered jozve builds" || true
+          gh release upload "$REL" HumsYar_MedPhysics_Jozve.pdf --clobber || true
+
+      - name: clean intermediates
+        if: always()
+        run: |
+          # the built PDF stays at the repo root (committed by relay_push.sh, so the
+          # deliverable survives runner resets); only drop the throwaway pass files.
+          rm -f render/pass1.pdf
+          ls -la HumsYar_MedPhysics_Jozve.pdf || true
+
+      - name: commit results
+        if: always()
+        run: bash tools/relay_push.sh render-done

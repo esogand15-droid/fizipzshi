@@ -1,0 +1,132 @@
+name: fetch-sources
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fetch-sources.yml'
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: arena/01a0f6eb-fizipzshi
+  BIN: https://filebin.net/811lna3jdjwdzr6d
+  RAR_URL: https://filebin.net/811lna3jdjwdzr6d/%d9%81%db%8c%d8%b2%db%8c%da%a9%20%d9%be%d8%b2%d8%b4%da%a9%db%8c.rar
+  MD_URL: https://filebin.net/811lna3jdjwdzr6d/HumsYar_Master_Prompt%20%281%29.md
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+
+      - name: setup tools
+        run: |
+          set -x
+          mkdir -p work/relay work/tmp src
+          sudo apt-get update -qq || true
+          sudo apt-get install -y -qq unrar poppler-utils p7zip-full unar file || sudo apt-get install -y -qq unrar-free poppler-utils p7zip-full unar file || true
+          which unrar unar 7z 7za bsdtar pdfinfo ffprobe curl || true
+          python3 -m pip install --quiet pypdfium2 pillow python-pptx || true
+          {
+            echo "=== relay start $(date -u) ==="
+            uname -a
+            df -h /
+            free -h
+            nproc
+          } >> work/relay/status.log
+
+      - name: push-state-0
+        if: always()
+        run: bash tools/relay_push.sh state0-setup-done
+
+      - name: fetch master prompt md
+        if: always()
+        run: |
+          set -x
+          curl -sSL --retry 5 --retry-delay 5 --max-time 120 -o "src/HumsYar_Master_Prompt_Physiology.md" "$MD_URL" || echo "MD download failed" >> work/relay/status.log
+          ls -la src/ >> work/relay/status.log
+          head -c 400 "src/HumsYar_Master_Prompt_Physiology.md" >> work/relay/status.log 2>&1 || true
+
+      - name: push-state-1
+        if: always()
+        run: bash tools/relay_push.sh state1-prompt-md-fetched
+
+      - name: download rar
+        if: always()
+        run: |
+          set -x
+          for i in 1 2 3 4 5 6; do
+            curl -L --retry 8 --retry-delay 10 --retry-all-errors --connect-timeout 30 \
+                 --max-time 3000 -C - -o work/tmp/phys.rar "$RAR_URL" && break
+            echo "attempt $i failed, retrying" >> work/relay/status.log
+            sleep 10
+          done
+          ls -la work/tmp/ >> work/relay/status.log
+          du -h work/tmp/phys.rar >> work/relay/status.log 2>&1 || true
+
+      - name: push-state-2
+        if: always()
+        run: bash tools/relay_push.sh state2-rar-downloaded
+
+      - name: verify and list archive
+        if: always()
+        run: |
+          set -x
+          file work/tmp/phys.rar >> work/relay/status.log 2>&1 || true
+          (unrar l work/tmp/phys.rar 2>&1 || unar -l work/tmp/phys.rar 2>&1 || 7z l work/tmp/phys.rar 2>&1 || bsdtar -tvf work/tmp/phys.rar 2>&1) > work/relay/rar_list.txt || true
+          wc -l work/relay/rar_list.txt >> work/relay/status.log || true
+          tail -c 3000 work/relay/rar_list.txt >> work/relay/status.log || true
+
+      - name: push-state-3
+        if: always()
+        run: bash tools/relay_push.sh state3-archive-listed
+
+      - name: extract
+        if: always()
+        run: |
+          set -x
+          mkdir -p src/extracted
+          (unrar x -o+ -idq work/tmp/phys.rar src/extracted/ 2>&1 || unar -q -o src/extracted work/tmp/phys.rar 2>&1 || 7z x -y -o./src/extracted work/tmp/phys.rar 2>&1 || bsdtar -xf work/tmp/phys.rar -C src/extracted 2>&1) | tail -20 >> work/relay/status.log
+          find src/extracted -type f | wc -l >> work/relay/status.log
+          du -sh src/extracted >> work/relay/status.log
+
+      - name: push-state-4
+        if: always()
+        run: bash tools/relay_push.sh state4-extracted
+
+      - name: inventory
+        if: always()
+        run: |
+          set -x
+          python3 tools/make_inventory.py 2>&1 | tail -40 >> work/relay/status.log || true
+
+      - name: push-state-5
+        if: always()
+        run: bash tools/relay_push.sh state5-inventory-made
+
+      - name: commit small sources
+        if: always()
+        run: |
+          set -x
+          git config user.email "agent@arena.ai"
+          git config user.name "HumsYar Agent Runner"
+          # stage everything except huge media (videos stay out of git history)
+          git add -A src work/relay INVENTORY.md tools 2>/dev/null || true
+          find src -type f -size +45M -print >> work/relay/big_files.txt 2>/dev/null || true
+          find src -type f -size +45M -print0 2>/dev/null | xargs -0 -r git reset -q -- 2>/dev/null || true
+          git add -f "src/HumsYar_Master_Prompt_Physiology.md" 2>/dev/null || true
+          git status --porcelain | head -50 >> work/relay/status.log
+          git commit -q -m "chore(relay): sources fetched + inventory [state5]" || echo "nothing to commit" >> work/relay/status.log
+          git pull --no-rebase -X ours -q origin "$BRANCH" 2>/dev/null || true
+          git push origin "HEAD:$BRANCH" 2>&1 | tail -5 >> work/relay/status.log
+
+      - name: push-state-6-final
+        if: always()
+        run: bash tools/relay_push.sh state6-sources-committed

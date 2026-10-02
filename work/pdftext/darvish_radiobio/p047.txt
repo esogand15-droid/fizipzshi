@@ -1,0 +1,13 @@
+1
+.1
+.01
+.001
+fraction 
+surviving
+0 1 2 3 4 5
+dose / Gy
+Measuring radiation damage
+پرتوی آسیب گیری اندازه
+Measuring cell survival
+سلول بقای گیری اندازه
+6

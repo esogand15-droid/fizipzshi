@@ -1,0 +1,7 @@
+[16] duration=21.6min chunks=2 todo=2
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[16] model loaded in 11s
+[0;93m2026-10-01 11:16:39.559474055 [W:onnxruntime:Default, device_discovery.cc:146 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+[16] chunk 0 done in 6.4min (20.0min audio, x0.32 realtime)
+[16] chunk 1 done in 0.5min (1.6min audio, x0.30 realtime)
+merged 227 segments -> work/transcripts/16/raw.json

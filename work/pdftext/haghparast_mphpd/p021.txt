@@ -1,0 +1,33 @@
+21
+Alpha Decay 
+Uranium-238
+T½ = 4.49x109 yr
+92 p
++
+146 n
+0
+Thorium-234
+90 p
++
+144 n
+0
+2 p
++
+2 n
+ 0
+Process
+AX A-4Y +
+4
+
+Z → Z-2 2
+238U 234Th + 4
+
+92 → 90 2
+Decay Equation
+92
+238U
+4.49x109 yr
+ (4.19 MeV)
+90
+234Th
+Decay Schematic

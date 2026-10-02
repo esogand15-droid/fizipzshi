@@ -1,0 +1,15 @@
+Relative Radiosensitivities 
+of Cells
+ها سلول نسبی پرتوی های حساسیت
+Low: mature blood cells, muscle cells, ganglion 
+cells, mature connective tissues
+ ،ای ماهیچه های سلول ،بالغ خونی های سلول :کم پرتوی حساسیت با های سلول
+بالغ همبند های بافت ،گانگلیونی های سلول
+High: gastric mucosa, mucous membranes, 
+esophageal epithelium, urinary bladder epithelium 
+ ،مری اپیتلیوم ،مخاطی غشاهای ،معده مخاط :باال پرتوی حساسیت های سلول
+مثانه اپیتلیوم
+Very High: primitive blood cells, intestinal epithelium, 
+spermatogonia, ovarian follicular cells, lymphocytes.
+ ،روده اپیتلیوم ،اولیه خونی های سلول :زیاد بسیار حساسیت با های سلول
+ها لنفوسیت ،تخمدان فولیکولی های سلول ،اسپرماتوگونی

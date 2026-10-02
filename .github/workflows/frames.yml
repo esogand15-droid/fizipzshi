@@ -1,0 +1,75 @@
+name: frames
+
+on:
+  workflow_dispatch:
+    inputs:
+      slugs:
+        description: 'all | comma separated slugs'
+        default: 'all'
+        type: string
+      maxpar:
+        description: 'max parallel jobs'
+        default: '5'
+        type: string
+  push:
+    paths:
+      - '.github/workflows/frames.yml'
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: arena/01a0f6eb-fizipzshi
+  REL: sources-v1
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+      count: ${{ steps.m.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+      - id: m
+        run: python3 tools/plan_matrix.py "${{ inputs.slugs || 'all' }}"
+
+  frames:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJSON(inputs.maxpar || '6') }}
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    name: f-${{ matrix.slug }}-p${{ matrix.part }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+
+      - name: setup
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet pillow
+          mkdir -p work/media
+          echo "[$(date -u)] frames ${{ matrix.slug }} p${{ matrix.part }} start" >> work/relay/status.log
+
+      - name: download video
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release download "$REL" --pattern "${{ matrix.slug }}.mp4" -D work/media --clobber
+
+      - name: extract frames
+        if: matrix.part == 0
+        run: python3 tools/extract_frames.py "${{ matrix.slug }}" "work/media/${{ matrix.slug }}.mp4"
+        continue-on-error: true
+
+      - name: push frames
+        if: always()
+        run: bash tools/relay_push.sh "frames-${{ matrix.slug }}-p${{ matrix.part }}-done"

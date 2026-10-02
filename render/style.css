@@ -1,0 +1,157 @@
+/* HumsYar — جزوه جامع فیزیک پزشکی — WeasyPrint stylesheet (RTL, Vazirmatn) */
+
+@font-face { font-family: 'Vazirmatn'; src: url('__FONTS__/Vazirmatn-Regular.ttf'); font-weight: normal; }
+@font-face { font-family: 'Vazirmatn'; src: url('__FONTS__/Vazirmatn-Medium.ttf'); font-weight: 600; }
+@font-face { font-family: 'Vazirmatn'; src: url('__FONTS__/Vazirmatn-Bold.ttf'); font-weight: bold; }
+
+@counter-style fadigits {
+  system: numeric;
+  symbols: '\06F0' '\06F1' '\06F2' '\06F3' '\06F4' '\06F5' '\06F6' '\06F7' '\06F8' '\06F9';
+}
+
+@page {
+  size: A4;
+  margin: 12mm 11mm 15mm 11mm;
+  direction: rtl;
+  background: #f0f6ff;
+  @bottom-right { content: counter(page, fadigits); font-family: 'Vazirmatn'; font-size: 9pt; color: #64748b; }
+  @bottom-left  { content: 'HumsYar | جزوه فیزیک پزشکی'; font-family: 'Vazirmatn'; font-size: 8.4pt; color: #94a3b8; }
+}
+@page dark { margin: 0; background: #0a0f1e;
+  @bottom-right { content: normal; } @bottom-left { content: normal; } }
+
+* { box-sizing: border-box; }
+body { font-family: 'Vazirmatn'; direction: rtl; margin: 0; color: #1e293b; }
+
+/* ---------- dark pages (cover / section covers) ---------- */
+.cover, .seccover { page: dark; page-break-after: always; }
+.cover { height: 296mm; padding: 26mm 20mm 0 20mm;
+  background: radial-gradient(circle at 78% 12%, rgba(37,99,235,0.30), rgba(37,99,235,0) 55%),
+              radial-gradient(circle at 18% 85%, rgba(20,184,166,0.26), rgba(20,184,166,0) 50%),
+              linear-gradient(160deg, #0a0f1e 0%, #0d1524 55%, #0a1a26 100%); }
+.seccover { height: 296mm; padding: 42mm 24mm 0 24mm; text-align: center;
+  background: radial-gradient(circle at 78% 12%, rgba(37,99,235,0.30), rgba(37,99,235,0) 55%),
+              radial-gradient(circle at 18% 85%, rgba(20,184,166,0.26), rgba(20,184,166,0) 50%),
+              linear-gradient(160deg, #0a0f1e 0%, #0d1524 55%, #0a1a26 100%); }
+.wordmark { display: block; margin: 0 auto; text-align: center; }
+.wordmark .wm1 { font-size: 34pt; font-weight: bold; color: #ffffff; letter-spacing: 0.5pt; }
+.wordmark .wm2 { font-size: 12pt; color: #7dd3fc; letter-spacing: 3pt; margin-top: 1mm; }
+.wordmark .wm3 { font-size: 9.5pt; color: #5eead4; margin-top: 1.5mm; }
+.rule { display: table; margin: 6mm auto 8mm auto; width: 62mm; height: 1.2mm;
+  background: linear-gradient(to left, #14b8a6, #2563eb); border-radius: 1mm; }
+.kicker { color: #7dd3fc; font-size: 11.5pt; text-align: center; margin-bottom: 4mm; }
+.cover h1 { color: #ffffff; font-size: 25pt; font-weight: bold; text-align: center; margin: 0 0 5mm 0; line-height: 1.6; }
+.subtitle { color: #a5f3fc; font-size: 13pt; text-align: center; margin-bottom: 4mm; }
+.ref { color: #94a3b8; font-size: 9.6pt; text-align: center; line-height: 1.9; }
+table.stats { margin: 10mm auto 0 auto; border-collapse: separate; border-spacing: 6mm 0; }
+.stat { background: rgba(37,99,235,0.16); border: 0.3mm solid rgba(45,212,191,0.55);
+  border-radius: 4mm; padding: 5mm 9mm; text-align: center; }
+.stat .num { font-size: 21pt; font-weight: bold; color: #ffffff; display: block; }
+.stat .lbl { font-size: 9.5pt; color: #a5f3fc; display: block; margin-top: 1mm; }
+.cover .foot { color: #64748b; font-size: 9pt; text-align: center; margin-top: 30mm; }
+.seccover .pill { display: inline-block; padding: 2mm 7mm; border-radius: 20mm;
+  background: linear-gradient(to left, #2563eb, #2dd4bf); color: #ffffff; font-size: 10.5pt; font-weight: 600; }
+table.icnt { display: table; margin: 12mm auto 8mm auto; }
+.icn { width: 34mm; height: 34mm; border-radius: 50%; border: 0.4mm solid rgba(94,234,212,0.55);
+  background: rgba(13,21,36,0.55); text-align: center; vertical-align: middle; }
+.sess { color: #7dd3fc; font-size: 11pt; margin-bottom: 4mm; }
+.seccover h2 { color: #ffffff; font-size: 19pt; font-weight: bold; line-height: 1.7; margin: 0 0 4mm 0; }
+.prof { color: #5eead4; font-size: 10.5pt; margin-bottom: 3mm; }
+.range { color: #cbd5e1; font-size: 10.5pt; margin-bottom: 8mm; }
+table.meta { margin: 0 auto; border-collapse: separate; border-spacing: 5mm 0; }
+.mbox { background: rgba(255,255,255,0.06); border: 0.3mm solid rgba(148,163,184,0.35);
+  border-radius: 3.5mm; padding: 4mm 8mm; text-align: center; }
+.mbox .n { display: block; font-size: 14pt; font-weight: bold; color: #2dd4bf; }
+.mbox .l { display: block; font-size: 9pt; color: #94a3b8; margin-top: 1mm; }
+
+/* ---------- front matter ---------- */
+.toc { padding: 6mm 4mm 0 4mm; }
+.toc h2 { color: #0f172a; font-size: 20pt; font-weight: bold; margin: 0 0 5mm 0; }
+.tline { display: table; width: 100%; height: 1mm; background: linear-gradient(to left, #14b8a6, #2563eb);
+  border-radius: 1mm; margin-bottom: 7mm; }
+.row { display: flex; align-items: center; gap: 4mm; padding: 4mm 2mm; border-bottom: 0.2mm solid #e2e8f0; }
+.nbadge { flex: none; width: 10mm; height: 10mm; border-radius: 3mm; color: #ffffff; font-weight: bold;
+  font-size: 13pt; background: linear-gradient(135deg, #2563eb, #2dd4bf);
+  display: flex; align-items: center; justify-content: center; }
+.ttl { flex: 1; color: #1e293b; font-size: 11.4pt; font-weight: 600; line-height: 1.7; }
+.ttl small { display: block; color: #0d9488; font-size: 8.8pt; font-weight: normal; margin-top: 1mm; }
+.rng { flex: none; color: #475569; font-size: 9.6pt; }
+.badge-exam { display: inline-block; background: linear-gradient(to left, #2563eb, #14b8a6); color: #ffffff;
+  font-size: 7.8pt; border-radius: 8mm; padding: 0.5mm 2.6mm; margin-right: 2mm; font-weight: 600; }
+.badge-nonexam { display: inline-block; background: #e2e8f0; color: #64748b;
+  font-size: 7.6pt; border-radius: 8mm; padding: 0.5mm 2.4mm; margin-right: 2mm; }
+
+.guide { padding: 6mm 4mm 0 4mm; }
+.guide h2 { color: #0f172a; font-size: 19pt; margin: 0 0 4mm 0; }
+.guide .lead { background: linear-gradient(to left, #dbeafe, #ccfbf1); border: 0.25mm solid #cde8f5;
+  border-radius: 3mm; padding: 4mm 4.5mm; font-size: 10.2pt; line-height: 2; color: #334155; margin-bottom: 6mm; }
+table.gt { width: 100%; border-collapse: collapse; }
+table.gt th { background: linear-gradient(to left, #eff6ff, #f0fdfa); color: #0f172a; font-size: 9.4pt;
+  padding: 2.6mm 2.4mm; border: 0.2mm solid #e2e8f0; }
+table.gt td { padding: 2.8mm 2.4mm; border: 0.2mm solid #e2e8f0; font-size: 9.2pt; color: #334155;
+  line-height: 1.85; vertical-align: top; }
+table.gt tr:nth-child(even) td { background: #f8fafc; }
+.pgpill { display: inline-block; background: #eff6ff; border: 0.2mm solid #bfdbfe; color: #1d4ed8;
+  border-radius: 6mm; padding: 0.6mm 3mm; font-size: 9pt; font-weight: 600; }
+
+/* ---------- content ---------- */
+.chbody { padding: 5mm 2mm 0 2mm; }
+.subhead { display: flex; align-items: center; gap: 3mm; margin: 7mm 2mm 4mm 2mm; break-after: avoid; }
+.subhead .sd, .subhead .sl { flex: 1; height: 0.6mm; border-radius: 1mm;
+  background: linear-gradient(to left, #2563eb, #2dd4bf); opacity: 0.75; }
+.subhead .st { color: #1d4ed8; font-size: 12.4pt; font-weight: bold; }
+.subhead .flag { flex: none; }
+p.tx { font-size: 10.4pt; line-height: 1.95; text-align: justify; color: #1e293b; margin: 0 0 3.4mm 0; }
+ul.bl { margin: 0 0 3.4mm 0; padding-right: 5mm; }
+ul.bl li { font-size: 10.2pt; line-height: 1.9; margin-bottom: 1.6mm; color: #1e293b; }
+ul.bl li::marker { color: #14b8a6; }
+.src { font-size: 7.9pt; color: #94a3b8; margin: -1.6mm 0 4mm 0; line-height: 1.6; }
+.card { background: #ffffff; border: 0.2mm solid #e2e8f0; border-radius: 3.6mm;
+  box-shadow: 0 0.8mm 3mm rgba(15,23,42,0.06); margin-bottom: 5mm; break-inside: avoid; }
+.card .cap { padding: 2.6mm 4mm 3.4mm 4mm; font-size: 9.2pt; color: #475569; text-align: center; line-height: 1.8; }
+.card .cap .csrc { display: block; font-size: 7.6pt; color: #94a3b8; margin-top: 1mm; }
+.card img { display: block; margin: 0 auto; max-width: 100%; padding: 3mm 3mm 0 3mm; }
+table.dt { width: 100%; border-collapse: collapse; margin-bottom: 1mm; }
+table.dt th { background: linear-gradient(to left, #eff6ff, #f0fdfa); color: #0f172a;
+  font-size: 9.2pt; padding: 2.4mm 2.2mm; border: 0.2mm solid #e2e8f0; text-align: right; }
+table.dt td { font-size: 9.2pt; color: #334155; padding: 2.4mm 2.2mm; border: 0.2mm solid #e2e8f0;
+  line-height: 1.85; vertical-align: top; }
+table.dt tr:nth-child(even) td { background: #f8fafc; }
+.ftable { margin-bottom: 4.4mm; break-inside: avoid; }
+.fbox { background: #ffffff; border: 0.25mm solid #bfdbfe; border-radius: 3.4mm;
+  padding: 4mm 5mm; margin-bottom: 4.4mm; break-inside: avoid; }
+.fbox .fx { text-align: center; font-size: 12.6pt; color: #0f172a; margin-bottom: 2.6mm; direction: ltr; }
+.fbox .acc { text-decoration: overline; }
+.fbox .fleg { font-size: 9.2pt; color: #475569; line-height: 1.9; }
+.fbox .fleg b { color: #0f766e; }
+.frac { display: inline-table; vertical-align: middle; text-align: center; margin: 0 1mm; }
+.frac .fn { display: table-row; }
+.frac .fd { display: table-row; }
+.frac .fn span { display: table-cell; border-bottom: 0.25mm solid #0f172a; padding: 0 1mm; }
+.frac .fd span { display: table-cell; padding: 0 1mm; }
+.key { border-right: 1.4mm solid #14b8a6; background: #ccfbf1; border-radius: 2.4mm;
+  padding: 3.2mm 4mm; margin-bottom: 4.2mm; font-size: 10pt; line-height: 1.9; color: #0f766e;
+  break-inside: avoid; }
+.key b { color: #0f766e; }
+.examtip { background: linear-gradient(to left, #2563eb, #14b8a6); color: #ffffff; border-radius: 3mm;
+  padding: 3.4mm 4.4mm; margin-bottom: 4.2mm; font-size: 10pt; line-height: 1.9;
+  break-inside: avoid; }
+.review { background: linear-gradient(to left, #dbeafe, #ccfbf1); border: 0.25mm solid #cde8f5;
+  border-radius: 4mm; padding: 4.5mm 5mm; margin: 6mm 0 4mm 0; break-inside: avoid; }
+.review h3 { margin: 0 0 3mm 0; color: #1d4ed8; font-size: 12pt; }
+.review ul { margin: 0; padding-right: 5mm; }
+.review li { font-size: 9.9pt; line-height: 1.9; color: #1e293b; margin-bottom: 1.4mm; }
+.fnote { background: #f8fafc; border: 0.2mm dashed #cbd5e1; border-radius: 2.6mm; padding: 3mm 4mm;
+  margin-bottom: 4mm; font-size: 9pt; color: #64748b; line-height: 1.85; }
+.endpage { page: dark; height: 296mm; padding: 60mm 24mm 0 24mm; text-align: center;
+  background: radial-gradient(circle at 78% 12%, rgba(37,99,235,0.30), rgba(37,99,235,0) 55%),
+              radial-gradient(circle at 18% 85%, rgba(20,184,166,0.26), rgba(20,184,166,0) 50%),
+              linear-gradient(160deg, #0a0f1e 0%, #0d1524 55%, #0a1a26 100%); }
+.endpage .t1 { color: #ffffff; font-size: 20pt; font-weight: bold; margin-bottom: 6mm; }
+.endpage .t2 { color: #a5f3fc; font-size: 11.5pt; line-height: 2.1; }
+.endpage .t3 { color: #94a3b8; font-size: 9.5pt; margin-top: 14mm; line-height: 2; }
+
+.marker { color: #f0f6ff; font-size: 1pt; line-height: 1; }
+
+.subhead3 { margin: 5mm 2mm 2.6mm 2mm; break-after: avoid; }
+.subhead3 .st3 { color: #0d9488; font-size: 11pt; font-weight: 600; }

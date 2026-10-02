@@ -1,0 +1,160 @@
+=== relay start Thu Oct  1 10:07:54 UTC 2026 ===
+Linux runnervm8df0l 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       145G   59G   86G  41% /
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       1.2Gi        11Gi        42Mi       2.9Gi        14Gi
+Swap:          3.0Gi          0B       3.0Gi
+4
+[10:07:54] state0-setup-done
+(no changes for state0-setup-done)
+[10:07:55] pushed: state0-setup-done
+total 44
+drwxr-xr-x 2 runner runner  4096 Oct  1 10:07 .
+drwxr-xr-x 7 runner runner  4096 Oct  1 10:07 ..
+-rw-r--r-- 1 runner runner 35111 Oct  1 10:07 HumsYar_Master_Prompt_Physiology.md
+# پرامپت_master — بانک سوالات طبقه‌بندی‌شده HumsYar
+
+> **روش استفاده:** کل این فایل را به‌عنوان پرامپت به ایجنت بدهید و فایل‌های ورودی (جزوه PDF/Markdown، لوگو، نمونه‌های تصویری) را پیوست کنید. ایجنت باید دقیقاً طبق همین مشخصات، بانک [10:07:56] state1-prompt-md-fetched
+(no changes for state1-prompt-md-fetched)
+[10:07:56] pushed: state1-prompt-md-fetched
+total 1641368
+drwxr-xr-x 2 runner runner       4096 Oct  1 10:07 .
+drwxr-xr-x 4 runner runner       4096 Oct  1 10:07 ..
+-rw-r--r-- 1 runner runner 1680747445 Oct  1 10:09 phys.rar
+1.6G	work/tmp/phys.rar
+[10:09:06] state2-rar-downloaded
+(no changes for state2-rar-downloaded)
+[10:09:06] pushed: state2-rar-downloaded
+work/tmp/phys.rar: RAR archive data, v5
+52 work/relay/rar_list.txt
+1  فیزیک پزشکی/فیزیک پزشکی تشعشع/7.mp4
+    ..A....  41409943  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/8.mp4
+    ..A....  30835673  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/9.mp4
+    ..A....     36807  2026-10-01 18:42  فیزیک پزشکی/فیزیک پزشکی تشعشع/M.Ph.P.D [Repaired] [Repaired].md
+    ..A....   4032174  2026-10-01 18:30  فیزیک پزشکی/فیزیک پزشکی تشعشع/M.Ph.P.D [Repaired] [Repaired].pdf
+    ..A....     40201  2026-10-01 18:50  فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک تشعشع و پزشکی هسته_ای.md
+    ..A....  18872987  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک تشعشع و پزشکی هسته_ای.pdf
+    ..A....     18965  2026-10-01 18:54  فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک سونوگرافی.md
+    ..A....   8188873  2026-10-01 18:30  فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک سونوگرافی.pdf
+    ..A....  38743689  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه اول حق پرست .mp4
+    ..A....  34488065  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه دوم حق پرست.mp4
+    ..A....  44433652  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه سوم حق پرست.mp4
+    ..A....  60669567  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه ششم حق پرست.mp4
+    ..A....  67746662  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه پنجم حق پرست.mp4
+    ..A....  45599193  2026-10-01 18:31  فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه چهارم حق پرست.mp4
+    ..A....     36807  2026-10-01 18:57  فیزیک پزشکی/نمونه سوال/M.Ph.P.D [Repaired] [Repaired] (1).md
+    ..A....    821854  2026-10-01 18:26  فیزیک پزشکی/نمونه سوال/Medical Physics.pdf
+    ..A....    182405  2026-10-01 18:56  فیزیک پزشکی/نمونه سوال/بانک سوالات فیزیک پزشکی هامزیار.md
+    ..A....   3309215  2026-10-01 18:30  فیزیک پزشکی/نمونه سوال/بانک سوالات فیزیک پزشکی هامزیار.pdf
+    ...D...         0  2026-10-01 18:39  فیزیک پزشکی/MRI
+    ...D...         0  2026-10-01 18:40  فیزیک پزشکی/رادیوبیولوژِی
+    ...D...         0  2026-10-01 18:41  فیزیک پزشکی/فیزیک پزشکی
+    ...D...         0  2026-10-01 18:54  فیزیک پزشکی/فیزیک پزشکی تشعشع
+    ...D...         0  2026-10-01 18:57  فیزیک پزشکی/نمونه سوال
+    ...D...         0  2026-10-01 18:30  فیزیک پزشکی
+----------- ---------  ---------- -----  ----
+           2844881822                    41
+
+[10:09:06] state3-archive-listed
+(no changes for state3-archive-listed)
+[10:09:06] pushed: state3-archive-listed
+35
+2.7G	src/extracted
+[10:09:17] state4-extracted
+(no changes for state4-extracted)
+[10:09:18] pushed: state4-extracted
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی/جزوه افضلی پور.md', 'name': 'جزوه افضلی پور.md', 'size': 49477, 'size_h': '0.0MB', 'kind': 'doc'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی/جزوه افضلی پور.pdf', 'name': 'جزوه افضلی پور.pdf', 'size': 8290183, 'size_h': '8.3MB', 'kind': 'doc', 'pages': 124, 'text_chars': 29192}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی/جلسه دوم افضلی پور.mp4', 'name': 'جلسه دوم افضلی پور.mp4', 'size': 98945329, 'size_h': '98.9MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی/جلسه سوم افضلی پور.mp4', 'name': 'جلسه سوم افضلی پور.mp4', 'size': 69131863, 'size_h': '69.1MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی/جلسه چهارم افضلی پور.mp4', 'name': 'جلسه چهارم افضلی پور.mp4', 'size': 84628922, 'size_h': '84.6MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/نمونه سوال/M.Ph.P.D [Repaired] [Repaired] (1).md', 'name': 'M.Ph.P.D [Repaired] [Repaired] (1).md', 'size': 36807, 'size_h': '0.0MB', 'kind': 'doc'}
+{'path': 'src/extracted/فیزیک پزشکی/نمونه سوال/Medical Physics.pdf', 'name': 'Medical Physics.pdf', 'size': 821854, 'size_h': '0.8MB', 'kind': 'doc', 'pages': 5, 'text_chars': 8915}
+{'path': 'src/extracted/فیزیک پزشکی/نمونه سوال/بانک سوالات فیزیک پزشکی هامزیار.md', 'name': 'بانک سوالات فیزیک پزشکی هامزیار.md', 'size': 182405, 'size_h': '0.2MB', 'kind': 'doc'}
+{'path': 'src/extracted/فیزیک پزشکی/نمونه سوال/بانک سوالات فیزیک پزشکی هامزیار.pdf', 'name': 'بانک سوالات فیزیک پزشکی هامزیار.pdf', 'size': 3309215, 'size_h': '3.3MB', 'kind': 'doc', 'pages': 98, 'text_chars': 99304}
+{'path': 'src/extracted/فیزیک پزشکی/رادیوبیولوژِی/جزوه لیلی درویش.md', 'name': 'جزوه لیلی درویش.md', 'size': 29298, 'size_h': '0.0MB', 'kind': 'doc'}
+{'path': 'src/extracted/فیزیک پزشکی/رادیوبیولوژِی/جزوه لیلی درویش.pdf', 'name': 'جزوه لیلی درویش.pdf', 'size': 16094328, 'size_h': '16.1MB', 'kind': 'doc', 'pages': 82, 'text_chars': 21960}
+{'path': 'src/extracted/فیزیک پزشکی/رادیوبیولوژِی/رادیوبیولوژی 1-  فیزیک پزشکی.mp4', 'name': 'رادیوبیولوژی 1-  فیزیک پزشکی.mp4', 'size': 131926466, 'size_h': '131.9MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/رادیوبیولوژِی/رادیوبیولوژی 3-ویدئو-فیزیک پزشکی.mp4', 'name': 'رادیوبیولوژی 3-ویدئو-فیزیک پزشکی.mp4', 'size': 215319501, 'size_h': '215.3MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/رادیوبیولوژِی/فیزیک پزشکی- رادیوبیولوژی2.mp4', 'name': 'فیزیک پزشکی- رادیوبیولوژی2.mp4', 'size': 216495537, 'size_h': '216.5MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/10.mp4', 'name': '10.mp4', 'size': 48795692, 'size_h': '48.8MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/7.mp4', 'name': '7.mp4', 'size': 43909638, 'size_h': '43.9MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/8.mp4', 'name': '8.mp4', 'size': 41409943, 'size_h': '41.4MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/9.mp4', 'name': '9.mp4', 'size': 30835673, 'size_h': '30.8MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/M.Ph.P.D [Repaired] [Repaired].md', 'name': 'M.Ph.P.D [Repaired] [Repaired].md', 'size': 36807, 'size_h': '0.0MB', 'kind': 'doc'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/M.Ph.P.D [Repaired] [Repaired].pdf', 'name': 'M.Ph.P.D [Repaired] [Repaired].pdf', 'size': 4032174, 'size_h': '4.0MB', 'kind': 'doc', 'pages': 103, 'text_chars': 22832}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک تشعشع و پزشکی هسته_ای.md', 'name': 'جزوه فیزیک تشعشع و پزشکی هسته_ای.md', 'size': 40201, 'size_h': '0.0MB', 'kind': 'doc'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک تشعشع و پزشکی هسته_ای.pdf', 'name': 'جزوه فیزیک تشعشع و پزشکی هسته_ای.pdf', 'size': 18872987, 'size_h': '18.9MB', 'kind': 'doc', 'pages': 45, 'text_chars': 0}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک سونوگرافی.md', 'name': 'جزوه فیزیک سونوگرافی.md', 'size': 18965, 'size_h': '0.0MB', 'kind': 'doc'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک سونوگرافی.pdf', 'name': 'جزوه فیزیک سونوگرافی.pdf', 'size': 8188873, 'size_h': '8.2MB', 'kind': 'doc', 'pages': 23, 'text_chars': 0}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه اول حق پرست .mp4', 'name': 'جلسه اول حق پرست .mp4', 'size': 38743689, 'size_h': '38.7MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه دوم حق پرست.mp4', 'name': 'جلسه دوم حق پرست.mp4', 'size': 34488065, 'size_h': '34.5MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه سوم حق پرست.mp4', 'name': 'جلسه سوم حق پرست.mp4', 'size': 44433652, 'size_h': '44.4MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه ششم حق پرست.mp4', 'name': 'جلسه ششم حق پرست.mp4', 'size': 60669567, 'size_h': '60.7MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه پنجم حق پرست.mp4', 'name': 'جلسه پنجم حق پرست.mp4', 'size': 67746662, 'size_h': '67.7MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه چهارم حق پرست.mp4', 'name': 'جلسه چهارم حق پرست.mp4', 'size': 45599193, 'size_h': '45.6MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/MRI/22MRI (1).md', 'name': '22MRI (1).md', 'size': 15038, 'size_h': '0.0MB', 'kind': 'doc'}
+{'path': 'src/extracted/فیزیک پزشکی/MRI/22MRI.pdf', 'name': '22MRI.pdf', 'size': 6459949, 'size_h': '6.5MB', 'kind': 'doc', 'pages': 51, 'text_chars': 9819}
+{'path': 'src/extracted/فیزیک پزشکی/MRI/MRI 1.mp4', 'name': 'MRI 1.mp4', 'size': 597840150, 'size_h': '597.8MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/MRI/MRI 2.mp4', 'name': 'MRI 2.mp4', 'size': 577520006, 'size_h': '577.5MB', 'kind': 'video', 'duration': '?'}
+{'path': 'src/extracted/فیزیک پزشکی/MRI/MRI 3.mp4', 'name': 'MRI 3.mp4', 'size': 329963713, 'size_h': '330.0MB', 'kind': 'video', 'duration': '?'}
+wrote INVENTORY.md
+[10:09:19] state5-inventory-made
+[10:09:29] pushed: state5-inventory-made
+M  work/relay/status.log
+?? work/relay/big_files.txt
+To https://github.com/esogand15-droid/fizipzshi
+   f47dacf..804377c  HEAD -> arena/01a0f6eb-fizipzshi
+[10:09:31] state6-sources-committed
+[10:17:04] ocr-done
+[Thu Oct  1 10:17:48 UTC 2026] transcribe 09 part 0 start
+[10:18:18] transcribe-09-p0-end
+[Thu Oct  1 10:19:13 UTC 2026] transcribe 13 part 0 start
+[10:19:53] transcribe-13-p0-end
+[Thu Oct  1 10:21:27 UTC 2026] frames 11 p0 start
+[10:21:43] frames-11-p0-done
+[Thu Oct  1 10:22:54 UTC 2026] frames 17 p0 start
+[10:23:20] frames-17-p0-done
+[10:24:57] render-done
+[10:27:24] render-done
+[Thu Oct  1 10:29:15 UTC 2026] transcribe 10 part 0 start
+[10:29:57] transcribe-10-p0-end
+[Thu Oct  1 10:31:28 UTC 2026] transcribe 17 part 0 start
+[10:32:28] transcribe-17-p0-end
+[Thu Oct  1 10:34:09 UTC 2026] transcribe 06 part 0 start
+[10:55:07] transcribe-06-chunk000
+[10:55:19] pushed: transcribe-06-chunk000
+[10:55:19] transcribe-06-p0-end
+[Thu Oct  1 10:55:49 UTC 2026] transcribe 07 part 0 start
+[11:15:38] transcribe-07-p0-end
+[Thu Oct  1 11:17:11 UTC 2026] transcribe 19 part 0 start
+[11:29:08] transcribe-19-chunk000
+[11:29:49] pushed: transcribe-19-chunk000
+[11:37:16] transcribe-19-chunk001
+[11:37:24] pushed: transcribe-19-chunk001
+[11:37:24] transcribe-19-complete
+[11:37:26] pushed: transcribe-19-complete
+[11:37:26] transcribe-19-p0-end
+[11:49:49] figure-sheets
+[11:53:34] figure-sheets
+[11:55:21] render-done
+[11:58:07] render-done
+[12:13:24] render-done
+[12:14:41] render-done
+[12:16:58] render-done
+[12:19:49] render-done
+[12:21:09] render-done
+[12:30:29] render-done
+[12:34:05] render-done
+[12:37:44] render-done
+[12:39:25] render-done
+[13:04:09] render-done
+[15:22:26] render-done
+[15:26:16] render-done
+[15:30:40] render-done
+[15:36:03] render-done
+[15:37:51] render-done
+[16:00:46] render-done
+[16:04:18] render-done
+[11:57:05] render-done

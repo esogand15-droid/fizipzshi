@@ -1,0 +1,84 @@
+name: figure-sheets
+
+# Regenerates the embedded-figure extraction from the source PDFs and tiles every
+# candidate into labelled contact sheets (work/figsheets/sheet_NN.png + manifest.json)
+# so the useful figures can be picked by their printed index and copied into
+# images/fig/ with a real caption. Also runs on demand via the `pick` input.
+on:
+  workflow_dispatch:
+    inputs:
+      pick_json:
+        description: 'JSON list of {raw,out} pairs to copy into images/fig'
+        required: false
+        default: ''
+        type: string
+  push:
+    paths:
+      - '.github/workflows/figure-sheets.yml'
+      - 'tools/figure_sheets.py'
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: arena/01a0f6eb-fizipzshi
+
+jobs:
+  sheets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0f6eb-fizipzshi
+          fetch-depth: 1
+
+      - name: setup
+        run: |
+          python3 -m pip install --quiet pymupdf pillow
+          mkdir -p work/figsheets images/fig
+
+      - name: extract embedded figures
+        run: |
+          set -x
+          python3 tools/extract_figures.py 2>&1 | tail -12
+          ls images/raw | head
+          python3 -c "import json;print('index entries:',len(json.load(open('images/INDEX.json'))))"
+
+      - name: build contact sheets
+        run: python3 tools/figure_sheets.py
+
+      - name: apply picks
+        run: |
+          # picks come either from the manual input or from the committed
+          # work/figpicks.json (which lets a push trigger the copy step)
+          python3 - <<'PY'
+          import json, os, pathlib
+          from PIL import Image
+          raw = os.environ.get("PICK_JSON") or ""
+          if raw.strip():
+              picks = json.loads(raw)
+          else:
+              f = pathlib.Path("work/figpicks.json")
+              picks = json.loads(f.read_text(encoding="utf-8")) if f.exists() else []
+          os.makedirs("images/fig", exist_ok=True)
+          for p in picks:
+              src, dst = p["raw"], "images/fig/" + p["out"]
+              im = Image.open(src)
+              if im.mode in ("RGBA", "LA", "P"):
+                  bg = Image.new("RGB", im.size, "white")
+                  im = im.convert("RGBA")
+                  bg.paste(im, mask=im.split()[-1])
+                  im = bg
+              if im.width > 1200:
+                  im = im.resize((1200, round(im.height * 1200 / im.width)), Image.LANCZOS)
+              im.convert("RGB").save(dst, "JPEG", quality=88, optimize=True)
+              print("picked", src, "->", dst, im.size)
+          print("total picked:", len(picks))
+          PY
+        env:
+          PICK_JSON: ${{ inputs.pick_json }}
+
+      - name: push results
+        if: always()
+        run: bash tools/relay_push.sh figure-sheets

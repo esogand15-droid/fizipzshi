@@ -1,0 +1,194 @@
+[
+ {
+  "raw": "images/raw/afzalipour/p032_1.png",
+  "out": "fig02_bremsstrahlung.jpg",
+  "idx": 40,
+  "page": 32,
+  "slug": "afzalipour",
+  "heading": "مكﺎنيسم توليد پرتوx"
+ },
+ {
+  "raw": "images/raw/afzalipour/p036_1.png",
+  "out": "fig02_tube_schematic.jpg",
+  "idx": 42,
+  "page": 36,
+  "slug": "afzalipour",
+  "heading": "ﻻمﭗ پﺮتوx"
+ },
+ {
+  "raw": "images/raw/afzalipour/p036_2.png",
+  "out": "fig02_tube_photo.jpg",
+  "idx": 43,
+  "page": 36,
+  "slug": "afzalipour",
+  "heading": "ﻻمﭗ پﺮتوx"
+ },
+ {
+  "raw": "images/raw/afzalipour/p054_1.png",
+  "out": "fig03_image_formation.jpg",
+  "idx": 45,
+  "page": 54,
+  "slug": "afzalipour",
+  "heading": "پايه هاي فيزيكي بوجود آمدن يك تصويﺮ راديو گﺮافي"
+ },
+ {
+  "raw": "images/raw/afzalipour/p058_1.png",
+  "out": "fig03_barium.jpg",
+  "idx": 46,
+  "page": 58,
+  "slug": "afzalipour",
+  "heading": "١ ( مواد كنتراست روشن با ﻣادة شفاف"
+ },
+ {
+  "raw": "images/raw/afzalipour/p058_2.png",
+  "out": "fig03_contrast_iodine.jpg",
+  "idx": 47,
+  "page": 58,
+  "slug": "afzalipour",
+  "heading": "١ ( مواد كنتراست روشن با ﻣادة شفاف"
+ },
+ {
+  "raw": "images/raw/afzalipour/p062_1.png",
+  "out": "fig03_ct_schematic.jpg",
+  "idx": 53,
+  "page": 62,
+  "slug": "afzalipour",
+  "heading": "توموگﺮافي كامپيوتﺮي :"
+ },
+ {
+  "raw": "images/raw/afzalipour/p064_1.png",
+  "out": "fig03_ct_console.jpg",
+  "idx": 54,
+  "page": 64,
+  "slug": "afzalipour",
+  "heading": "گانتري)"
+ },
+ {
+  "raw": "images/raw/afzalipour/p066_1.png",
+  "out": "fig03_mammo_views.jpg",
+  "idx": 56,
+  "page": 66,
+  "slug": "afzalipour",
+  "heading": ""
+ },
+ {
+  "raw": "images/raw/afzalipour/p067_1.png",
+  "out": "fig03_mammo_aec.jpg",
+  "idx": 57,
+  "page": 67,
+  "slug": "afzalipour",
+  "heading": ""
+ },
+ {
+  "raw": "images/raw/afzalipour/p089_1.png",
+  "out": "fig06_dst_wheel.jpg",
+  "idx": 67,
+  "page": 89,
+  "slug": "afzalipour",
+  "heading": "ﻫيچ كس نبايد بﻪ طور ﻣداوم بﻪ نگهداري بيماران ﻣبادرت ند ك."
+ },
+ {
+  "raw": "images/raw/afzalipour/p093_1.png",
+  "out": "fig06_dose_distance.jpg",
+  "idx": 71,
+  "page": 93,
+  "slug": "afzalipour",
+  "heading": "فاصله"
+ },
+ {
+  "raw": "images/raw/afzalipour/p099_1.png",
+  "out": "fig06_mobile_shield.jpg",
+  "idx": 77,
+  "page": 99,
+  "slug": "afzalipour",
+  "heading": "سوﻣين روش كاﻫش تابش گيري"
+ },
+ {
+  "raw": "images/raw/afzalipour/p109_1.png",
+  "out": "fig06_thyroid_shield.jpg",
+  "idx": 91,
+  "page": 109,
+  "slug": "afzalipour",
+  "heading": "حفاظ هاي تيﺮوئيد"
+ },
+ {
+  "raw": "images/raw/afzalipour/p122_3.png",
+  "out": "fig06_protective_kit.jpg",
+  "idx": 103,
+  "page": 122,
+  "slug": "afzalipour",
+  "heading": "تجهيزات حفاظتي"
+ },
+ {
+  "raw": "images/raw/haghparast_mphpd/p095_2.png",
+  "out": "fig07_vessel_wall.jpg",
+  "idx": 220,
+  "page": 95,
+  "slug": "haghparast_mphpd",
+  "heading": ""
+ },
+ {
+  "raw": "images/raw/haghparast_mphpd/p102_2.png",
+  "out": "fig07_doppler_angle.jpg",
+  "idx": 222,
+  "page": 102,
+  "slug": "haghparast_mphpd",
+  "heading": ""
+ },
+ {
+  "raw": "images/raw/darvish_mri/p012_1.png",
+  "out": "fig09_rf_on.jpg",
+  "idx": 121,
+  "page": 12,
+  "slug": "darvish_mri",
+  "heading": "RF OFF"
+ },
+ {
+  "raw": "images/raw/darvish_mri/p037_1.png",
+  "out": "fig09_t1_recovery.jpg",
+  "idx": 126,
+  "page": 37,
+  "slug": "darvish_mri",
+  "heading": "•ثابت"
+ },
+ {
+  "raw": "images/raw/darvish_mri/p040_1.png",
+  "out": "fig09_t2_decay.jpg",
+  "idx": 127,
+  "page": 40,
+  "slug": "darvish_mri",
+  "heading": ""
+ },
+ {
+  "raw": "images/raw/darvish_mri/p041_1.png",
+  "out": "fig09_mz_mxy.jpg",
+  "idx": 128,
+  "page": 41,
+  "slug": "darvish_mri",
+  "heading": ""
+ },
+ {
+  "raw": "images/raw/darvish_mri/p042_1.png",
+  "out": "fig09_tr_te.jpg",
+  "idx": 129,
+  "page": 42,
+  "slug": "darvish_mri",
+  "heading": ""
+ },
+ {
+  "raw": "images/raw/darvish_mri/p043_1.png",
+  "out": "fig09_mri_computer.jpg",
+  "idx": 130,
+  "page": 43,
+  "slug": "darvish_mri",
+  "heading": "TR, TE"
+ },
+ {
+  "raw": "images/raw/darvish_mri/p050_1.png",
+  "out": "fig09_contrast_table.jpg",
+  "idx": 136,
+  "page": 50,
+  "slug": "darvish_mri",
+  "heading": "کنتراست درMRI"
+ }
+]

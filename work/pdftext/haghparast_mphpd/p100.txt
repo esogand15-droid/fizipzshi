@@ -1,0 +1,10 @@
+Doppler effect
+Moving source of sound changes perceived 
+wavelength (frequency).
+Shift in frequency is termed “Doppler shift.”
+∆f = 2f(C/v)cosq
+– f = frequency
+– C = source velocity
+– v = velocity of sound
+– q = angle between “view” direction and 
+direction of motion.

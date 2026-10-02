@@ -1,0 +1,9 @@
+{
+ "slug": "14",
+ "video": "work/media/14.mp4",
+ "duration": 1237.632,
+ "offset": 0.0,
+ "end": 1237.632,
+ "model": "large-v3-turbo",
+ "chunk_min": 20.0
+}

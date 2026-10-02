@@ -1,0 +1,15 @@
+Linear No Threshold Response
+آستانه بدون خطی پاسخ
+• Applies to stochastic effects
+• Suppose that any amount of 
+radiation has some 
+detrimental effect
+دارد کاربرد( تصادفی )احتمالی اثرات برای• 
+مضری اثر تشعشع مقدار هر کنید فرض
+.دارد
+0 50 100
+0
+0.5
+1
+Dose
+Probability of Effect

@@ -1,0 +1,66 @@
+Linear Energy Transfer (LET)
+ خطی انرژی انتقال)LET)
+• The amount of energy deposited per unit path length
+• High LET Radiation is more damaging
+.مسیر طول واحد در واگذارشده انرژی مقدار• 
+.است تر رسان آسیب باال LET با پرتو• 
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
++
+-
+Low LET
+High LET
