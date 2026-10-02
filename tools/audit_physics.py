@@ -101,6 +101,14 @@ def main() -> int:
     fig_place = load_module("fig_place", "content/fig_place.py")
     if "images/fig/slide06_afzalipour_p105_0.jpg" not in fig_place.FIG_DROP:
         fail("redundant protection image has not been removed")
+    apron_path = "images/fig/fig06_lead_apron.jpg"
+    if any(b.get("type") == "figure" and b.get("file") == apron_path
+           for b in protection.BLOCKS):
+        fail("orphaned apron image remains in the protection chapter")
+    attach_figures = load_module("attach_figures", "tools/attach_figures.py")
+    if any(fig.get("file") == apron_path
+           for _anchor, figures in attach_figures.PLAN.get(6, []) for fig in figures):
+        fail("figure helper would reinsert the redundant apron image")
 
     print("فیزیک سونوگرافی: R/T، درصدها، اعداد مثال‌ها، شکل‌ها و جدول لایه‌ها ✓")
     print(f"محاسبه‌ها: عضله/هوا R={muscle_r*100:.3f}%؛ چربی/کلیه R={fat_kidney_r*100:.2f}% ✓")

@@ -290,7 +290,7 @@
   },
   {
    "type": "formula",
-   "tex": "Z = \rho \times C",
+   "tex": "Z = \\rho \\times C",
    "name": "امپدانس صوتی ([[Acoustic Impedance]])",
    "legend": [
     "[[Z]] = چگالی بافت × سرعت صوت در بافت",
