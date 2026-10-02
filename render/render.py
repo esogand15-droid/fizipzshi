@@ -49,13 +49,60 @@ def LTR_DIGITS(text: str) -> str:
     return "".join(out)
 
 
+FA_CHARS = re.compile(r"[\u0600-\u06FF]")
+_LATIN_TOK = re.compile(r"[A-Za-z0-9]")
+
+
+def _island_chunks(inner: str) -> list[tuple[str, str]]:
+    """Split island content into (kind, text) pieces: 'fa' | 'num' | 'ltr' | 'neu'."""
+    out: list[tuple[str, str]] = []
+    for tok in re.findall(r"\S+\s*|\s+", inner):
+        if FA_CHARS.search(tok):
+            kind = "fa"
+        elif re.search(r"[\^_\\]", tok) or re.search(r"[A-Za-z]", tok):
+            kind = "ltr"           # Latin word or math token: keep in an LTR span
+        elif _LATIN_TOK.search(tok):
+            kind = "num"           # bare number: Persian digits, RTL flow
+        else:
+            kind = "neu"
+        if out and (kind == "neu" or out[-1][0] == kind):
+            out[-1] = (out[-1][0], out[-1][1] + tok)
+        else:
+            out.append((kind, tok))
+    return out
+
+
+def island(inner: str) -> str:
+    """[[...]] island → bidi-correct HTML.
+
+    Latin-only islands stay a single LTR span, so unit strings such as ``mSv/h``
+    or ``1.022 MeV`` never split. When an island mixes Persian words with numbers
+    or Latin units (``5 سانتی‌متر``, ``2 تا 5 مگاهرتز``), the pieces are emitted in
+    logical order inside the surrounding RTL flow — wrapping the whole island in
+    ``dir="ltr"`` used to render the number *before* its unit word when read
+    right-to-left (``سانتی‌متر 5``).
+    """
+    chunks = _island_chunks(inner)
+    if not any(k == "fa" for k, _ in chunks):
+        return '<span dir="ltr">' + mathml_like(inner) + "</span>"
+    out = []
+    for kind, tok in chunks:
+        if kind in ("fa", "num"):
+            out.append(fa_digits(esc(tok)))
+        elif kind == "ltr":
+            out.append('<span dir="ltr">' + mathml_like(tok) + "</span>")
+        else:
+            out.append(esc(tok))
+    return "".join(out)
+
+
 def inline(text: str) -> str:
     """Mini markup: **bold**, [[ltr]] islands, Persian digits elsewhere."""
     chunks = re.split(r"(\[\[.*?\]\]|\*\*.*?\*\*)", str(text))
     out = []
     for c in chunks:
         if c.startswith("[[") and c.endswith("]]"):
-            out.append('<span dir="ltr">' + esc(c[2:-2]) + "</span>")
+            out.append(island(c[2:-2]))
         elif c.startswith("**") and c.endswith("**"):
             out.append("<b>" + LTR_DIGITS(c[2:-2]) + "</b>")
         else:
@@ -144,6 +191,9 @@ def mathml_like(tex: str, _depth: int = 0) -> str:
                     out.append("\u221a(" + mathml_like(g, _depth + 1) + ")")
                 elif cmd in SYMS:
                     out.append(SYMS[cmd])
+                elif cmd in ("left", "right", "big", "Big", "bigg", "Bigg", "bigl", "bigr",
+                             "Bigl", "Bigr", "displaystyle", "textstyle", "nolimits", "limits"):
+                    pass                     # sizing/delimiter hints: drop, keep the bracket
                 else:
                     out.append(cmd)          # unknown command: keep it readable
                 continue
@@ -157,8 +207,12 @@ def mathml_like(tex: str, _depth: int = 0) -> str:
             if i < n and s[i] == "{":
                 g, i = _group(s, i)
             else:
-                g = s[i] if i < n else ""
-                i += 1
+                # `c^2`, `10^-10`, `10^-4`, `2m_ec^2`, `e^-`: take the sign+number
+                # run when there is one, else a single letter — the old one-char
+                # rule turned `10^-4` into `10^{-}4`.
+                m = re.match(r"-?\d+(?:[.,]\d+)?|[A-Za-z]|[+\-]", s[i:])
+                g = m.group(0) if m else ""
+                i += len(g)
             tag = "sup" if ch == "^" else "sub"
             out.append(f"<{tag}>{mathml_like(g, _depth + 1)}</{tag}>")
             continue

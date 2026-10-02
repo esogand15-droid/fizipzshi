@@ -25,7 +25,7 @@ FIG_AFTER: dict[str, tuple[int, str]] = {
     # --- ch06: سه اصل کاهش، روپوش محافظ، نگه‌داشتن بیمار ---
     "images/fig/slide06_afzalipour_p090_0.jpg": (6, "کاهش زمان در معرض قرارگیری پرتو"),
     "images/fig/slide06_afzalipour_p092_0.jpg": (6, "افزایش فاصله از منبع پرتوزا"),
-    "images/fig/slide06_afzalipour_p081_0.jpg": (6, "لزوم و زمان استفاده از رویوش‌های محافظ"),
+    "images/fig/slide06_afzalipour_p081_0.jpg": (6, "لزوم و زمان استفاده از روپوش‌های محافظ"),
     "images/fig/slide06_afzalipour_p104_0.jpg": (6, "وضعیت همه افراد حاضر"),
     "images/fig/slide06_afzalipour_p105_0.jpg": (6, "به نگه‌داری بیمار یا فیلم نیاز است"),
     # --- ch07: موج صوتی و A-mode چشم ---
@@ -124,7 +124,7 @@ FIG_AFTER.update({
     "images/fig/slide05_afzalipour_p091_0.jpg": (3, "۲. پایه‌های فیزیکی تشکیل تصویر رادیوگرافی"),
     "images/fig/slide05_afzalipour_p094_0.jpg": (3, "۵. آنژیوگرافی"),
     "images/fig/slide05_afzalipour_p094_1.jpg": (3, "۵. آنژیوگرافی"),
-    # روپوش سربی → بخش «رویوش‌های محافظ» (نه بخش نگه‌داشتن بیمار)
+    # روپوش سربی → بخش «روپوش‌های محافظ» (نه بخش نگه‌داشتن بیمار)
     "images/fig/slide06_afzalipour_p105_0.jpg": (6, "موارد استثنا: قرار گرفتن گنادها در میدان تشخیصی"),
     # پاسخ سلولی به پرتوتابی → بخش اندازه‌گیری آسیب پرتوی
     "images/fig/slide08_darvish_radiobio_p036_0.jpg": (8, "۱۶. اندازه‌گیری آسیب پرتوی و منحنی بقای سلول"),

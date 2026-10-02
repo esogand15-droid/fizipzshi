@@ -49,8 +49,8 @@ BLOCKS = [
      },
 
     {"type": "formula", "tex": "E_{K\\alpha} = E_{binding,K} - E_{binding,L} = 70 - 11 = 59\\ keV", "name": "انرژی فوتون مشخصه تنگستن",
-     "legend": ["[[E_binding,K = 70 keV]]: انرژی بستگی الکترون لایه [[K]] تنگستن",
-                "[[E_binding,L = 11 keV]]: انرژی بستگی الکترون لایه [[L]]",
+     "legend": ["[[E_{binding,K} = 70 keV]]: انرژی بستگی الکترون لایه [[K]] تنگستن",
+                "[[E_{binding,L} = 11 keV]]: انرژی بستگی الکترون لایه [[L]]",
                 "خروجی: فوتون ایکس مشخصه با انرژی [[59 keV]]"],
      "src": f"{A} ص۱۲؛ {B} اسلاید «[[Characteristic X-ray Production]]»"},
     {"type": "h2", "text": "۴. طیف انرژی اشعه ایکس"},
