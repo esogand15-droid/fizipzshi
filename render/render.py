@@ -394,15 +394,29 @@ def _fig_width(path: str, want: str) -> str:
     return f"{max(40.0, min(pct, capped)):.1f}%"
 
 
+# --- page-fill state (see fit_figures() in main) ----------------------------- #
+# FIG_SEQ counts the figures of one build_html() pass so every figure gets a
+# stable id; FIG_SCALE holds the shrink factor the fitting pass decided for it.
+FIG_SEQ = 0
+FIG_SCALE: dict[int, float] = {}
+
+
 def blk_figure(b: dict) -> str:
+    global FIG_SEQ
     f = b.get("file", "")
     path = f if os.path.isabs(f) else str(ROOT / f)
     if not Path(path).exists():
         return f'<div class="fnote">شکل در دسترس نیست: {esc(f)}</div>'
+    fid = FIG_SEQ
+    FIG_SEQ += 1
     cap = inline(b.get("caption", ""))
     cs = f'<span class="csrc">{LTR_DIGITS(b.get("src",""))}</span>' if b.get("src") else ""
     w = _fig_width(path, b.get("width") or "86%")
-    return (f'<div class="card"><img src="{path}" style="width:{w}"/>'
+    scale = FIG_SCALE.get(fid, 1.0)
+    if scale < 1.0 and w.endswith("%"):
+        w = f"{max(26.0, float(w[:-1]) * scale):.1f}%"
+    return (f'<div class="card"><span class="marker">JZF{fid:03d}MARK</span>'
+            f'<img src="{path}" style="width:{w}"/>'
             f'<div class="cap">{cap}{cs}</div></div>')
 
 
@@ -591,6 +605,8 @@ def end_html(n_pages: str, n_fig: str, n_tab: str, n_blocks: str,
 
 
 def build_html(page_map: dict | None = None, total_pages: str = "—") -> str:
+    global FIG_SEQ
+    FIG_SEQ = 0
     chapters = load_chapters()
     guide_rows = json.loads((LOCK / "guide.json").read_text(encoding="utf-8")) \
         if (LOCK / "guide.json").exists() else []
@@ -689,6 +705,100 @@ def scan_pages(pdf_path: Path, chapters: list[dict], guide_rows: list[dict]) -> 
     return out
 
 
+FIG_MARK = re.compile(r"JZF(\d\d\d)MARK")
+# a page whose content stops this far above the footer is "half empty"
+GAP_LIMIT = 0.20
+
+
+def page_gaps(pdf_path: Path) -> list[float]:
+    """Fraction of each page's body height left blank at the bottom.
+
+    Rasterises every page at low resolution and finds the last row that holds
+    any ink. The footer band (page number / wordmark) is excluded, and dark
+    cover pages come out as 0 because their background is ink.
+    """
+    import pypdfium2 as pdfium
+    from PIL import Image
+
+    gaps = []
+    pdf = pdfium.PdfDocument(str(pdf_path))
+    for i in range(len(pdf)):
+        img = pdf[i].render(scale=0.5).to_pil().convert("L")
+        img = img.point(lambda v: 255 if v > 225 else 0)
+        body = img.crop((0, 0, img.width, int(img.height * 0.945)))
+        col = body.resize((1, body.height), Image.BOX)
+        rows = list(col.getdata())
+        last = -1
+        for y, v in enumerate(rows):
+            if v < 254:
+                last = y
+        gaps.append(1.0 if last < 0 else (len(rows) - 1 - last) / len(rows))
+    return gaps
+
+
+def figure_pages(pdf_path: Path) -> dict[int, int]:
+    """figure id → 1-based page it was laid out on."""
+    import pypdfium2 as pdfium
+
+    pdf = pdfium.PdfDocument(str(pdf_path))
+    out: dict[int, int] = {}
+    for i in range(len(pdf)):
+        txt = pdf[i].get_textpage().get_text_bounded()
+        for m in FIG_MARK.finditer(txt):
+            out.setdefault(int(m.group(1)), i + 1)
+    return out
+
+
+def fit_figures(render_once, rounds: int = 4) -> None:
+    """Shrink the figures that leave a big hole at the bottom of their page.
+
+    A figure card cannot be split across pages, so whenever the block after it
+    does not fit, the rest of the page stays empty and the جزوه looks torn apart
+    (the reader sees one item alone at the bottom and the next two overleaf).
+    Each round finds the pages with the largest holes, shrinks the last figure
+    sitting on them, and re-renders; a figure that does not actually help is
+    restored and frozen so the loop always converges.
+    """
+    pdf_path = render_once()
+    gaps = page_gaps(pdf_path)
+    frozen: set[int] = set()
+    for _ in range(rounds):
+        figs = figure_pages(pdf_path)
+        by_page: dict[int, list[int]] = {}
+        for fid, pno in figs.items():
+            by_page.setdefault(pno, []).append(fid)
+        picks = []
+        for pno, g in enumerate(gaps, 1):
+            if g <= GAP_LIMIT:
+                continue
+            cands = [f for f in by_page.get(pno, []) if f not in frozen
+                     and FIG_SCALE.get(f, 1.0) > 0.62]
+            if cands:
+                picks.append((max(cands), pno, g))
+        if not picks:
+            break
+        before = {f: FIG_SCALE.get(f, 1.0) for f, _, _ in picks}
+        for fid, _, _ in picks:
+            FIG_SCALE[fid] = round(before[fid] * 0.85, 3)
+        pdf_path = render_once()
+        new_gaps = page_gaps(pdf_path)
+        improved = False
+        for fid, pno, g in picks:
+            ng = new_gaps[pno - 1] if pno - 1 < len(new_gaps) else 1.0
+            if ng < g - 0.03:
+                improved = True
+            else:
+                FIG_SCALE[fid] = before[fid]
+                frozen.add(fid)
+        if not improved:
+            # every candidate was rolled back -> re-render the restored layout
+            pdf_path = render_once()
+            new_gaps = page_gaps(pdf_path)
+        gaps = new_gaps
+    print("page-fill: shrunk figures:",
+          {k: v for k, v in sorted(FIG_SCALE.items()) if v < 1.0})
+
+
 def main() -> int:
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "HumsYar_MedPhysics_Jozve.pdf"
     chapters = load_chapters()
@@ -697,10 +807,17 @@ def main() -> int:
     from weasyprint import HTML
 
     # pass 1: placeholder page numbers (also used to measure the final page count)
-    html1 = build_html()
-    (BASE / "pass1.html").write_text(html1, encoding="utf-8")
     tmp = BASE / "pass1.pdf"
-    HTML(string=html1, base_url=str(BASE)).write_pdf(str(tmp))
+
+    def render_pass1() -> Path:
+        html1 = build_html()
+        (BASE / "pass1.html").write_text(html1, encoding="utf-8")
+        HTML(string=html1, base_url=str(BASE)).write_pdf(str(tmp))
+        return tmp
+
+    # pass 1b: pull orphaned blocks back by shrinking the figures that leave
+    # half-empty pages behind them (keeps sections visually compact)
+    fit_figures(render_pass1, rounds=3)
     pm = scan_pages(tmp, chapters, guide_rows)
 
     # page count changes once real numbers are substituted -> render pass 2 with
