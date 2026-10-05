@@ -60,10 +60,18 @@ jobs:
           # filebin hands out a session cookie on the bin page; without it the
           # file URL answers with an HTML interstitial instead of the archive
           curl -sS -L -c /tmp/dl/jar.txt -A "$UA" -o /tmp/dl/bin.html "$BIN" || true
-          curl -L --retry 5 --retry-delay 5 --retry-all-errors \
-               -b /tmp/dl/jar.txt -c /tmp/dl/jar.txt -A "$UA" \
-               -H "Referer: $BIN" -H "Accept: */*" --compressed \
-               -D /tmp/diag/headers.txt -o /tmp/dl/archive.bin "$URL" || true
+          # the first hit answers with the «Please read» interstitial and sets a
+          # `verified` cookie; sending that cookie back yields the real archive
+          for attempt in 1 2 3; do
+            curl -L --retry 5 --retry-delay 5 --retry-all-errors \
+                 -b /tmp/dl/jar.txt -c /tmp/dl/jar.txt -b "verified=2024-05-24" \
+                 -A "$UA" -H "Referer: $BIN" -H "Accept: */*" \
+                 -D /tmp/diag/headers.txt -o /tmp/dl/archive.bin "$URL" || true
+            sz=$(stat -c%s /tmp/dl/archive.bin 2>/dev/null || echo 0)
+            echo "attempt $attempt -> $sz bytes" | tee -a /tmp/diag/download.txt
+            [ "$sz" -gt 1000000 ] && break
+            sleep 3
+          done
           { ls -l /tmp/dl; echo "== magic =="; head -c 16 /tmp/dl/archive.bin | od -An -tx1 -c; } \
             | tee -a /tmp/diag/download.txt
           if [ "$(stat -c%s /tmp/dl/archive.bin)" -lt 1000000 ]; then
