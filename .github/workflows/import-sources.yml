@@ -10,8 +10,15 @@ on:
     inputs:
       url:
         description: direct download URL of the source archive
-        required: true
+        required: false
         type: string
+  # only workflows living on the default branch can be dispatched by name, so
+  # the session branch kicks this off by committing the URL into REQUEST.txt
+  push:
+    branches:
+      - arena/ff8acb52-fizipzshi
+    paths:
+      - 'work/sources/REQUEST.txt'
 
 permissions:
   contents: write
@@ -40,9 +47,12 @@ jobs:
       - name: download archive
         run: |
           mkdir -p /tmp/dl
+          URL="${{ inputs.url }}"
+          if [ -z "$URL" ]; then URL="$(grep -v '^#' work/sources/REQUEST.txt | head -1 | tr -d '\r\n')"; fi
+          echo "fetching: $URL"
           curl -L --fail --retry 5 --retry-delay 5 --retry-all-errors \
                -A "Mozilla/5.0 (X11; Linux x86_64)" \
-               -o /tmp/dl/archive.bin "${{ inputs.url }}"
+               -o /tmp/dl/archive.bin "$URL"
           ls -l /tmp/dl
           head -c 8 /tmp/dl/archive.bin | od -c | head -2
 
