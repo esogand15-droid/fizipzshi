@@ -39,38 +39,63 @@ jobs:
 
       - name: setup
         run: |
+          mkdir -p /tmp/diag
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache || true
           sudo apt-get update -qq
-          sudo apt-get install -y -qq p7zip-full p7zip-rar unrar-free || true
+          sudo apt-get install -y -qq p7zip-full unar rsync || true
+          sudo apt-get install -y -qq p7zip-rar || echo "p7zip-rar unavailable" >> /tmp/diag/notes.txt
           python3 -m pip install --quiet pymupdf
-          df -h / | tail -1
+          { echo "== tools =="; which 7z 7za unar unrar lsar || true;
+            echo "== disk =="; df -h /; } > /tmp/diag/env.txt
+          cat /tmp/diag/env.txt
 
       - name: download archive
         run: |
           mkdir -p /tmp/dl
           URL="${{ inputs.url }}"
           if [ -z "$URL" ]; then URL="$(grep -v '^#' work/sources/REQUEST.txt | head -1 | tr -d '\r\n')"; fi
-          echo "fetching: $URL"
+          echo "fetching: $URL" | tee -a /tmp/diag/download.txt
           curl -L --fail --retry 5 --retry-delay 5 --retry-all-errors \
                -A "Mozilla/5.0 (X11; Linux x86_64)" \
                -o /tmp/dl/archive.bin "$URL"
-          ls -l /tmp/dl
-          head -c 8 /tmp/dl/archive.bin | od -c | head -2
+          { ls -l /tmp/dl; echo "== magic =="; head -c 16 /tmp/dl/archive.bin | od -An -tx1 -c; } \
+            | tee -a /tmp/diag/download.txt
 
       - name: list + extract
+        id: extract
+        continue-on-error: true
         run: |
           mkdir -p /tmp/src work/sources
-          7z l /tmp/dl/archive.bin > work/sources/ARCHIVE_LISTING.txt || true
-          tail -5 work/sources/ARCHIVE_LISTING.txt
-          7z x -y -o/tmp/src /tmp/dl/archive.bin > /tmp/extract.log || \
-            (tail -30 /tmp/extract.log; exit 1)
+          lsar /tmp/dl/archive.bin > /tmp/diag/listing_lsar.txt 2>&1 || true
+          7z l /tmp/dl/archive.bin > /tmp/diag/listing_7z.txt 2>&1 || true
+          tail -5 /tmp/diag/listing_7z.txt
+          ok=0
+          if unar -q -f -o /tmp/src /tmp/dl/archive.bin > /tmp/diag/unar.log 2>&1; then
+            echo "extracted with unar"; ok=1
+          else
+            tail -20 /tmp/diag/unar.log
+            if 7z x -y -o/tmp/src /tmp/dl/archive.bin > /tmp/diag/7z.log 2>&1; then
+              echo "extracted with 7z"; ok=1
+            else
+              tail -20 /tmp/diag/7z.log
+            fi
+          fi
           rm -f /tmp/dl/archive.bin
-          du -sh /tmp/src
-          find /tmp/src -type f | wc -l
+          { echo "ok=$ok"; du -sh /tmp/src; find /tmp/src -type f | wc -l; } \
+            | tee -a /tmp/diag/extract.txt
+          find /tmp/src -type f -printf '%10s  %p\n' | sort -k2 > /tmp/diag/files.txt || true
+          head -50 /tmp/diag/files.txt
+          test "$ok" = "1"
 
       - name: inventory
-        run: python3 tools/src_inventory.py /tmp/src work/sources/inventory.json
+        continue-on-error: true
+        run: |
+          python3 tools/src_inventory.py /tmp/src work/sources/inventory.json \
+            | tee /tmp/diag/inventory.txt
+          cp -f work/sources/inventory.json /tmp/diag/ || true
 
       - name: collect documents (no video/audio)
+        continue-on-error: true
         run: |
           mkdir -p /tmp/docs
           cd /tmp/src
@@ -78,21 +103,33 @@ jobs:
                 -o -iname '*.pdf' -o -iname '*.docx' -o -iname '*.doc' \
                 -o -iname '*.md' -o -iname '*.txt' -o -iname '*.odp' \) \
             -print0 | rsync -a --files-from=- --from0 ./ /tmp/docs/
-          du -sh /tmp/docs
-          find /tmp/docs -type f | wc -l
+          du -sh /tmp/docs | tee -a /tmp/diag/docs.txt
+          find /tmp/docs -type f | wc -l | tee -a /tmp/diag/docs.txt
 
       - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: import-diagnostics
+          path: /tmp/diag
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: source-docs
           path: /tmp/docs
           retention-days: 7
           compression-level: 1
+          if-no-files-found: ignore
 
       - name: commit inventory
+        if: always()
         run: |
+          cp -f /tmp/diag/listing_7z.txt work/sources/ARCHIVE_LISTING.txt 2>/dev/null || true
+          cp -f /tmp/diag/files.txt work/sources/ARCHIVE_FILES.txt 2>/dev/null || true
           git config user.name  "humsyar-bot"
           git config user.email "humsyar-bot@users.noreply.github.com"
-          git add work/sources/inventory.json work/sources/ARCHIVE_LISTING.txt
+          git add -A work/sources || true
           git commit -m "sources: inventory of the lecture archive" || exit 0
           git pull --rebase origin "$BRANCH"
           git push origin HEAD:"$BRANCH"
