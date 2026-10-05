@@ -363,9 +363,31 @@ def _table_mm(head: list, rows: list) -> float:
     return h
 
 
+# cells that carry no information — a column made only of these is dead weight
+_EMPTY_CELL = {"", "—", "-", "–", "ـ", "_"}
+
+
+def _trim_table(head: list, rows: list) -> tuple[list, list]:
+    """Square the grid off and drop columns that hold nothing.
+
+    A placeholder column (every body cell «—») is printed as a wide empty strip
+    that makes the table look broken. Ragged rows are padded so no cell ever
+    lands under the wrong header.
+    """
+    ncol = max([len(head)] + [len(r) for r in rows] + [0])
+    if ncol == 0:
+        return head, rows
+    head = list(head) + [""] * (ncol - len(head))
+    rows = [list(r) + [""] * (ncol - len(r)) for r in rows]
+    keep = [c for c in range(ncol)
+            if not (rows and all(str(r[c]).strip() in _EMPTY_CELL for r in rows))]
+    if not keep or len(keep) == ncol:
+        return head, rows
+    return [head[c] for c in keep], [[r[c] for c in keep] for r in rows]
+
+
 def blk_table(b: dict) -> str:
-    head = b.get("head") or []
-    rows = b.get("rows") or []
+    head, rows = _trim_table(b.get("head") or [], b.get("rows") or [])
     th = "".join(f"<th>{inline(h)}</th>" for h in head)
     trs = []
     for r in rows:
