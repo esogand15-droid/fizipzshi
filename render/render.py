@@ -353,7 +353,11 @@ def blk_table(b: dict) -> str:
         tds = "".join(f"<td>{inline(c)}</td>" for c in r)
         trs.append(f"<tr>{tds}</tr>")
     cap = f'<div class="cap">{inline(b["caption"])}</div>' if b.get("caption") else ""
-    return (f'<div class="ftable"><table class="dt"><thead><tr>{th}</tr></thead>'
+    # Long tables may run over a page boundary (the header row repeats); short
+    # ones are kept whole. Forcing every table to stay on one page is what left
+    # half-empty pages behind — the table jumped over, the text stayed put.
+    cls = "ftable long" if len(rows) >= 5 else "ftable"
+    return (f'<div class="{cls}"><table class="dt"><thead><tr>{th}</tr></thead>'
             f'<tbody>{"".join(trs)}</tbody></table>{cap}</div>' + src_line(b.get("src")))
 
 

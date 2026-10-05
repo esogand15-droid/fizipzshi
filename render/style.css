@@ -124,6 +124,11 @@ table.dt td { font-size: 9.2pt; color: #334155; padding: 2.4mm 2.2mm; border: 0.
   line-height: 1.85; vertical-align: top; }
 table.dt tr:nth-child(even) td { background: #f8fafc; }
 .ftable { margin-bottom: 4.4mm; break-inside: avoid; }
+/* tables with many rows may continue on the next page; the header repeats and
+   no single row is ever split in half */
+.ftable.long, .ftable.long table.dt, .ftable.long tbody { break-inside: auto; }
+.ftable.long thead { display: table-header-group; }
+.ftable.long tr { break-inside: avoid; }
 .fbox { background: #ffffff; border: 0.25mm solid #bfdbfe; border-radius: 3.4mm;
   padding: 4mm 5mm; margin-bottom: 4.4mm; break-inside: avoid; }
 .fbox .fx { text-align: center; font-size: 12.6pt; color: #0f172a; margin-bottom: 2.6mm; direction: ltr; }
@@ -142,11 +147,15 @@ table.dt tr:nth-child(even) td { background: #f8fafc; }
 .examtip { background: linear-gradient(to left, #2563eb, #14b8a6); color: #ffffff; border-radius: 3mm;
   padding: 3.4mm 4.4mm; margin-bottom: 4.2mm; font-size: 10pt; line-height: 1.9;
   break-inside: avoid; }
+/* «مرور سریع» is often taller than the space left on a page; let it continue
+   overleaf instead of jumping over and leaving a hole */
 .review { background: linear-gradient(to left, #dbeafe, #ccfbf1); border: 0.25mm solid #cde8f5;
-  border-radius: 4mm; padding: 4.5mm 5mm; margin: 6mm 0 4mm 0; break-inside: avoid; }
-.review h3 { margin: 0 0 3mm 0; color: #1d4ed8; font-size: 12pt; }
+  border-radius: 4mm; padding: 4.5mm 5mm; margin: 6mm 0 4mm 0; break-inside: auto;
+  orphans: 2; widows: 2; }
+.review h3 { margin: 0 0 3mm 0; color: #1d4ed8; font-size: 12pt; break-after: avoid; }
 .review ul { margin: 0; padding-right: 5mm; }
-.review li { font-size: 9.9pt; line-height: 1.9; color: #1e293b; margin-bottom: 1.4mm; }
+.review li { font-size: 9.9pt; line-height: 1.9; color: #1e293b; margin-bottom: 1.4mm;
+  break-inside: avoid; }
 .fnote { background: #f8fafc; border: 0.2mm dashed #cbd5e1; border-radius: 2.6mm; padding: 3mm 4mm;
   margin-bottom: 4mm; font-size: 9pt; color: #64748b; line-height: 1.85; }
 .endpage { page: dark; height: 296mm; padding: 60mm 24mm 0 24mm; text-align: center;
