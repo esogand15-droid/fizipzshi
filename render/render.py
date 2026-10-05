@@ -435,7 +435,7 @@ def blk_figure(b: dict) -> str:
     w = _fig_width(path, b.get("width") or "86%")
     scale = FIG_SCALE.get(fid, 1.0)
     if scale < 1.0 and w.endswith("%"):
-        w = f"{max(26.0, float(w[:-1]) * scale):.1f}%"
+        w = f"{max(45.0, float(w[:-1]) * scale):.1f}%"
     FIG_H[fid] = _printed_height_mm(path, w)
     return (f'<div class="card"><span class="marker">JZF{fid:03d}MARK</span>'
             f'<img src="{path}" style="width:{w}"/>'
@@ -796,7 +796,7 @@ def fit_figures(render_once, rounds: int = 4) -> None:
             if g <= GAP_LIMIT:
                 continue
             cands = [f for f in by_page.get(pno, []) if f not in frozen
-                     and FIG_SCALE.get(f, 1.0) > 0.45]
+                     and FIG_SCALE.get(f, 1.0) > 0.71]
             if cands:
                 picks.append((max(cands), pno, g))
         if not picks:
@@ -808,8 +808,10 @@ def fit_figures(render_once, rounds: int = 4) -> None:
             # climb onto this page.
             h = FIG_H.get(fid) or 0.0
             gap_mm = g * BODY_MM
-            factor = 0.85 if h <= 0 else max(0.55, (h - gap_mm) / h)
-            FIG_SCALE[fid] = round(max(0.42, before[fid] * min(0.95, factor)), 3)
+            factor = 0.85 if h <= 0 else max(0.72, (h - gap_mm) / h)
+            # never shrink past legibility — a slightly short page beats a
+            # slide screenshot whose own text can no longer be read
+            FIG_SCALE[fid] = round(max(0.70, before[fid] * min(0.95, factor)), 3)
         pdf_path = render_once()
         new_gaps = page_gaps(pdf_path)
         improved = False
