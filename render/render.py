@@ -806,7 +806,7 @@ FIG_MARK = re.compile(r"JZF(\d\d\d)MARK")
 # A4 height minus the page margins — the band page_gaps() measures
 BODY_MM = (297.0 - 12.0 - 15.0) * 0.945
 # a page whose content stops this far above the footer is "half empty"
-GAP_LIMIT = 0.20
+GAP_LIMIT = 0.16
 
 
 def page_gaps(pdf_path: Path) -> list[float]:
@@ -924,7 +924,7 @@ def main() -> int:
 
     # pass 1b: pull orphaned blocks back by shrinking the figures that leave
     # half-empty pages behind them (keeps sections visually compact)
-    fit_figures(render_pass1, rounds=3)
+    fit_figures(render_pass1, rounds=5)
     # the locators have done their job; keep them out of the delivered text layer
     global EMIT_FIG_MARKS
     EMIT_FIG_MARKS = False
