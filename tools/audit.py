@@ -386,6 +386,9 @@ def check_pdf(chs: dict, pdf: Path) -> None:
                                               for ln in t.splitlines()))
     pages_raw = [rtl(t) for t in raw]
     pages = [re.sub(r"[^\w\u0600-\u06ff]", "", t) for t in pages_raw]
+    # headings must be matched against the *unreversed* text: rtl() flips the
+    # word order of every line, which breaks a multi-word needle
+    pages_lr = [re.sub(r"[^\w\u0600-\u06ff]", "", t) for t in raw]
     line(f"## ۷) تطبیق با PDF رندرشده ({n} صفحه)")
 
     # صفحه‌های خالی
@@ -430,7 +433,7 @@ def check_pdf(chs: dict, pdf: Path) -> None:
         first = next((b["text"] for b in chs[no]["blocks"] if b.get("type") == "h2"), "")
         key = re.sub(r"[^\w\u0600-\u06ff]", "", first)[:16]
         pg = v["start"]                       # ۰-مبنا
-        ok = bool(key) and key in pages[pg]
+        ok = bool(key) and (key in pages[pg] or key in pages_lr[pg])
         if not ok:
             wrong.append((k, pg + 1, first[:22]))
     if wrong:
