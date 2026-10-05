@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - arena/01a0fd2a-fizipzshi
+      - arena/ff8acb52-fizipzshi
     paths:
       - 'lock/**'
       - 'render/**'
@@ -16,19 +16,19 @@ permissions:
   contents: write
 
 env:
-  BRANCH: arena/01a0fd2a-fizipzshi
+  BRANCH: arena/ff8acb52-fizipzshi
   # nudge: keep the release asset in sync with the committed PDF
   REL: jozve-v1
 
 jobs:
   render:
-    if: github.ref_name == 'arena/01a0fd2a-fizipzshi'
+    if: github.ref_name == 'arena/ff8acb52-fizipzshi'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: arena/01a0fd2a-fizipzshi
+          ref: arena/ff8acb52-fizipzshi
           fetch-depth: 1
 
       - name: setup

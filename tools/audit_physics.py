@@ -38,8 +38,15 @@ def main() -> int:
     text = "\n".join(str(b) for b in blocks)
     if r"R = \\left(\\frac{Z_2 - Z_1}{Z_2 + Z_1}\\right)^2" not in text:
         fail("ultrasound energy-reflectance equation missing or malformed")
-    if not any(b.get("type") == "formula" and b.get("tex") == "T = 1 - R" for b in blocks):
+    if not any(b.get("type") == "formula" and b.get("tex", "").startswith("T = 1 - R")
+               for b in blocks):
         fail("transmission must be defined as the fractional complement T = 1 - R")
+    # the closed form must agree with T = 1 - R, and the percentage conversion
+    # (the «درصد عبور» topic) must actually be stated somewhere in the chapter
+    if r"\\frac{4 Z_1 Z_2}{(Z_1 + Z_2)^2}" not in text:
+        fail("closed form T = 4Z1Z2/(Z1+Z2)^2 missing")
+    if "درصدِ\\\\ عبور" not in text and "درصد عبور" not in text:
+        fail("percentage-transmission section missing")
     if "نه درصدها" not in text or "100% − درصدِ بازتاب" not in text:
         fail("fraction-versus-percent distinction is missing")
     if "ویژگی ذاتی موج" not in text or "شدت" not in text or "توان منبع" not in text:
@@ -77,8 +84,12 @@ def main() -> int:
         fail("external clinical reference for lung ultrasound is missing")
 
     nuclear_text = "\n".join(str(b) for b in nuclear.BLOCKS)
-    if "2 m_e c^2" not in nuclear_text:
-        fail("positron threshold formula should display 2 m_e c^2")
+    # written without spaces: `mathml_like()` keeps literal spaces, so "2 m_e c^2"
+    # printed as «2 m ₑ c ²». The tight form renders as 2mₑc².
+    if "2m_ec^2" not in nuclear_text:
+        fail("positron threshold formula should display 2m_ec^2")
+    if "2 m_e c^2" in nuclear_text:
+        fail("spaced form '2 m_e c^2' renders with gaps — use '2m_ec^2'")
     gamma = next((b for b in nuclear.BLOCKS if b.get("type") == "formula"
                   and "87m" in b.get("tex", "")), None)
     if not gamma or "_{38}" not in gamma.get("tex", "") or "rightarrow" not in gamma.get("tex", ""):

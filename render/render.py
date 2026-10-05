@@ -38,12 +38,18 @@ def fa_digits(s: str) -> str:
 
 
 def LTR_DIGITS(text: str) -> str:
-    """Persian digits outside [[...]] LTR islands; ASCII kept inside islands."""
+    """Persian digits outside [[...]] islands; islands go through `island()`.
+
+    Routing islands through the same helper the body text uses keeps the digit
+    style identical everywhere (captions, «منبع:» lines and bold runs included),
+    so a quantity never appears as ``0.25 mm`` on one line and «۰.۲۵ میلی‌متر» on
+    the next.
+    """
     parts = re.split(r"(\[\[.*?\]\])", str(text))
     out = []
     for i, p in enumerate(parts):
         if i % 2 == 1:  # LTR island
-            out.append("<span dir=\"ltr\">" + esc(p[2:-2]) + "</span>")
+            out.append(island(p[2:-2]))
         else:
             out.append(fa_digits(esc(p)))
     return "".join(out)
@@ -72,23 +78,67 @@ def _island_chunks(inner: str) -> list[tuple[str, str]]:
     return out
 
 
+# A plain number (optionally grouped/decimal) and a bare unit symbol.
+_NUMBER = r"[0-9]+(?:[.,\u066B][0-9]+)*"
+# «۱۱×۱۱»، «۱.۷۰ / ۰.۰۰۰۴»، «۰.۲۴/۳»: an expression built only from digits and
+# arithmetic separators — no Latin letter, so nothing of it is an identifier.
+_NUM_EXPR = re.compile(r"^[0-9\s.,\u066B/×÷−–—+%:]+$")
+# «0.25 mm»، «1.022 MeV»، «1540 m/s»: one number, one space, one unit symbol.
+_NUM_UNIT = re.compile(rf"^({_NUMBER})\s+([A-Za-z\u00b5\u03bc\u03a9\u00b0]"
+                       r"[A-Za-z\u00b5\u03bc\u03a9\u00b00-9/\u00b7]{0,8})$")
+
+
+def quantity(inner: str) -> str | None:
+    """Render «عدد» / «عدد + یکا» with Persian digits, as one unbreakable run.
+
+    The book writes every number of the running text in Persian digits — that is
+    what a mixed island such as ``[[2.5 سانتی‌متر]]`` already produced. A Latin-only
+    island used to escape that rule and printed ``2.5`` next to «۲.۵» in the very
+    same sentence (``11×11`` beside «۱۷×۱۷», ``100 mrad`` beside «۲.۵ سانتی‌متر»).
+    Pure quantities now follow the same rule; formulas, element/isotope symbols
+    and anything holding a Latin identifier (``A = 87``, ``U-238 → Th-234``,
+    ``100 × R``) are left untouched as LTR math.
+    """
+    t = str(inner).strip()
+    if not t or not re.search(r"[0-9]", t):
+        return None
+    if _NUM_EXPR.match(t):
+        return '<span class="qty">' + fa_digits(esc(t)) + "</span>"
+    m = _NUM_UNIT.match(t)
+    if m:
+        return ('<span class="qty">' + fa_digits(esc(m.group(1))) + "\u00a0"
+                + '<span dir="ltr">' + esc(m.group(2)) + "</span></span>")
+    return None
+
+
 def island(inner: str) -> str:
     """[[...]] island → bidi-correct HTML.
 
     Latin-only islands stay a single LTR span, so unit strings such as ``mSv/h``
-    or ``1.022 MeV`` never split. When an island mixes Persian words with numbers
-    or Latin units (``5 سانتی‌متر``, ``2 تا 5 مگاهرتز``), the pieces are emitted in
-    logical order inside the surrounding RTL flow — wrapping the whole island in
-    ``dir="ltr"`` used to render the number *before* its unit word when read
-    right-to-left (``سانتی‌متر 5``).
+    or formulas such as ``A = 87`` never split. When an island mixes Persian words
+    with numbers or Latin units (``5 سانتی‌متر``, ``2 تا 5 مگاهرتز``), the pieces are
+    emitted in logical order inside the surrounding RTL flow — wrapping the whole
+    island in ``dir="ltr"`` used to render the number *before* its unit word when
+    read right-to-left (``سانتی‌متر 5``). A Latin-only island that is just a number
+    (with or without a unit symbol) is handled by `quantity()` so the digit style
+    stays the same across the whole book.
     """
     chunks = _island_chunks(inner)
     if not any(k == "fa" for k, _ in chunks):
+        q = quantity(inner)
+        if q is not None:
+            return q
         return '<span dir="ltr">' + mathml_like(inner) + "</span>"
     out = []
-    for kind, tok in chunks:
+    for idx, (kind, tok) in enumerate(chunks):
+        nxt = chunks[idx + 1][0] if idx + 1 < len(chunks) else None
         if kind in ("fa", "num"):
-            out.append(fa_digits(esc(tok)))
+            piece = fa_digits(esc(tok))
+            if kind == "num" and nxt in ("fa", "ltr"):
+                # «۵ سانتی‌متر» / «۸ mSv/h»: a number must never be left at the end
+                # of a line with its unit pushed to the next one.
+                piece = re.sub(r"[ \t]+$", "\u00a0", piece)
+            out.append(piece)
         elif kind == "ltr":
             out.append('<span dir="ltr">' + mathml_like(tok) + "</span>")
         else:
@@ -316,6 +366,34 @@ def blk_formula(b: dict) -> str:
             f'<div class="fleg">{leg}</div></div>' + src_line(b.get("src")))
 
 
+# A4 (210mm) minus the @page side margins (11mm each) minus .chbody padding (2mm
+# each) minus the .card img padding (3mm each) — the usable picture width.
+COL_MM = 210.0 - 2 * 11.0 - 2 * 2.0 - 2 * 3.0
+# Printed height cap for a single figure. Without it a portrait scan at width 86%
+# can be ~180mm tall; together with its caption it eats a whole page and leaves the
+# previous page a fifth empty, which is the "fragmented layout" complaint.
+FIG_MAX_MM = 112.0
+
+
+def _fig_width(path: str, want: str) -> str:
+    """Shrink a figure's width so its printed height stays under `FIG_MAX_MM`."""
+    if not want.endswith("%"):
+        return want
+    try:
+        from PIL import Image  # optional: only used to read the aspect ratio
+        with Image.open(path) as im:
+            px_w, px_h = im.size
+    except Exception:
+        return want
+    if px_w <= 0 or px_h <= 0:
+        return want
+    pct = float(want[:-1])
+    if COL_MM * pct / 100.0 * px_h / px_w <= FIG_MAX_MM:
+        return want
+    capped = FIG_MAX_MM * px_w / px_h / COL_MM * 100.0
+    return f"{max(40.0, min(pct, capped)):.1f}%"
+
+
 def blk_figure(b: dict) -> str:
     f = b.get("file", "")
     path = f if os.path.isabs(f) else str(ROOT / f)
@@ -323,7 +401,7 @@ def blk_figure(b: dict) -> str:
         return f'<div class="fnote">شکل در دسترس نیست: {esc(f)}</div>'
     cap = inline(b.get("caption", ""))
     cs = f'<span class="csrc">{LTR_DIGITS(b.get("src",""))}</span>' if b.get("src") else ""
-    w = b.get("width") or "86%"
+    w = _fig_width(path, b.get("width") or "86%")
     return (f'<div class="card"><img src="{path}" style="width:{w}"/>'
             f'<div class="cap">{cap}{cs}</div></div>')
 

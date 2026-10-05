@@ -101,11 +101,17 @@ table.gt tr:nth-child(even) td { background: #f8fafc; }
   background: linear-gradient(to left, #2563eb, #2dd4bf); opacity: 0.75; }
 .subhead .st { color: #1d4ed8; font-size: 12.4pt; font-weight: bold; }
 .subhead .flag { flex: none; }
-p.tx { font-size: 10.4pt; line-height: 1.95; text-align: justify; color: #1e293b; margin: 0 0 3.4mm 0; }
-ul.bl { margin: 0 0 3.4mm 0; padding-right: 5mm; }
-ul.bl li { font-size: 10.2pt; line-height: 1.9; margin-bottom: 1.6mm; color: #1e293b; }
+p.tx { font-size: 10.4pt; line-height: 1.95; text-align: justify; color: #1e293b; margin: 0 0 3.4mm 0;
+  orphans: 2; widows: 2; }
+ul.bl { margin: 0 0 3.4mm 0; padding-right: 5mm; orphans: 2; widows: 2; }
+ul.bl li { font-size: 10.2pt; line-height: 1.9; margin-bottom: 1.6mm; color: #1e293b;
+  break-inside: avoid; orphans: 2; widows: 2; }
 ul.bl li::marker { color: #14b8a6; }
-.src { font-size: 7.9pt; color: #94a3b8; margin: -1.6mm 0 4mm 0; line-height: 1.6; }
+/* «منبع: …» belongs to the block above it — never let a page start with it. */
+.src { font-size: 7.9pt; color: #94a3b8; margin: -1.6mm 0 4mm 0; line-height: 1.6;
+  break-before: avoid; break-inside: avoid; }
+/* a number and its unit («۰.۲۵ mm»، «۱۱×۱۱») stay on one line */
+.qty { white-space: nowrap; }
 .card { background: #ffffff; border: 0.2mm solid #e2e8f0; border-radius: 3.6mm;
   box-shadow: 0 0.8mm 3mm rgba(15,23,42,0.06); margin-bottom: 5mm; break-inside: avoid; }
 .card .cap { padding: 2.6mm 4mm 3.4mm 4mm; font-size: 9.2pt; color: #475569; text-align: center; line-height: 1.8; }
