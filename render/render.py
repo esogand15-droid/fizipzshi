@@ -403,6 +403,23 @@ def _fig_width(path: str, want: str) -> str:
 # stable id; FIG_SCALE holds the shrink factor the fitting pass decided for it.
 FIG_SEQ = 0
 FIG_SCALE: dict[int, float] = {}
+# printed height (mm) each figure ended up with on the last build
+FIG_H: dict[int, float] = {}
+
+
+def _printed_height_mm(path: str, width: str) -> float:
+    """How tall the picture itself will be on paper, for the page-fill pass."""
+    if not width.endswith("%"):
+        return 0.0
+    try:
+        from PIL import Image
+        with Image.open(path) as im:
+            px_w, px_h = im.size
+    except Exception:
+        return 0.0
+    if px_w <= 0:
+        return 0.0
+    return COL_MM * float(width[:-1]) / 100.0 * px_h / px_w
 
 
 def blk_figure(b: dict) -> str:
@@ -419,6 +436,7 @@ def blk_figure(b: dict) -> str:
     scale = FIG_SCALE.get(fid, 1.0)
     if scale < 1.0 and w.endswith("%"):
         w = f"{max(26.0, float(w[:-1]) * scale):.1f}%"
+    FIG_H[fid] = _printed_height_mm(path, w)
     return (f'<div class="card"><span class="marker">JZF{fid:03d}MARK</span>'
             f'<img src="{path}" style="width:{w}"/>'
             f'<div class="cap">{cap}{cs}</div></div>')
@@ -710,6 +728,8 @@ def scan_pages(pdf_path: Path, chapters: list[dict], guide_rows: list[dict]) -> 
 
 
 FIG_MARK = re.compile(r"JZF(\d\d\d)MARK")
+# A4 height minus the page margins — the band page_gaps() measures
+BODY_MM = (297.0 - 12.0 - 15.0) * 0.945
 # a page whose content stops this far above the footer is "half empty"
 GAP_LIMIT = 0.20
 
@@ -776,14 +796,20 @@ def fit_figures(render_once, rounds: int = 4) -> None:
             if g <= GAP_LIMIT:
                 continue
             cands = [f for f in by_page.get(pno, []) if f not in frozen
-                     and FIG_SCALE.get(f, 1.0) > 0.62]
+                     and FIG_SCALE.get(f, 1.0) > 0.45]
             if cands:
                 picks.append((max(cands), pno, g))
         if not picks:
             break
         before = {f: FIG_SCALE.get(f, 1.0) for f, _, _ in picks}
-        for fid, _, _ in picks:
-            FIG_SCALE[fid] = round(before[fid] * 0.85, 3)
+        for fid, _, g in picks:
+            # free up roughly the whole hole: if the block that was pushed over
+            # needed `gap` more millimetres, giving it `gap` back usually lets it
+            # climb onto this page.
+            h = FIG_H.get(fid) or 0.0
+            gap_mm = g * BODY_MM
+            factor = 0.85 if h <= 0 else max(0.55, (h - gap_mm) / h)
+            FIG_SCALE[fid] = round(max(0.42, before[fid] * min(0.95, factor)), 3)
         pdf_path = render_once()
         new_gaps = page_gaps(pdf_path)
         improved = False
