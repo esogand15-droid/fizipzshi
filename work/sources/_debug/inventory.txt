@@ -1,1 +1,12 @@
-inventory: 0 files -> work/sources/inventory.json
+inventory: 35 files -> work/sources/inventory.json
+  document        8 files       66.1 MB
+  text            8 files        0.4 MB
+  video/audio    19 files     2778.4 MB
+  · فیزیک پزشکی/MRI/22MRI.pdf  (6.5 MB) pages=51 images=606 text_chars=9678 pages_without_text=11
+  · فیزیک پزشکی/رادیوبیولوژِی/جزوه لیلی درویش.pdf  (16.1 MB) pages=82 images=1412 text_chars=21711 pages_without_text=6
+  · فیزیک پزشکی/فیزیک پزشکی/جزوه افضلی پور.pdf  (8.3 MB) pages=124 images=864 text_chars=28934 pages_without_text=27
+  · فیزیک پزشکی/فیزیک پزشکی تشعشع/M.Ph.P.D [Repaired] [Repaired].pdf  (4.0 MB) pages=103 images=231 text_chars=22180 pages_without_text=21
+  · فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک تشعشع و پزشکی هسته_ای.pdf  (18.9 MB) pages=45 images=45 text_chars=0 pages_without_text=45
+  · فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک سونوگرافی.pdf  (8.2 MB) pages=23 images=23 text_chars=0 pages_without_text=23
+  · فیزیک پزشکی/نمونه سوال/Medical Physics.pdf  (0.8 MB) pages=5 images=1 text_chars=10781 pages_without_text=0
+  · فیزیک پزشکی/نمونه سوال/بانک سوالات فیزیک پزشکی هامزیار.pdf  (3.3 MB) pages=98 images=0 text_chars=97621 pages_without_text=0

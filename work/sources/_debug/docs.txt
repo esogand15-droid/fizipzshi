@@ -1,2 +1,2 @@
-4.0K	/tmp/docs
-0
+64M	/tmp/docs
+16

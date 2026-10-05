@@ -1,5 +1,312 @@
 {
  "root": "/tmp/src",
- "totals": {},
- "files": []
+ "totals": {
+  "text": {
+   "files": 8,
+   "bytes": 408998
+  },
+  "document": {
+   "files": 8,
+   "bytes": 66069563
+  },
+  "video/audio": {
+   "files": 19,
+   "bytes": 2778403261
+  }
+ },
+ "files": [
+  {
+   "path": "فیزیک پزشکی/MRI/22MRI (1).md",
+   "name": "22MRI (1).md",
+   "ext": ".md",
+   "bytes": 15038,
+   "kind": "text"
+  },
+  {
+   "path": "فیزیک پزشکی/MRI/22MRI.pdf",
+   "name": "22MRI.pdf",
+   "ext": ".pdf",
+   "bytes": 6459949,
+   "kind": "document",
+   "pdf": {
+    "pages": 51,
+    "images": 606,
+    "text_chars": 9678,
+    "pages_without_text": 11
+   }
+  },
+  {
+   "path": "فیزیک پزشکی/MRI/MRI 1.mp4",
+   "name": "MRI 1.mp4",
+   "ext": ".mp4",
+   "bytes": 597840150,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/MRI/MRI 2.mp4",
+   "name": "MRI 2.mp4",
+   "ext": ".mp4",
+   "bytes": 577520006,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/MRI/MRI 3.mp4",
+   "name": "MRI 3.mp4",
+   "ext": ".mp4",
+   "bytes": 329963713,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/رادیوبیولوژِی/جزوه لیلی درویش.md",
+   "name": "جزوه لیلی درویش.md",
+   "ext": ".md",
+   "bytes": 29298,
+   "kind": "text"
+  },
+  {
+   "path": "فیزیک پزشکی/رادیوبیولوژِی/جزوه لیلی درویش.pdf",
+   "name": "جزوه لیلی درویش.pdf",
+   "ext": ".pdf",
+   "bytes": 16094328,
+   "kind": "document",
+   "pdf": {
+    "pages": 82,
+    "images": 1412,
+    "text_chars": 21711,
+    "pages_without_text": 6
+   }
+  },
+  {
+   "path": "فیزیک پزشکی/رادیوبیولوژِی/رادیوبیولوژی 1-  فیزیک پزشکی.mp4",
+   "name": "رادیوبیولوژی 1-  فیزیک پزشکی.mp4",
+   "ext": ".mp4",
+   "bytes": 131926466,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/رادیوبیولوژِی/رادیوبیولوژی 3-ویدئو-فیزیک پزشکی.mp4",
+   "name": "رادیوبیولوژی 3-ویدئو-فیزیک پزشکی.mp4",
+   "ext": ".mp4",
+   "bytes": 215319501,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/رادیوبیولوژِی/فیزیک پزشکی- رادیوبیولوژی2.mp4",
+   "name": "فیزیک پزشکی- رادیوبیولوژی2.mp4",
+   "ext": ".mp4",
+   "bytes": 216495537,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی/جزوه افضلی پور.md",
+   "name": "جزوه افضلی پور.md",
+   "ext": ".md",
+   "bytes": 49477,
+   "kind": "text"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی/جزوه افضلی پور.pdf",
+   "name": "جزوه افضلی پور.pdf",
+   "ext": ".pdf",
+   "bytes": 8290183,
+   "kind": "document",
+   "pdf": {
+    "pages": 124,
+    "images": 864,
+    "text_chars": 28934,
+    "pages_without_text": 27
+   }
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی/جلسه دوم افضلی پور.mp4",
+   "name": "جلسه دوم افضلی پور.mp4",
+   "ext": ".mp4",
+   "bytes": 98945329,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی/جلسه سوم افضلی پور.mp4",
+   "name": "جلسه سوم افضلی پور.mp4",
+   "ext": ".mp4",
+   "bytes": 69131863,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی/جلسه چهارم افضلی پور.mp4",
+   "name": "جلسه چهارم افضلی پور.mp4",
+   "ext": ".mp4",
+   "bytes": 84628922,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/10.mp4",
+   "name": "10.mp4",
+   "ext": ".mp4",
+   "bytes": 48795692,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/7.mp4",
+   "name": "7.mp4",
+   "ext": ".mp4",
+   "bytes": 43909638,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/8.mp4",
+   "name": "8.mp4",
+   "ext": ".mp4",
+   "bytes": 41409943,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/9.mp4",
+   "name": "9.mp4",
+   "ext": ".mp4",
+   "bytes": 30835673,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/M.Ph.P.D [Repaired] [Repaired].md",
+   "name": "M.Ph.P.D [Repaired] [Repaired].md",
+   "ext": ".md",
+   "bytes": 36807,
+   "kind": "text"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/M.Ph.P.D [Repaired] [Repaired].pdf",
+   "name": "M.Ph.P.D [Repaired] [Repaired].pdf",
+   "ext": ".pdf",
+   "bytes": 4032174,
+   "kind": "document",
+   "pdf": {
+    "pages": 103,
+    "images": 231,
+    "text_chars": 22180,
+    "pages_without_text": 21
+   }
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک تشعشع و پزشکی هسته_ای.md",
+   "name": "جزوه فیزیک تشعشع و پزشکی هسته_ای.md",
+   "ext": ".md",
+   "bytes": 40201,
+   "kind": "text"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک تشعشع و پزشکی هسته_ای.pdf",
+   "name": "جزوه فیزیک تشعشع و پزشکی هسته_ای.pdf",
+   "ext": ".pdf",
+   "bytes": 18872987,
+   "kind": "document",
+   "pdf": {
+    "pages": 45,
+    "images": 45,
+    "text_chars": 0,
+    "pages_without_text": 45
+   }
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک سونوگرافی.md",
+   "name": "جزوه فیزیک سونوگرافی.md",
+   "ext": ".md",
+   "bytes": 18965,
+   "kind": "text"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جزوه فیزیک سونوگرافی.pdf",
+   "name": "جزوه فیزیک سونوگرافی.pdf",
+   "ext": ".pdf",
+   "bytes": 8188873,
+   "kind": "document",
+   "pdf": {
+    "pages": 23,
+    "images": 23,
+    "text_chars": 0,
+    "pages_without_text": 23
+   }
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه اول حق پرست .mp4",
+   "name": "جلسه اول حق پرست .mp4",
+   "ext": ".mp4",
+   "bytes": 38743689,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه دوم حق پرست.mp4",
+   "name": "جلسه دوم حق پرست.mp4",
+   "ext": ".mp4",
+   "bytes": 34488065,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه سوم حق پرست.mp4",
+   "name": "جلسه سوم حق پرست.mp4",
+   "ext": ".mp4",
+   "bytes": 44433652,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه ششم حق پرست.mp4",
+   "name": "جلسه ششم حق پرست.mp4",
+   "ext": ".mp4",
+   "bytes": 60669567,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه پنجم حق پرست.mp4",
+   "name": "جلسه پنجم حق پرست.mp4",
+   "ext": ".mp4",
+   "bytes": 67746662,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/فیزیک پزشکی تشعشع/جلسه چهارم حق پرست.mp4",
+   "name": "جلسه چهارم حق پرست.mp4",
+   "ext": ".mp4",
+   "bytes": 45599193,
+   "kind": "video/audio"
+  },
+  {
+   "path": "فیزیک پزشکی/نمونه سوال/M.Ph.P.D [Repaired] [Repaired] (1).md",
+   "name": "M.Ph.P.D [Repaired] [Repaired] (1).md",
+   "ext": ".md",
+   "bytes": 36807,
+   "kind": "text"
+  },
+  {
+   "path": "فیزیک پزشکی/نمونه سوال/Medical Physics.pdf",
+   "name": "Medical Physics.pdf",
+   "ext": ".pdf",
+   "bytes": 821854,
+   "kind": "document",
+   "pdf": {
+    "pages": 5,
+    "images": 1,
+    "text_chars": 10781,
+    "pages_without_text": 0
+   }
+  },
+  {
+   "path": "فیزیک پزشکی/نمونه سوال/بانک سوالات فیزیک پزشکی هامزیار.md",
+   "name": "بانک سوالات فیزیک پزشکی هامزیار.md",
+   "ext": ".md",
+   "bytes": 182405,
+   "kind": "text"
+  },
+  {
+   "path": "فیزیک پزشکی/نمونه سوال/بانک سوالات فیزیک پزشکی هامزیار.pdf",
+   "name": "بانک سوالات فیزیک پزشکی هامزیار.pdf",
+   "ext": ".pdf",
+   "bytes": 3309215,
+   "kind": "document",
+   "pdf": {
+    "pages": 98,
+    "images": 0,
+    "text_chars": 97621,
+    "pages_without_text": 0
+   }
+  }
+ ]
 }

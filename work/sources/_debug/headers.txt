@@ -1,13 +1,11 @@
-HTTP/1.1 200 OK
+HTTP/1.1 302 Found
 Cache-Control: max-age=0
-Content-Encoding: gzip
-Content-Type: text/html; charset=utf-8
-Set-Cookie: verified=2024-05-24; Path=/; Expires=Wed, 04 Nov 2026 22:50:31 GMT; HttpOnly; Secure
+Location: https://storage.filebin.net/filebin/15062c042b6114ed3cf0d09dcbfdc4e58d3570a976262b3eea97cb6c8286d199?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=GK352fd2505074fc9dde7fd2cb%2F20261005%2Fhel1-dc4%2Fs3%2Faws4_request&X-Amz-Date=20261005T225310Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&response-cache-control=max-age%3D900&response-content-disposition=inline%3B%20filename%3D%22%D9%81%DB%8C%D8%B2%DB%8C%DA%A9%20%D9%BE%D8%B2%D8%B4%DA%A9%DB%8C.rar%22&response-content-type=application%2Fvnd.rar&x-id=GetObject&X-Amz-Signature=af3714eb49b9a82fcfafe978c403546a89c533ee66ebec22b208ad5aa66f7926
 Vary: Accept-Encoding
 X-Robots-Tag: noindex
-Date: Mon, 05 Oct 2026 22:50:31 GMT
-Content-Length: 1758
-X-Varnish: 349541979
+Date: Mon, 05 Oct 2026 22:53:10 GMT
+Content-Length: 0
+X-Varnish: 349617457
 Age: 0
 Via: 1.1 varnish (Varnish/6.0)
 Access-Control-Allow-Origin: *
@@ -16,6 +14,27 @@ Referrer-Policy: origin
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-Report-Abuse: abuse@filebin.net
+Connection: keep-alive
+
+HTTP/1.1 200 OK
 Accept-Ranges: bytes
+Cache-Control: max-age=900
+Content-Disposition: inline; filename="فیزیک پزشکی.rar"
+Content-Length: 1680747445
+Content-Type: application/vnd.rar
+Etag: "434236259caa894230ca3ab3a8a544d6-27"
+Last-Modified: Thu, 01 Oct 2026 08:42:32 GMT
+X-Request-Id: 36a4b0b8bb595df3
+Date: Mon, 05 Oct 2026 22:53:11 GMT
+X-Varnish: 349617461
+Age: 0
+Via: 1.1 varnish (Varnish/6.0)
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Referrer-Policy: origin
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-Report-Abuse: abuse@filebin.net
+Content-Security-Policy: script-src 'none'; script-src-elem 'none'; script-src-attr 'none'
 Connection: keep-alive
 
