@@ -55,7 +55,7 @@ jobs:
       - name: layout qc
         run: |
           set -x
-          python3 tools/qc_layout.py HumsYar_MedPhysics_Jozve.pdf > render/qc_layout.txt 2>&1 || true
+          python3 tools/qc_layout.py HumsYar_MedPhysics_Jozve.pdf || true
           tail -40 render/qc_layout.txt
 
       - name: previews
