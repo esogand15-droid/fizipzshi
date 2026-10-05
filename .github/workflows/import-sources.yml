@@ -1,0 +1,88 @@
+name: import-sources
+
+# The sandbox that authors this جزوه can only reach github.com, so the raw
+# lecture archive (PowerPoint decks + PDFs, ~1.7 GB) is fetched here instead.
+# The job keeps the heavy material OUT of git: only the inventory is committed,
+# while the slides/PDFs themselves travel back as a workflow artifact.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: direct download URL of the source archive
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: arena/ff8acb52-fizipzshi
+
+jobs:
+  import:
+    if: github.ref_name == 'arena/ff8acb52-fizipzshi'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/ff8acb52-fizipzshi
+          fetch-depth: 1
+
+      - name: setup
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq p7zip-full p7zip-rar unrar-free || true
+          python3 -m pip install --quiet pymupdf
+          df -h / | tail -1
+
+      - name: download archive
+        run: |
+          mkdir -p /tmp/dl
+          curl -L --fail --retry 5 --retry-delay 5 --retry-all-errors \
+               -A "Mozilla/5.0 (X11; Linux x86_64)" \
+               -o /tmp/dl/archive.bin "${{ inputs.url }}"
+          ls -l /tmp/dl
+          head -c 8 /tmp/dl/archive.bin | od -c | head -2
+
+      - name: list + extract
+        run: |
+          mkdir -p /tmp/src work/sources
+          7z l /tmp/dl/archive.bin > work/sources/ARCHIVE_LISTING.txt || true
+          tail -5 work/sources/ARCHIVE_LISTING.txt
+          7z x -y -o/tmp/src /tmp/dl/archive.bin > /tmp/extract.log || \
+            (tail -30 /tmp/extract.log; exit 1)
+          rm -f /tmp/dl/archive.bin
+          du -sh /tmp/src
+          find /tmp/src -type f | wc -l
+
+      - name: inventory
+        run: python3 tools/src_inventory.py /tmp/src work/sources/inventory.json
+
+      - name: collect documents (no video/audio)
+        run: |
+          mkdir -p /tmp/docs
+          cd /tmp/src
+          find . -type f \( -iname '*.pptx' -o -iname '*.ppt' -o -iname '*.pptm' \
+                -o -iname '*.pdf' -o -iname '*.docx' -o -iname '*.doc' \
+                -o -iname '*.md' -o -iname '*.txt' -o -iname '*.odp' \) \
+            -print0 | rsync -a --files-from=- --from0 ./ /tmp/docs/
+          du -sh /tmp/docs
+          find /tmp/docs -type f | wc -l
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-docs
+          path: /tmp/docs
+          retention-days: 7
+          compression-level: 1
+
+      - name: commit inventory
+        run: |
+          git config user.name  "humsyar-bot"
+          git config user.email "humsyar-bot@users.noreply.github.com"
+          git add work/sources/inventory.json work/sources/ARCHIVE_LISTING.txt
+          git commit -m "sources: inventory of the lecture archive" || exit 0
+          git pull --rebase origin "$BRANCH"
+          git push origin HEAD:"$BRANCH"
