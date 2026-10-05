@@ -5,30 +5,30 @@
  },
  "ch2": {
   "start": 12,
-  "end": 22
+  "end": 21
  },
  "ch3": {
-  "start": 23,
-  "end": 39
+  "start": 22,
+  "end": 38
  },
  "ch4": {
-  "start": 40,
-  "end": 54
+  "start": 39,
+  "end": 53
  },
  "ch5": {
-  "start": 55,
-  "end": 59
+  "start": 54,
+  "end": 58
  },
  "ch6": {
-  "start": 60,
-  "end": 73
+  "start": 59,
+  "end": 72
  },
  "ch7": {
-  "start": 74,
-  "end": 90
+  "start": 73,
+  "end": 91
  },
  "ch8": {
-  "start": 91,
+  "start": 92,
   "end": 111
  },
  "ch9": {
@@ -36,12 +36,12 @@
   "end": 129
  },
  "guide:0": [
-  92,
-  92
+  93,
+  93
  ],
  "guide:1": [
-  96,
-  96
+  97,
+  102
  ],
  "guide:2": [
   120,
