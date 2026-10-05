@@ -313,9 +313,15 @@ def icon_svg(kind: str, size: int = 76, stroke: str = "#5eead4", sw: float = 3) 
 # block renderers
 # --------------------------------------------------------------------------- #
 def src_line(src: str | None) -> str:
+    """Render the «منبع: …» credit under a block.
+
+    Many entries already start with «منبع:» in the authoring layer, so strip a
+    leading label before adding ours — otherwise the line reads «منبع: منبع: …».
+    """
     if not src:
         return ""
-    return f'<div class="src">منبع: {LTR_DIGITS(src)}</div>'
+    txt = re.sub(r"^\s*منبع\s*[:：]\s*", "", str(src))
+    return f'<div class="src">منبع: {LTR_DIGITS(txt)}</div>'
 
 
 def blk_h3(b: dict) -> str:
