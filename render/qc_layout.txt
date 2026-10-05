@@ -1,0 +1,7 @@
+# گزارش بازبینی چیدمان (QC layout)
+
+- پرش از بررسی شکستگی بلوک‌ها (WeasyPrint در دسترس نیست: cannot load library 'libpango-1.0-0': libpango-1.0-0: cannot open shared object file: No such file or directory.  Additionally, ctypes.util.find_library() did not manage to locate a library called 'libpango-1.0-0')
+- صفحه‌های دارای جوهر بیرون از کادر: 0
+- صفحه‌های با بیش از ۲۰٪ فضای خالی در پایین: 19 → [(3, 0.31), (13, 0.28), (18, 0.21), (21, 0.48), (26, 0.21), (33, 0.32), (34, 0.32), (37, 0.88), (48, 0.2), (52, 0.89), (57, 0.6), (59, 0.29), (68, 0.33), (69, 0.33), (71, 0.52), (83, 0.4), (89, 0.23), (108, 0.39), (125, 0.39)]
+
+## نتیجه: شکستگی بلوک 0 · خروج از کادر 0

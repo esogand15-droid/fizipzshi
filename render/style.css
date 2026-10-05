@@ -110,8 +110,9 @@ ul.bl li::marker { color: #14b8a6; }
 /* «منبع: …» belongs to the block above it — never let a page start with it. */
 .src { font-size: 7.9pt; color: #94a3b8; margin: -1.6mm 0 4mm 0; line-height: 1.6;
   break-before: avoid; break-inside: avoid; }
-/* a number and its unit («۰.۲۵ mm»، «۱۱×۱۱») stay on one line */
-.qty { white-space: nowrap; }
+/* a number and its unit («۰.۲۵ mm»، «۱۱×۱۱») stay on one line, and so does a
+   short scientific token («Tc-99m», «C-14 → N-14», «1/T_eff = 1/T_p + 1/T_b») */
+.qty, .nb { white-space: nowrap; }
 .card { background: #ffffff; border: 0.2mm solid #e2e8f0; border-radius: 3.6mm;
   box-shadow: 0 0.8mm 3mm rgba(15,23,42,0.06); margin-bottom: 5mm; break-inside: avoid; }
 .card .cap { padding: 2.6mm 4mm 3.4mm 4mm; font-size: 9.2pt; color: #475569; text-align: center; line-height: 1.8; }
@@ -124,11 +125,13 @@ table.dt td { font-size: 9.2pt; color: #334155; padding: 2.4mm 2.2mm; border: 0.
   line-height: 1.85; vertical-align: top; }
 table.dt tr:nth-child(even) td { background: #f8fafc; }
 .ftable { margin-bottom: 4.4mm; break-inside: avoid; }
-/* tables with many rows may continue on the next page; the header repeats and
-   no single row is ever split in half */
+/* Only a table too tall to ever fit on one page may continue overleaf: the
+   header row repeats, no row is split, and the rounded frame is redrawn on both
+   fragments so each page still shows a finished-looking table. */
 .ftable.long, .ftable.long table.dt, .ftable.long tbody { break-inside: auto; }
 .ftable.long thead { display: table-header-group; }
 .ftable.long tr { break-inside: avoid; }
+.ftable.long table.dt { box-decoration-break: clone; }
 .fbox { background: #ffffff; border: 0.25mm solid #bfdbfe; border-radius: 3.4mm;
   padding: 4mm 5mm; margin-bottom: 4.4mm; break-inside: avoid; }
 .fbox .fx { text-align: center; font-size: 12.6pt; color: #0f172a; margin-bottom: 2.6mm; direction: ltr; }
@@ -147,10 +150,11 @@ table.dt tr:nth-child(even) td { background: #f8fafc; }
 .examtip { background: linear-gradient(to left, #2563eb, #14b8a6); color: #ffffff; border-radius: 3mm;
   padding: 3.4mm 4.4mm; margin-bottom: 4.2mm; font-size: 10pt; line-height: 1.9;
   break-inside: avoid; }
-/* «مرور سریع» is often taller than the space left on a page; let it continue
-   overleaf instead of jumping over and leaving a hole */
+/* «مرور سریع» is a single visual card: it must never be cut in half by a page
+   break. If it does not fit, the whole box moves to the next page (the
+   page-fill pass then pulls the hole shut by resizing the figure above it). */
 .review { background: linear-gradient(to left, #dbeafe, #ccfbf1); border: 0.25mm solid #cde8f5;
-  border-radius: 4mm; padding: 4.5mm 5mm; margin: 6mm 0 4mm 0; break-inside: auto;
+  border-radius: 4mm; padding: 4.5mm 5mm; margin: 6mm 0 4mm 0; break-inside: avoid;
   orphans: 2; widows: 2; }
 .review h3 { margin: 0 0 3mm 0; color: #1d4ed8; font-size: 12pt; break-after: avoid; }
 .review ul { margin: 0; padding-right: 5mm; }

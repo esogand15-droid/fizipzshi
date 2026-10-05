@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import html
 import json
+import math
 import os
 import re
 import sys
@@ -128,7 +129,11 @@ def island(inner: str) -> str:
         q = quantity(inner)
         if q is not None:
             return q
-        return '<span dir="ltr">' + mathml_like(inner) + "</span>"
+        # Short scientific notation («Tc-99m», «C-14 → N-14», «λ = A/N», «1 J/kg»)
+        # is one indivisible symbol for the reader: never let a line break land
+        # inside it. Long runs (a citation, an English sentence) must still wrap.
+        nb = ' class="nb"' if len(inner) <= 24 else ""
+        return f'<span dir="ltr"{nb}>' + mathml_like(inner) + "</span>"
     out = []
     for idx, (kind, tok) in enumerate(chunks):
         nxt = chunks[idx + 1][0] if idx + 1 < len(chunks) else None
@@ -340,8 +345,22 @@ def blk_p(b: dict) -> str:
 
 
 def blk_bullets(b: dict) -> str:
-    items = "".join(f"<li>{inline(i)}</li>" for i in b.get("items", []))
-    return f'<ul class="bl">{items}</ul>' + src_line(b.get("src"))
+    out = []
+    for i in b.get("items", []):
+        a0, a1 = amark("bullet " + re.sub(r"\[\[|\]\]|\*\*", "", str(i))[:34])
+        out.append(f"<li>{a0}{inline(i)}{a1}</li>")
+    return f'<ul class="bl">{"".join(out)}</ul>' + src_line(b.get("src"))
+
+
+def _table_mm(head: list, rows: list) -> float:
+    """Rough printed height of a table, used to decide whether it may break."""
+    ncol = max(1, len(head) or max((len(r) for r in rows), default=1))
+    cpl = max(8.0, (182.0 / ncol) / 1.95)          # characters that fit per line
+    h = 0.0
+    for r in [head] + list(rows):
+        cells = [len(re.sub(r"\[\[|\]\]|\*\*", "", str(c))) for c in r] or [0]
+        h += max(1, math.ceil(max(cells) / cpl)) * 4.4 + 4.8
+    return h
 
 
 def blk_table(b: dict) -> str:
@@ -353,12 +372,13 @@ def blk_table(b: dict) -> str:
         tds = "".join(f"<td>{inline(c)}</td>" for c in r)
         trs.append(f"<tr>{tds}</tr>")
     cap = f'<div class="cap">{inline(b["caption"])}</div>' if b.get("caption") else ""
-    # Long tables may run over a page boundary (the header row repeats); short
-    # ones are kept whole. Forcing every table to stay on one page is what left
-    # half-empty pages behind — the table jumped over, the text stayed put.
-    cls = "ftable long" if len(rows) >= 5 else "ftable"
-    return (f'<div class="{cls}"><table class="dt"><thead><tr>{th}</tr></thead>'
-            f'<tbody>{"".join(trs)}</tbody></table>{cap}</div>' + src_line(b.get("src")))
+    # A table is kept whole unless it is physically too tall for one page; only
+    # then may it continue overleaf with a repeated header. Everything that fits
+    # on a page stays on a page, so no table is ever cut in half.
+    cls = "ftable long" if _table_mm(head, rows) > 205.0 else "ftable"
+    a0, a1 = amark("table " + re.sub(r"\[\[|\]\]", "", str(head[:1]))[:26])
+    return (f'<div class="{cls}">{a0}<table class="dt"><thead><tr>{th}</tr></thead>'
+            f'<tbody>{"".join(trs)}</tbody></table>{cap}{a1}</div>' + src_line(b.get("src")))
 
 
 def blk_formula(b: dict) -> str:
@@ -366,8 +386,9 @@ def blk_formula(b: dict) -> str:
     legend = b.get("legend") or []
     leg = "".join(f"<div>{inline(x)}</div>" for x in legend)
     name = f'<div class="fleg"><b>{inline(b["name"])}</b></div>' if b.get("name") else ""
-    return (f'<div class="fbox"><div class="fx">{fx}</div>{name}'
-            f'<div class="fleg">{leg}</div></div>' + src_line(b.get("src")))
+    a0, a1 = amark("formula " + str(b.get("tex", ""))[:28])
+    return (f'<div class="fbox">{a0}<div class="fx">{fx}</div>{name}'
+            f'<div class="fleg">{leg}</div>{a1}</div>' + src_line(b.get("src")))
 
 
 # A4 (210mm) minus the @page side margins (11mm each) minus .chbody padding (2mm
@@ -398,10 +419,36 @@ def _fig_width(path: str, want: str) -> str:
     return f"{max(40.0, min(pct, capped)):.1f}%"
 
 
+# --- layout QA instrumentation ---------------------------------------------- #
+# When MARK_ATOMS is on, every block that must stay in one piece gets an
+# invisible marker at its start and at its end. tools/qc_layout.py then checks
+# that both markers landed on the same page — a cheap, exact way to find a card,
+# formula box, bullet or paragraph that a page break tore in half. The shipped
+# PDF is rendered with the flag off, so these never reach the reader.
+MARK_ATOMS = False
+ATOM_SEQ = 0
+ATOMS: dict[int, str] = {}
+
+
+def amark(kind: str) -> tuple[str, str]:
+    """Return the (start, end) markers that fence one unbreakable block."""
+    global ATOM_SEQ
+    if not MARK_ATOMS:
+        return "", ""
+    i = ATOM_SEQ
+    ATOM_SEQ += 1
+    ATOMS[i] = kind
+    return (f'<span class="marker">JZA{i:04d}S</span>',
+            f'<span class="marker">JZA{i:04d}E</span>')
+
+
 # --- page-fill state (see fit_figures() in main) ----------------------------- #
 # FIG_SEQ counts the figures of one build_html() pass so every figure gets a
 # stable id; FIG_SCALE holds the shrink factor the fitting pass decided for it.
 FIG_SEQ = 0
+# figure locators are only needed while the page-fill pass measures the layout;
+# the shipped PDF is rendered without them so the text layer stays clean
+EMIT_FIG_MARKS = True
 FIG_SCALE: dict[int, float] = {}
 # printed height (mm) each figure ended up with on the last build
 FIG_H: dict[int, float] = {}
@@ -437,28 +484,34 @@ def blk_figure(b: dict) -> str:
     if scale < 1.0 and w.endswith("%"):
         w = f"{max(45.0, float(w[:-1]) * scale):.1f}%"
     FIG_H[fid] = _printed_height_mm(path, w)
-    return (f'<div class="card"><span class="marker">JZF{fid:03d}MARK</span>'
+    a0, a1 = amark(f"figure {os.path.basename(f)}")
+    fm = f'<span class="marker">JZF{fid:03d}MARK</span>' if EMIT_FIG_MARKS else ""
+    return (f'<div class="card">{fm}{a0}'
             f'<img src="{path}" style="width:{w}"/>'
-            f'<div class="cap">{cap}{cs}</div></div>')
+            f'<div class="cap">{cap}{cs}</div>{a1}</div>')
 
 
 def blk_key(b: dict) -> str:
-    return f'<div class="key"><b>نکته کلیدی: </b>{inline(b.get("text",""))}</div>'
+    a0, a1 = amark("key")
+    return f'<div class="key">{a0}<b>نکته کلیدی: </b>{inline(b.get("text",""))}{a1}</div>'
 
 
 def blk_examtip(b: dict) -> str:
-    return f'<div class="examtip"><b>نکته امتحانی: </b>{inline(b.get("text",""))}</div>'
+    a0, a1 = amark("examtip")
+    return f'<div class="examtip">{a0}<b>نکته امتحانی: </b>{inline(b.get("text",""))}{a1}</div>'
 
 
 
 
 def blk_note(b: dict) -> str:
-    return f'<div class="fnote">{inline(b.get("text",""))}</div>'
+    a0, a1 = amark("note")
+    return f'<div class="fnote">{a0}{inline(b.get("text",""))}{a1}</div>'
 
 
 def blk_review(b: dict) -> str:
     items = "".join(f"<li>{inline(i)}</li>" for i in b.get("items", []))
-    return f'<div class="review"><h3>مرور سریع</h3><ul>{items}</ul></div>'
+    a0, a1 = amark("quickreview")
+    return f'<div class="review">{a0}<h3>مرور سریع</h3><ul>{items}</ul>{a1}</div>'
 
 
 RENDER = {
@@ -850,6 +903,10 @@ def main() -> int:
     # pass 1b: pull orphaned blocks back by shrinking the figures that leave
     # half-empty pages behind them (keeps sections visually compact)
     fit_figures(render_pass1, rounds=3)
+    # the locators have done their job; keep them out of the delivered text layer
+    global EMIT_FIG_MARKS
+    EMIT_FIG_MARKS = False
+    render_pass1()
     pm = scan_pages(tmp, chapters, guide_rows)
 
     # page count changes once real numbers are substituted -> render pass 2 with

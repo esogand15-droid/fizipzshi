@@ -52,6 +52,12 @@ jobs:
           python3 tools/qc_pdf.py HumsYar_MedPhysics_Jozve.pdf > render/qc_report.txt 2>&1 || true
           cat render/qc_report.txt | tail -40
 
+      - name: layout qc
+        run: |
+          set -x
+          python3 tools/qc_layout.py HumsYar_MedPhysics_Jozve.pdf > render/qc_layout.txt 2>&1 || true
+          tail -40 render/qc_layout.txt
+
       - name: previews
         if: success()
         run: |
