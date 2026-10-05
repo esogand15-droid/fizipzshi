@@ -55,11 +55,24 @@ jobs:
           URL="${{ inputs.url }}"
           if [ -z "$URL" ]; then URL="$(grep -v '^#' work/sources/REQUEST.txt | head -1 | tr -d '\r\n')"; fi
           echo "fetching: $URL" | tee -a /tmp/diag/download.txt
-          curl -L --fail --retry 5 --retry-delay 5 --retry-all-errors \
-               -A "Mozilla/5.0 (X11; Linux x86_64)" \
-               -o /tmp/dl/archive.bin "$URL"
+          BIN="$(echo "$URL" | sed -E 's#(https://[^/]+/[^/]+).*#\1#')"
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36"
+          # filebin hands out a session cookie on the bin page; without it the
+          # file URL answers with an HTML interstitial instead of the archive
+          curl -sS -L -c /tmp/dl/jar.txt -A "$UA" -o /tmp/dl/bin.html "$BIN" || true
+          curl -L --retry 5 --retry-delay 5 --retry-all-errors \
+               -b /tmp/dl/jar.txt -c /tmp/dl/jar.txt -A "$UA" \
+               -H "Referer: $BIN" -H "Accept: */*" --compressed \
+               -D /tmp/diag/headers.txt -o /tmp/dl/archive.bin "$URL" || true
           { ls -l /tmp/dl; echo "== magic =="; head -c 16 /tmp/dl/archive.bin | od -An -tx1 -c; } \
             | tee -a /tmp/diag/download.txt
+          if [ "$(stat -c%s /tmp/dl/archive.bin)" -lt 1000000 ]; then
+            echo "== body (small -> not the archive) ==" >> /tmp/diag/download.txt
+            head -c 4000 /tmp/dl/archive.bin >> /tmp/diag/download.txt
+            echo >> /tmp/diag/download.txt
+            echo "== bin page head ==" >> /tmp/diag/download.txt
+            head -c 1500 /tmp/dl/bin.html >> /tmp/diag/download.txt
+          fi
 
       - name: list + extract
         id: extract
@@ -125,6 +138,8 @@ jobs:
       - name: commit inventory
         if: always()
         run: |
+          mkdir -p work/sources/_debug
+          cp -f /tmp/diag/*.txt work/sources/_debug/ 2>/dev/null || true
           cp -f /tmp/diag/listing_7z.txt work/sources/ARCHIVE_LISTING.txt 2>/dev/null || true
           cp -f /tmp/diag/files.txt work/sources/ARCHIVE_FILES.txt 2>/dev/null || true
           git config user.name  "humsyar-bot"
