@@ -311,3 +311,34 @@ FIG_DROP.append("images/fig/fig06_scatter_position.jpg")
 #    هیچ شکلی در گالری انتهای فصل باقی نماند.
 FIG_AFTER["images/fig/x160_darvish_mri_p050.jpg"] = (
     9, "پس کنتراست بافت‌های متفاوت با هم فرق می‌کند")
+
+# ۴) بازبینی چشمی ۸۱ شکلِ پیش از این پاس: شش شکل که یا بنر عنوان‌اند، یا اسلاید
+#    متنی، یا تکراری، یا شرحشان به تصویر دیگری تعلق داشت.
+FIG_DROP += [
+    # بنر عنوان اسلاید «Biological Effects of Ionizing Radiation» — تزیینی
+    "images/fig/slide01_darvish_radiobio_p002_0.jpg",
+    # بنر عنوان «X-ray Production / Bremsstrahlung / Characteristic» — تزیینی
+    "images/fig/slide02_haghparast_mphpd_p009_0.jpg",
+    # تصویرِ «سه اصل کاهش پرتوگیری» بود اما شرحش دربارهٔ تشکیل تصویر رادیوگرافی؛
+    # همین مفهوم با چهار شکل بهتر در فصل ۶ آمده است
+    "images/fig/slide05_afzalipour_p091_0.jpg",
+    # اسلاید متنی «مقدمه» ماموگرافی — آمارش در متن فصل تایپ شده است
+    "images/fig/slide01_afzalipour_p065_0.jpg",
+    # بنر عنوان «Stochastic (Random) Effects» — تزیینی
+    "images/fig/slide08_darvish_radiobio_p005_0.jpg",
+    # مدل مولکولی DNA با شرحِ «منحنی بقای سلولی»: هم تکرار fig08_dna_target است
+    # و هم شرحش به منحنی بقا (x209/x210) تعلق دارد
+    "images/fig/fig08_survival.png",
+]
+
+# شرح‌هایی که به تصویرِ دیگری تعلق داشتند
+FIG_CAPTION["images/fig/fig06_room_shielding.jpg"] = (
+    "شکل — پرتو پراکنده از بدن بیمار و موقعیت کارکنان ([[A]] و [[B]]): بدن بیمار "
+    "خودش چشمه پرتو پراکنده است، پس هرچه دورتر بایستیم پرتوگیری کمتر می‌شود.")
+FIG_CAPTION["images/fig/fig06_protective_kit.jpg"] = (
+    "شکل — ایستادن پرتوکار پشت حفاظ شیشه‌ای سربی هنگام تصویربرداری.")
+FIG_CAPTION["images/fig/slide06_afzalipour_p081_0.jpg"] = (
+    "شکل — تجهیزات حفاظت فردی: روپوش سربی، دستکش، عینک و حفاظ تیروئید.")
+FIG_CAPTION["images/fig/slide08_darvish_radiobio_p040_0.jpg"] = (
+    "شکل — برهم‌کنش مستقیم: ذره یونیزان مستقیماً به رشته [[DNA]] برخورد می‌کند و "
+    "پیوند را می‌شکند.")
