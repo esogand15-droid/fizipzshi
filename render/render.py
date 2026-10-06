@@ -474,6 +474,10 @@ def amark(kind: str) -> tuple[str, str]:
 # FIG_SEQ counts the figures of one build_html() pass so every figure gets a
 # stable id; FIG_SCALE holds the shrink factor the fitting pass decided for it.
 FIG_SEQ = 0
+# file -> stable figure id (see fig_id); never reset between passes
+FIG_ID: dict[str, int] = {}
+# figures the float pass moved one block later so the text can close the hole
+FIG_DEFER: set[int] = set()
 # figure locators are only needed while the page-fill pass measures the layout;
 # the shipped PDF is rendered without them so the text layer stays clean
 EMIT_FIG_MARKS = True
@@ -497,14 +501,24 @@ def _printed_height_mm(path: str, width: str) -> float:
     return COL_MM * float(width[:-1]) / 100.0 * px_h / px_w
 
 
+def fig_id(file: str) -> int:
+    """Stable id for a figure, derived from the picture it shows.
+
+    The fitting passes reorder blocks, so a counter would hand the same figure a
+    different id on the next pass and every measurement would be attributed to
+    the wrong card.  Keying on the file keeps ids fixed for the whole build.
+    """
+    if file not in FIG_ID:
+        FIG_ID[file] = len(FIG_ID)
+    return FIG_ID[file]
+
+
 def blk_figure(b: dict) -> str:
-    global FIG_SEQ
     f = b.get("file", "")
     path = f if os.path.isabs(f) else str(ROOT / f)
     if not Path(path).exists():
         return f'<div class="fnote">شکل در دسترس نیست: {esc(f)}</div>'
-    fid = FIG_SEQ
-    FIG_SEQ += 1
+    fid = fig_id(f)
     cap = inline(b.get("caption", ""))
     cs = f'<span class="csrc">{LTR_DIGITS(b.get("src",""))}</span>' if b.get("src") else ""
     w = _fig_width(path, b.get("width") or "86%")
@@ -553,9 +567,39 @@ RENDER = {
 ANCHOR_MARK: dict[str, int] = {}
 
 
+FLOATABLE = {"p", "bullets", "table", "key", "note", "examtip", "formula"}
+
+
+def float_blocks(blocks: list[dict]) -> list[dict]:
+    """Let a deferred figure sink past the next block of prose.
+
+    A figure card cannot be split, so when it does not fit at the bottom of a
+    page the whole card moves overleaf and leaves a hole behind.  Shrinking only
+    helps up to the legibility floor; past that the honest fix is the one a
+    typesetter makes by hand — print the next paragraph first and let the figure
+    follow it, which fills the page and keeps the figure beside its own text.
+    """
+    if not FIG_DEFER:
+        return blocks
+    out = list(blocks)
+    i = 0
+    while i < len(out):
+        b = out[i]
+        if b.get("type") == "figure" and fig_id(b.get("file", "")) in FIG_DEFER:
+            j = i + 1
+            while j < len(out) and out[j].get("type") == "figure":
+                j += 1          # keep a group of figures together
+            if j < len(out) and out[j].get("type") in FLOATABLE:
+                out[i:j + 1] = out[i + 1:j + 1] + [b]
+                i = j + 1       # the figure now sits at j — do not float it twice
+                continue
+        i += 1
+    return out
+
+
 def render_blocks(blocks: list[dict]) -> str:
     out = []
-    for b in blocks:
+    for b in float_blocks(blocks):
         fn = RENDER.get(b.get("type", ""))
         if fn is None:
             print("!! unknown block type:", b.get("type"))
@@ -928,8 +972,34 @@ def fit_figures(render_once, rounds: int = 4) -> None:
             pdf_path = render_once()
             new_gaps = page_gaps(pdf_path)
         gaps = new_gaps
+
+    # second lever: the cards that are already as small as they may get and
+    # still push a hole in front of them are floated past the next paragraph.
+    for _ in range(3):
+        figs = figure_pages(pdf_path)
+        by_page: dict[int, list[int]] = {}
+        for fid, pno in figs.items():
+            by_page.setdefault(pno, []).append(fid)
+        want = set()
+        for pno, g in enumerate(gaps, 1):
+            if g <= GAP_LIMIT:
+                continue
+            nxt = sorted(f for f in by_page.get(pno + 1, []) if f not in FIG_DEFER)
+            if nxt:
+                want.add(nxt[0])
+        if not want:
+            break
+        FIG_DEFER.update(want)
+        pdf_path = render_once()
+        ng = page_gaps(pdf_path)
+        if sum(1 for g in ng if g > GAP_LIMIT) >= sum(1 for g in gaps if g > GAP_LIMIT):
+            FIG_DEFER.difference_update(want)   # no better: put them back
+            pdf_path = render_once()
+            break
+        gaps = ng
     print("page-fill: shrunk figures:",
           {k: v for k, v in sorted(FIG_SCALE.items()) if v < 1.0})
+    print("page-fill: floated figures:", sorted(FIG_DEFER))
 
 
 def main() -> int:
