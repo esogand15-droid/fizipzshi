@@ -21,3 +21,6 @@ render/pass1.html
 render/pass2.html
 render/HumsYar_MedPhysics_Jozve.pdf
 images/slide/
+
+# figure pipeline scratch (candidates are regenerable; the manifest is kept)
+work/figpipe/cand/
