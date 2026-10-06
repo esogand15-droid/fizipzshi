@@ -1,50 +1,50 @@
 {
  "ch1": {
   "start": 4,
-  "end": 11
+  "end": 14
  },
  "ch2": {
-  "start": 12,
-  "end": 21
+  "start": 15,
+  "end": 25
  },
  "ch3": {
-  "start": 22,
-  "end": 36
+  "start": 26,
+  "end": 44
  },
  "ch4": {
-  "start": 37,
-  "end": 51
+  "start": 45,
+  "end": 64
  },
  "ch5": {
-  "start": 52,
-  "end": 56
+  "start": 65,
+  "end": 69
  },
  "ch6": {
-  "start": 57,
-  "end": 70
+  "start": 70,
+  "end": 86
  },
  "ch7": {
-  "start": 71,
-  "end": 88
+  "start": 87,
+  "end": 104
  },
  "ch8": {
-  "start": 89,
-  "end": 107
+  "start": 105,
+  "end": 131
  },
  "ch9": {
-  "start": 108,
-  "end": 125
+  "start": 132,
+  "end": 150
  },
  "guide:0": [
-  90,
-  90
+  106,
+  106
  ],
  "guide:1": [
-  94,
-  99
+  112,
+  120
  ],
  "guide:2": [
-  116,
-  116
+  141,
+  141
  ]
 }
