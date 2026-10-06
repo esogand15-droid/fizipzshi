@@ -1,0 +1,530 @@
+[
+ {
+  "index": 11,
+  "file": "images/fig/x011_afzalipour_p011.jpg",
+  "w": 955,
+  "h": 961
+ },
+ {
+  "index": 12,
+  "file": "images/fig/x012_afzalipour_p011.jpg",
+  "w": 474,
+  "h": 686
+ },
+ {
+  "index": 13,
+  "file": "images/fig/x013_afzalipour_p012.jpg",
+  "w": 1482,
+  "h": 925
+ },
+ {
+  "index": 14,
+  "file": "images/fig/x014_afzalipour_p013.jpg",
+  "w": 1500,
+  "h": 1010
+ },
+ {
+  "index": 15,
+  "file": "images/fig/x015_afzalipour_p014.jpg",
+  "w": 1500,
+  "h": 994
+ },
+ {
+  "index": 21,
+  "file": "images/fig/x021_afzalipour_p019.jpg",
+  "w": 1500,
+  "h": 960
+ },
+ {
+  "index": 22,
+  "file": "images/fig/x022_afzalipour_p020.jpg",
+  "w": 1500,
+  "h": 930
+ },
+ {
+  "index": 23,
+  "file": "images/fig/x023_afzalipour_p022.jpg",
+  "w": 1500,
+  "h": 1030
+ },
+ {
+  "index": 24,
+  "file": "images/fig/x024_afzalipour_p023.jpg",
+  "w": 1500,
+  "h": 771
+ },
+ {
+  "index": 26,
+  "file": "images/fig/x026_afzalipour_p032.jpg",
+  "w": 703,
+  "h": 767
+ },
+ {
+  "index": 28,
+  "file": "images/fig/x028_afzalipour_p036.jpg",
+  "w": 1500,
+  "h": 771
+ },
+ {
+  "index": 31,
+  "file": "images/fig/x031_afzalipour_p054.jpg",
+  "w": 732,
+  "h": 534
+ },
+ {
+  "index": 32,
+  "file": "images/fig/x032_afzalipour_p056.jpg",
+  "w": 1500,
+  "h": 1019
+ },
+ {
+  "index": 37,
+  "file": "images/fig/x037_afzalipour_p059.jpg",
+  "w": 492,
+  "h": 478
+ },
+ {
+  "index": 38,
+  "file": "images/fig/x038_afzalipour_p060.jpg",
+  "w": 525,
+  "h": 524
+ },
+ {
+  "index": 40,
+  "file": "images/fig/x040_afzalipour_p062.jpg",
+  "w": 619,
+  "h": 466
+ },
+ {
+  "index": 41,
+  "file": "images/fig/x041_afzalipour_p062.jpg",
+  "w": 398,
+  "h": 382
+ },
+ {
+  "index": 42,
+  "file": "images/fig/x042_afzalipour_p064.jpg",
+  "w": 782,
+  "h": 478
+ },
+ {
+  "index": 60,
+  "file": "images/fig/x060_afzalipour_p081.jpg",
+  "w": 1500,
+  "h": 528
+ },
+ {
+  "index": 63,
+  "file": "images/fig/x063_afzalipour_p083.jpg",
+  "w": 637,
+  "h": 375
+ },
+ {
+  "index": 66,
+  "file": "images/fig/x066_afzalipour_p088.jpg",
+  "w": 488,
+  "h": 488
+ },
+ {
+  "index": 67,
+  "file": "images/fig/x067_afzalipour_p089.jpg",
+  "w": 619,
+  "h": 619
+ },
+ {
+  "index": 78,
+  "file": "images/fig/x078_afzalipour_p102.jpg",
+  "w": 821,
+  "h": 561
+ },
+ {
+  "index": 94,
+  "file": "images/fig/x094_afzalipour_p116.jpg",
+  "w": 884,
+  "h": 586
+ },
+ {
+  "index": 95,
+  "file": "images/fig/x095_afzalipour_p118.jpg",
+  "w": 1084,
+  "h": 740
+ },
+ {
+  "index": 96,
+  "file": "images/fig/x096_afzalipour_p119.jpg",
+  "w": 1159,
+  "h": 813
+ },
+ {
+  "index": 97,
+  "file": "images/fig/x097_afzalipour_p121.jpg",
+  "w": 1250,
+  "h": 816
+ },
+ {
+  "index": 109,
+  "file": "images/fig/x109_darvish_mri_p007.jpg",
+  "w": 1500,
+  "h": 633
+ },
+ {
+  "index": 111,
+  "file": "images/fig/x111_darvish_mri_p008.jpg",
+  "w": 1500,
+  "h": 877
+ },
+ {
+  "index": 116,
+  "file": "images/fig/x116_darvish_mri_p012.jpg",
+  "w": 1500,
+  "h": 1134
+ },
+ {
+  "index": 147,
+  "file": "images/fig/x147_darvish_mri_p037.jpg",
+  "w": 1096,
+  "h": 977
+ },
+ {
+  "index": 151,
+  "file": "images/fig/x151_darvish_mri_p042.jpg",
+  "w": 1321,
+  "h": 152
+ },
+ {
+  "index": 155,
+  "file": "images/fig/x155_darvish_mri_p046.jpg",
+  "w": 1051,
+  "h": 1300
+ },
+ {
+  "index": 156,
+  "file": "images/fig/x156_darvish_mri_p047.jpg",
+  "w": 921,
+  "h": 1093
+ },
+ {
+  "index": 157,
+  "file": "images/fig/x157_darvish_mri_p048.jpg",
+  "w": 1500,
+  "h": 916
+ },
+ {
+  "index": 160,
+  "file": "images/fig/x160_darvish_mri_p050.jpg",
+  "w": 1500,
+  "h": 876
+ },
+ {
+  "index": 161,
+  "file": "images/fig/x161_darvish_mri_p051.jpg",
+  "w": 1500,
+  "h": 705
+ },
+ {
+  "index": 170,
+  "file": "images/fig/x170_darvish_radiobio_p008.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 171,
+  "file": "images/fig/x171_darvish_radiobio_p009.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 176,
+  "file": "images/fig/x176_darvish_radiobio_p014.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 185,
+  "file": "images/fig/x185_darvish_radiobio_p023.jpg",
+  "w": 1500,
+  "h": 1076
+ },
+ {
+  "index": 189,
+  "file": "images/fig/x189_darvish_radiobio_p027.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 191,
+  "file": "images/fig/x191_darvish_radiobio_p029.jpg",
+  "w": 1500,
+  "h": 1086
+ },
+ {
+  "index": 196,
+  "file": "images/fig/x196_darvish_radiobio_p034.jpg",
+  "w": 1500,
+  "h": 1096
+ },
+ {
+  "index": 200,
+  "file": "images/fig/x200_darvish_radiobio_p038.jpg",
+  "w": 1500,
+  "h": 986
+ },
+ {
+  "index": 202,
+  "file": "images/fig/x202_darvish_radiobio_p040.jpg",
+  "w": 1500,
+  "h": 1037
+ },
+ {
+  "index": 207,
+  "file": "images/fig/x207_darvish_radiobio_p045.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 209,
+  "file": "images/fig/x209_darvish_radiobio_p047.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 210,
+  "file": "images/fig/x210_darvish_radiobio_p048.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 212,
+  "file": "images/fig/x212_darvish_radiobio_p050.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 213,
+  "file": "images/fig/x213_darvish_radiobio_p051.jpg",
+  "w": 1500,
+  "h": 1050
+ },
+ {
+  "index": 218,
+  "file": "images/fig/x218_darvish_radiobio_p057.jpg",
+  "w": 1500,
+  "h": 1124
+ },
+ {
+  "index": 219,
+  "file": "images/fig/x219_darvish_radiobio_p058.jpg",
+  "w": 1500,
+  "h": 1124
+ },
+ {
+  "index": 220,
+  "file": "images/fig/x220_darvish_radiobio_p059.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 228,
+  "file": "images/fig/x228_darvish_radiobio_p068.jpg",
+  "w": 1500,
+  "h": 979
+ },
+ {
+  "index": 235,
+  "file": "images/fig/x235_darvish_radiobio_p073.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 237,
+  "file": "images/fig/x237_darvish_radiobio_p075.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 238,
+  "file": "images/fig/x238_darvish_radiobio_p076.jpg",
+  "w": 1500,
+  "h": 1138
+ },
+ {
+  "index": 243,
+  "file": "images/fig/x243_darvish_radiobio_p081.jpg",
+  "w": 1500,
+  "h": 1122
+ },
+ {
+  "index": 258,
+  "file": "images/fig/x258_haghparast_mphpd_p024.jpg",
+  "w": 1500,
+  "h": 1082
+ },
+ {
+  "index": 266,
+  "file": "images/fig/x266_haghparast_mphpd_p044.jpg",
+  "w": 1224,
+  "h": 547
+ },
+ {
+  "index": 275,
+  "file": "images/fig/x275_haghparast_mphpd_p063.jpg",
+  "w": 1500,
+  "h": 898
+ },
+ {
+  "index": 276,
+  "file": "images/fig/x276_haghparast_mphpd_p064.jpg",
+  "w": 1500,
+  "h": 1098
+ },
+ {
+  "index": 292,
+  "file": "images/fig/x292_haghparast_mphpd_p085.jpg",
+  "w": 1500,
+  "h": 972
+ },
+ {
+  "index": 297,
+  "file": "images/fig/x297_haghparast_mphpd_p090.jpg",
+  "w": 1500,
+  "h": 1099
+ },
+ {
+  "index": 298,
+  "file": "images/fig/x298_haghparast_mphpd_p091.jpg",
+  "w": 1500,
+  "h": 928
+ },
+ {
+  "index": 300,
+  "file": "images/fig/x300_haghparast_mphpd_p093.jpg",
+  "w": 1500,
+  "h": 1180
+ },
+ {
+  "index": 301,
+  "file": "images/fig/x301_haghparast_mphpd_p094.jpg",
+  "w": 1500,
+  "h": 872
+ },
+ {
+  "index": 302,
+  "file": "images/fig/x302_haghparast_mphpd_p095.jpg",
+  "w": 1500,
+  "h": 941
+ },
+ {
+  "index": 308,
+  "file": "images/fig/x308_haghparast_mphpd_p102.jpg",
+  "w": 1500,
+  "h": 954
+ },
+ {
+  "index": 313,
+  "file": "images/fig/x313_haghparast_tashasho_p005.jpg",
+  "w": 1178,
+  "h": 885
+ },
+ {
+  "index": 315,
+  "file": "images/fig/x315_haghparast_tashasho_p007.jpg",
+  "w": 1178,
+  "h": 760
+ },
+ {
+  "index": 316,
+  "file": "images/fig/x316_haghparast_tashasho_p008.jpg",
+  "w": 1202,
+  "h": 871
+ },
+ {
+  "index": 317,
+  "file": "images/fig/x317_haghparast_tashasho_p009.jpg",
+  "w": 1178,
+  "h": 871
+ },
+ {
+  "index": 318,
+  "file": "images/fig/x318_haghparast_tashasho_p010.jpg",
+  "w": 1189,
+  "h": 872
+ },
+ {
+  "index": 319,
+  "file": "images/fig/x319_haghparast_tashasho_p011.jpg",
+  "w": 1150,
+  "h": 884
+ },
+ {
+  "index": 320,
+  "file": "images/fig/x320_haghparast_tashasho_p013.jpg",
+  "w": 1176,
+  "h": 759
+ },
+ {
+  "index": 322,
+  "file": "images/fig/x322_haghparast_tashasho_p017.jpg",
+  "w": 1178,
+  "h": 927
+ },
+ {
+  "index": 323,
+  "file": "images/fig/x323_haghparast_tashasho_p018.jpg",
+  "w": 1196,
+  "h": 854
+ },
+ {
+  "index": 325,
+  "file": "images/fig/x325_haghparast_tashasho_p021.jpg",
+  "w": 1178,
+  "h": 885
+ },
+ {
+  "index": 329,
+  "file": "images/fig/x329_haghparast_tashasho_p026.jpg",
+  "w": 1178,
+  "h": 884
+ },
+ {
+  "index": 330,
+  "file": "images/fig/x330_haghparast_tashasho_p033.jpg",
+  "w": 1178,
+  "h": 854
+ },
+ {
+  "index": 331,
+  "file": "images/fig/x331_haghparast_tashasho_p036.jpg",
+  "w": 1178,
+  "h": 885
+ },
+ {
+  "index": 333,
+  "file": "images/fig/x333_haghparast_tashasho_p039.jpg",
+  "w": 1154,
+  "h": 884
+ },
+ {
+  "index": 334,
+  "file": "images/fig/x334_haghparast_tashasho_p040.jpg",
+  "w": 1178,
+  "h": 838
+ },
+ {
+  "index": 335,
+  "file": "images/fig/x335_haghparast_tashasho_p041.jpg",
+  "w": 1178,
+  "h": 884
+ },
+ {
+  "index": 336,
+  "file": "images/fig/x336_haghparast_tashasho_p041.jpg",
+  "w": 1178,
+  "h": 819
+ },
+ {
+  "index": 337,
+  "file": "images/fig/x337_haghparast_tashasho_p044.jpg",
+  "w": 1178,
+  "h": 849
+ }
+]

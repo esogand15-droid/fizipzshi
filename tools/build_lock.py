@@ -119,6 +119,66 @@ def load_overlay():
     return getattr(mod, "SLIDE_FIGURES", {})
 
 
+def load_figures_extra():
+    """content/figures_extra.py — شکل‌های تازهٔ منابع + جایگزینی نسخه‌های بهتر."""
+    path = CONTENT / "figures_extra.py"
+    if not path.exists():
+        return {}, {}
+    spec = importlib.util.spec_from_file_location("figures_extra", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return (getattr(mod, "EXTRA_FIGURES", {}) or {},
+            getattr(mod, "FIG_UPGRADE", {}) or {})
+
+
+def apply_figures_extra(no: int, blocks: list[dict], extra: dict) -> tuple[list[dict], int]:
+    """هر شکل تازه را بلافاصله پس از بلوکی که متن `after` در آن است درج می‌کند.
+
+    لنگر، تکه‌متن واقعی همان بخش است (نه نام فایل و نه شماره اسلاید)؛ اگر در
+    فصل پیدا نشود، شکل درج نمی‌شود و در گزارش به‌عنوان بدون‌لنگر گزارش می‌شود.
+    """
+    figs = extra.get(no) or []
+    out, placed = list(blocks), 0
+    for fig in figs:
+        fname = str(fig.get("file"))
+        if any(b.get("file") == fname for b in out):
+            continue                                   # idempotent
+        needle = (fig.get("after") or "").strip()
+        pos = None
+        for i, b in enumerate(out):
+            if b.get("type") == "figure":
+                continue
+            if needle and needle in json.dumps(b, ensure_ascii=False):
+                pos = i
+                break
+        if pos is None:
+            sys.stderr.write(f"  ch{no:02d}: no anchor for {fname}\n")
+            continue
+        entry = {k: v for k, v in fig.items() if k != "after"}
+        entry["type"] = "figure"
+        entry.setdefault("width", "70%")
+        j = pos + 1
+        while j < len(out) and out[j].get("type") == "figure":
+            j += 1                                     # پس از شکل‌های همان بخش
+        out.insert(j, entry)
+        placed += 1
+    return out, placed
+
+
+def apply_fig_upgrade(blocks: list[dict], upgrade: dict) -> int:
+    """نسخهٔ بهتر یک شکل موجود را جایگزین می‌کند (جای شکل و متن دست‌نخورده)."""
+    n = 0
+    for b in blocks:
+        if b.get("type") != "figure":
+            continue
+        new = upgrade.get(str(b.get("file")))
+        if not new:
+            continue
+        b.update({k: v for k, v in new.items() if v})
+        n += 1
+    return n
+
+
 LEXICON = {
     # english slide term -> words that appear in this book (figures are usually
     # labelled in english while the chapters are persian)
@@ -511,6 +571,7 @@ def main() -> int:
         for ch_no in list(overlay):
             overlay[ch_no] = [e for e in overlay[ch_no]
                               if str(e.get("file")) not in fig_drop]
+    figures_extra, fig_upgrade = load_figures_extra()
     video_extra = load_video_extra()
     for no, meta in CHAPTERS.items():
         if only and no not in only:
@@ -528,6 +589,9 @@ def main() -> int:
                     if fix:
                         b["caption"] = fix
         blocks = apply_video_extra(no, blocks, video_extra)
+        # after the video/extra notes, so a figure can anchor to them too
+        blocks, added_figs = apply_figures_extra(no, blocks, figures_extra)
+        upgraded_figs = apply_fig_upgrade(blocks, fig_upgrade)
         blocks, vid_moved = relocate_video(no, blocks, video_after)
         blocks, qr_moved = quickreview_last(blocks)
         normalise_captions(blocks)
@@ -559,6 +623,10 @@ def main() -> int:
             notes.append(f"{empty_sections} سرفصل خالی حذف شد")
         if labelled:
             notes.append(f"{labelled} جمع‌بندی منبع‌دار شد")
+        if added_figs:
+            notes.append(f"{added_figs} شکل تازه افزوده شد")
+        if upgraded_figs:
+            notes.append(f"{upgraded_figs} شکل ارتقا یافت")
         extra = (", " + "، ".join(notes)) if notes else ""
         print(f"ch{no:02d}: {len(ch['blocks'])} blocks, {figs} figures, {src} with src{extra}")
         built += 1
