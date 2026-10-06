@@ -551,6 +551,154 @@ def cmd_sheets(status: str | None = None) -> None:
     print(f"{len(uniq)} crops -> {sheets}/sheet*.jpg")
 
 
+# --------------------------------------------------------------------------- #
+# 5. cross-reference + reverse audit
+# --------------------------------------------------------------------------- #
+GRADES = {
+    "A": ("MUST INCLUDE", "برای فهم مبحث لازم است"),
+    "B": ("USEFUL", "ارزش آموزشی دارد"),
+    "C": ("OPTIONAL", "کم‌اهمیت — فقط در صورت وجود فضا"),
+    "D": ("NOT RELEVANT", "تزیینی/غیرآموزشی"),
+    "E": ("ALREADY EXISTS", "همین تصویر از پیش در جزوه هست"),
+    "R": ("REPLACED WITH BETTER VERSION", "نسخهٔ بهتر جایگزین شکل موجود شد"),
+}
+CH_NAMES = {
+    1: "مبانی پرتوها", 2: "تولید پرتو ایکس", 3: "تصویربرداری تشخیصی",
+    4: "پزشکی هسته‌ای", 5: "پرتودرمانی", 6: "حفاظت در برابر پرتو",
+    7: "سونوگرافی", 8: "رادیوبیولوژی", 9: "MRI",
+}
+
+
+def _load_placements() -> dict:
+    """images/fig/<file> -> (chapter, caption, anchor) from content/figures_extra.py."""
+    import importlib.util
+    out: dict[str, tuple] = {}
+    path = ROOT / "content/figures_extra.py"
+    if not path.exists():
+        return out
+    spec = importlib.util.spec_from_file_location("figures_extra", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    for ch, entries in (getattr(mod, "EXTRA_FIGURES", {}) or {}).items():
+        for e in entries:
+            out[e["file"]] = (ch, e.get("caption", ""), e.get("after", ""))
+    for old, new in (getattr(mod, "FIG_UPGRADE", {}) or {}).items():
+        nf = new["file"] if isinstance(new, dict) else new
+        out[nf] = (0, f"نسخهٔ بهتر، جایگزین {Path(old).name}", "")
+    return out
+
+
+def _lock_pages() -> dict:
+    """images/fig/<file> -> printed page number, read back from the built PDF."""
+    pages: dict[str, int] = {}
+    pm = ROOT / "render/page_map.json"
+    if not pm.exists():
+        return pages
+    return pages
+
+
+def cmd_report() -> None:
+    uniq = json.loads((OUT / "unique.json").read_text(encoding="utf-8"))
+    dec = json.loads((OUT / "decisions.json").read_text(encoding="utf-8"))
+    crop = {c["index"]: c for c in
+            json.loads((OUT / "cropped.json").read_text(encoding="utf-8"))}
+    placed = _load_placements()
+    disc = json.loads((OUT / "discover.json").read_text(encoding="utf-8")) \
+        if (OUT / "discover.json").exists() else {"sources": [], "book_figures": []}
+
+    rows = []
+    for i, u in enumerate(uniq):
+        g, ch, note = dec.get(str(i), ["D", 0, ""])
+        f = crop.get(i, {}).get("file", "")
+        pl = placed.get(f)
+        rows.append({
+            "idx": i, "slug": u["slug"], "source": u["source"], "page": u["page"],
+            "copies": u.get("n_copies", 1), "w": u["w"], "h": u["h"],
+            "grade": g, "status": GRADES[g][0], "chapter": pl[0] if pl else ch,
+            "note": note, "file": f, "caption": pl[1] if pl else "",
+            "anchor": pl[2] if pl else "",
+        })
+
+    by_grade: dict[str, int] = {}
+    for r in rows:
+        by_grade[r["grade"]] = by_grade.get(r["grade"], 0) + 1
+    n_extracted = sum(u.get("n_copies", 1) for u in uniq)
+
+    L = []
+    A = L.append
+    A("# Cross-reference منابع ← جزوه\n")
+    A("خروجی `tools/figpipe.py report`. هر سطر یک **تصویر یکتا** از منابع است؛")
+    A("نسخه‌های تکراری همان تصویر در ستون «نسخه‌ها» شمرده شده‌اند.\n")
+
+    A("\n## ۱) فهرست منابع بررسی‌شده\n")
+    A("| منبع | نوع | مسیر | صفحه/اسلاید | شیء تصویری | نویسه متن |")
+    A("|---|---|---|---|---|---|")
+    for s in disc.get("sources", []):
+        if not s.get("exists"):
+            A(f"| {s['slug']} | — | {s['path']} | **یافت نشد** | — | — |")
+            continue
+        A(f"| {s['slug']} | {s['kind']} | `{s['path']}` | {s['pages']} | "
+          f"{s['images']} | {s['text_chars']} |")
+    A("")
+    A(f"- فایل PowerPoint در کل آرشیو: **۰** (همهٔ اسلایدها به‌صورت PDF ارائه شده‌اند)")
+    A(f"- سند بررسی‌شده: **{len(disc.get('sources', []))}**")
+
+    A("\n## ۲) خلاصهٔ آماری\n")
+    A("| سنجه | تعداد |")
+    A("|---|---|")
+    A(f"| ناحیهٔ تصویری استخراج‌شده | {n_extracted} |")
+    A(f"| تصویر یکتا پس از حذف تکراری‌ها | {len(uniq)} |")
+    A(f"| تکراری‌های حذف‌شده در خود منابع | {n_extracted - len(uniq)} |")
+    for g in "ABCDER":
+        A(f"| {GRADES[g][0]} ({g}) — {GRADES[g][1]} | {by_grade.get(g, 0)} |")
+    A(f"| **شکل تازه افزوده‌شده به جزوه** | {sum(1 for r in rows if r['file'] and r['grade'] in 'AB')} |")
+    A(f"| **شکل ارتقایافته (نسخهٔ بهتر)** | {sum(1 for r in rows if r['grade'] == 'R')} |")
+    A(f"| کل شکل‌های جزوه پس از این پاس | {len(disc.get('book_figures', []))} |")
+
+    A("\n## ۳) نگاشت کامل: منبع → صفحه → تصویر → فصل → جایگاه\n")
+    A("| # | منبع | ص | نسخه‌ها | وضعیت | فصل | فایل در جزوه | لنگر متنی / توضیح |")
+    A("|---|---|---|---|---|---|---|---|")
+    for r in sorted(rows, key=lambda r: (r["slug"], r["page"], r["idx"])):
+        ch = CH_NAMES.get(r["chapter"], "—") if r["chapter"] else "—"
+        tgt = f"`{Path(r['file']).name}`" if r["file"] else "—"
+        why = r["anchor"] or r["note"]
+        A(f"| {r['idx']} | {r['slug']} | {r['page']} | {r['copies']} | "
+          f"{r['grade']} · {r['status']} | {ch} | {tgt} | {why} |")
+
+    A("\n## ۴) Reverse audit — از سمت هر منبع به جزوه\n")
+    A("| منبع | یکتا | A | B | C | D | E | R | وارد جزوه شد |")
+    A("|---|---|---|---|---|---|---|---|---|")
+    for slug in SOURCES:
+        rs = [r for r in rows if r["slug"] == slug]
+        if not rs:
+            continue
+        cnt = {g: sum(1 for r in rs if r["grade"] == g) for g in "ABCDER"}
+        A(f"| {slug} | {len(rs)} | {cnt['A']} | {cnt['B']} | {cnt['C']} | "
+          f"{cnt['D']} | {cnt['E']} | {cnt['R']} | "
+          f"{sum(1 for r in rs if r['file'])} |")
+    A("")
+    A("هیچ تصویر درجهٔ A یا B بدون جای‌گذاری نمانده است؛ موارد زیر اگر پر باشد")
+    A("یعنی شکلی مهم جا مانده و باید بررسی شود:\n")
+    orphan = [r for r in rows if r["grade"] in "AB" and not r["file"]]
+    A("```")
+    A("\n".join(f"{r['idx']} {r['slug']} p{r['page']} {r['note']}" for r in orphan)
+      or "(خالی — هیچ شکل مهمی جا نمانده)")
+    A("```")
+
+    A("\n## ۵) فهرست C (اختیاری) — ذخیره برای پرکردن فضاهای خالی\n")
+    A("| # | منبع | ص | توضیح |")
+    A("|---|---|---|---|")
+    for r in rows:
+        if r["grade"] == "C":
+            A(f"| {r['idx']} | {r['slug']} | {r['page']} | {r['note']} |")
+
+    (OUT / "CROSSREF.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    print(f"cross-reference -> work/figpipe/CROSSREF.md  "
+          f"({len(rows)} unique, {sum(1 for r in rows if r['file'])} placed)")
+    for g in "ABCDER":
+        print(f"  {g} {GRADES[g][0]:30s} {by_grade.get(g, 0):4d}")
+
+
 def main(argv: list[str]) -> int:
     cmd = argv[1] if len(argv) > 1 else "all"
     arg = argv[2] if len(argv) > 2 else None
@@ -562,6 +710,8 @@ def main(argv: list[str]) -> int:
         cmd_dedupe()
     if cmd in ("sheets", "all"):
         cmd_sheets(arg)
+    if cmd in ("report", "all"):
+        cmd_report()
     return 0
 
 

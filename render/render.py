@@ -876,10 +876,12 @@ def fit_figures(render_once, rounds: int = 4) -> None:
         for pno, g in enumerate(gaps, 1):
             if g <= GAP_LIMIT:
                 continue
-            cands = [f for f in by_page.get(pno, []) if f not in frozen
-                     and FIG_SCALE.get(f, 1.0) > 0.71]
-            if cands:
-                picks.append((max(cands), pno, g))
+            cands = sorted(f for f in by_page.get(pno, []) if f not in frozen
+                           and FIG_SCALE.get(f, 1.0) > 0.71)
+            # the figures lowest on the page are the ones holding the next block
+            # back, so shrink the last two rather than only the last one
+            for fid in cands[-2:]:
+                picks.append((fid, pno, g))
         if not picks:
             break
         before = {f: FIG_SCALE.get(f, 1.0) for f, _, _ in picks}
@@ -930,7 +932,7 @@ def main() -> int:
 
     # pass 1b: pull orphaned blocks back by shrinking the figures that leave
     # half-empty pages behind them (keeps sections visually compact)
-    fit_figures(render_pass1, rounds=3)
+    fit_figures(render_pass1, rounds=6)
     # the locators have done their job; keep them out of the delivered text layer
     global EMIT_FIG_MARKS
     EMIT_FIG_MARKS = False
