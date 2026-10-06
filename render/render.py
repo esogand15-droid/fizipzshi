@@ -981,19 +981,30 @@ def fit_figures(render_once, rounds: int = 4) -> None:
         for fid, pno in figs.items():
             by_page.setdefault(pno, []).append(fid)
         want = set()
+        hole_of: dict[int, int] = {}
         for pno, g in enumerate(gaps, 1):
             if g <= GAP_LIMIT:
                 continue
             nxt = sorted(f for f in by_page.get(pno + 1, []) if f not in FIG_DEFER)
             if nxt:
                 want.add(nxt[0])
+                hole_of[nxt[0]] = pno
         if not want:
             break
         FIG_DEFER.update(want)
         pdf_path = render_once()
         ng = page_gaps(pdf_path)
+        # judge every float on the hole it was meant to close, not on the
+        # batch as a whole: one bad float used to roll back all the good ones
+        keep = {f for f in want
+                if ng[hole_of[f] - 1] < gaps[hole_of[f] - 1] - 0.03
+                if hole_of[f] - 1 < len(ng)}
+        if keep != want:
+            FIG_DEFER.difference_update(want - keep)
+            pdf_path = render_once()
+            ng = page_gaps(pdf_path)
         if sum(1 for g in ng if g > GAP_LIMIT) >= sum(1 for g in gaps if g > GAP_LIMIT):
-            FIG_DEFER.difference_update(want)   # no better: put them back
+            FIG_DEFER.difference_update(keep)    # no better: put them back
             pdf_path = render_once()
             break
         gaps = ng
