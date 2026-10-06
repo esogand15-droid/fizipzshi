@@ -872,33 +872,51 @@ def fit_figures(render_once, rounds: int = 4) -> None:
         by_page: dict[int, list[int]] = {}
         for fid, pno in figs.items():
             by_page.setdefault(pno, []).append(fid)
-        picks = []
+        picks: dict[int, tuple[int, float, str]] = {}
+
+        def _want(fid: int, pno: int, g: float, mode: str) -> None:
+            # keep the most aggressive request for a figure asked for twice
+            cur = picks.get(fid)
+            if cur is None or g > cur[1]:
+                picks[fid] = (pno, g, mode)
+
+        def _free(pno: int) -> list[int]:
+            return sorted(f for f in by_page.get(pno, []) if f not in frozen
+                          and FIG_SCALE.get(f, 1.0) > 0.71)
+
         for pno, g in enumerate(gaps, 1):
             if g <= GAP_LIMIT:
                 continue
-            cands = sorted(f for f in by_page.get(pno, []) if f not in frozen
-                           and FIG_SCALE.get(f, 1.0) > 0.71)
-            # the figures lowest on the page are the ones holding the next block
-            # back, so shrink the last two rather than only the last one
-            for fid in cands[-2:]:
-                picks.append((fid, pno, g))
+            # (a) by far the most common cause of a hole: the *next* block is a
+            # figure card, it did not fit, and the whole card moved overleaf.
+            # The card that has to give way is the first figure of the next
+            # page — shrinking anything on this page cannot help it fit.
+            nxt = _free(pno + 1)
+            if nxt:
+                _want(nxt[0], pno, g, "pull")
+            # (b) otherwise free a little room so the next text block climbs up
+            cur = _free(pno)
+            if cur:
+                _want(cur[-1], pno, g, "push")
         if not picks:
             break
-        before = {f: FIG_SCALE.get(f, 1.0) for f, _, _ in picks}
-        for fid, _, g in picks:
-            # free up roughly the whole hole: if the block that was pushed over
-            # needed `gap` more millimetres, giving it `gap` back usually lets it
-            # climb onto this page.
+        before = {f: FIG_SCALE.get(f, 1.0) for f in picks}
+        for fid, (pno, g, mode) in picks.items():
             h = FIG_H.get(fid) or 0.0
             gap_mm = g * BODY_MM
-            factor = 0.85 if h <= 0 else max(0.72, (h - gap_mm) / h)
+            if mode == "pull":
+                # the card must become short enough to fit the hole it left,
+                # with room for its caption and credit line
+                factor = 0.85 if h <= 0 else (gap_mm - 18.0) / h
+            else:
+                factor = 0.85 if h <= 0 else (h - gap_mm) / h
             # never shrink past legibility — a slightly short page beats a
             # slide screenshot whose own text can no longer be read
             FIG_SCALE[fid] = round(max(0.70, before[fid] * min(0.95, factor)), 3)
         pdf_path = render_once()
         new_gaps = page_gaps(pdf_path)
         improved = False
-        for fid, pno, g in picks:
+        for fid, (pno, g, _mode) in picks.items():
             ng = new_gaps[pno - 1] if pno - 1 < len(new_gaps) else 1.0
             if ng < g - 0.03:
                 improved = True
