@@ -34,12 +34,12 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 WORK = ROOT / "work" / "figpipe"
 OUT = ROOT / "images" / "fig"
 
-PAD = 10               # px of breathing room kept around the detected content
+PAD = 24               # px of breathing room kept around the detected content
 MAX_W = 1500           # final width cap (the page column is ~150 mm)
 JPEG_Q = 85
 MIN_PANEL = 0.10       # a white panel must cover this fraction of the tile
 MIN_SIDE = 160         # never emit something smaller than this
-KEEP_INK = 0.90        # a crop must retain this share of the tile's drawn pixels
+KEEP_INK = 0.975       # a crop must retain this share of the tile's drawn pixels
 
 
 # ----------------------------------------------------------------- helpers
@@ -122,6 +122,83 @@ def ink_mask(a: np.ndarray) -> np.ndarray:
     return np.abs(g - bg) > 38
 
 
+# --- recover artwork the extraction window cut off -------------------------
+_BBOX = None
+
+
+def _bbox_index() -> dict:
+    """tile path -> (pdf, page, bbox) from the extraction manifest."""
+    global _BBOX
+    if _BBOX is None:
+        _BBOX = {}
+        f = WORK / "candidates.json"
+        if f.exists():
+            for c in json.loads(f.read_text("utf-8")):
+                if c.get("bbox"):
+                    _BBOX[c["file"]] = (c["pdf"], c["page"], c["bbox"])
+    return _BBOX
+
+
+def _edge_ink(im) -> bool:
+    """True when drawn pixels run into the border — the tile is clipped."""
+    a = np.asarray(im.convert("RGB")).astype(np.float32)
+    m = ink_mask(a)
+    b = 3
+    return (m[:b, :].mean() > 0.012 or m[-b:, :].mean() > 0.012
+            or m[:, :b].mean() > 0.012 or m[:, -b:].mean() > 0.012)
+
+
+# A slide whose title sits far above the drawing needs a wider window than the
+# default budget allows; these tiles are allowed to grow further because the
+# extra area is the figure's own heading, not the slide's body text.
+WIDEN_CAP = {
+    "work/figpipe/cand/afzalipour/p022_0.jpg": 2.0,
+}
+DEFAULT_WIDEN_CAP = 1.5
+
+
+def widen(path: pathlib.Path):
+    """Re-render a clipped tile from its PDF with a wider window.
+
+    The extraction window is built from the picture and vector objects of the
+    slide, so an axis label or a table column that is pure *text* can fall just
+    outside it and come out sliced. When the tile's ink touches its own border
+    we go back to the page and grow the window until the cut lands on empty
+    space again — labels and legends are never dropped (rule 12/13).
+    """
+    im = Image.open(path).convert("RGB")
+    key = str(path)
+    if path.is_absolute():
+        try:
+            key = str(path.relative_to(ROOT))
+        except ValueError:
+            pass
+    rec = _bbox_index().get(key.replace("\\", "/"))
+    if rec is None or not _edge_ink(im):
+        return im
+    import pymupdf
+    pdf, pno, bbox = rec
+    doc = pymupdf.open(ROOT / pdf)
+    page = doc[pno - 1]
+    pr = page.rect
+    area0 = im.width * im.height
+    cap = WIDEN_CAP.get(key.replace("\\", "/"), DEFAULT_WIDEN_CAP)
+    best = im
+    for grow in (10, 20, 34, 52):
+        r = pymupdf.Rect(bbox[0] - grow, bbox[1] - grow,
+                         bbox[2] + grow, bbox[3] + grow) & pr
+        pix = page.get_pixmap(dpi=200, clip=r)
+        cand = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
+        if cand.width * cand.height < 0.95 * area0:
+            continue            # a bad bbox: never hand back less than we had
+        if cand.width * cand.height > cap * area0:
+            break               # we would be pulling in the slide's body text
+        if not _edge_ink(cand):
+            best = cand         # only accept a window that cuts clean air
+            break
+    doc.close()
+    return best
+
 def crop_one(path: pathlib.Path) -> Image.Image:
     """Smallest acceptable crop that still holds (almost) all of the artwork.
 
@@ -129,16 +206,42 @@ def crop_one(path: pathlib.Path) -> Image.Image:
     would throw away more than ``1 - KEEP_INK`` of the drawn pixels is refused,
     because that is exactly how labels, legends, axes and arrows get cut off.
     """
-    im = Image.open(path).convert("RGB")
+    im = widen(path)
     a = np.asarray(im).astype(np.float32)
     mask = ink_mask(a)
     total = float(mask.sum()) or 1.0
+
+    def clean_edges(box) -> bool:
+        """True when the cut runs through background, not through artwork.
+
+        Keeping 97.5% of the ink is not enough on its own: slicing the first
+        letters off an axis label or a table column costs only a few per mille
+        of the drawn pixels but ruins the figure. So also require that the crop
+        line itself lands on empty space — if ink touches the proposed border,
+        something is being cut in half.
+        """
+        x0, y0, x1, y1 = box
+        band = 3
+        for sl, full in (
+                (mask[y0:y0 + band, x0:x1], y0 > 0),
+                (mask[y1 - band:y1, x0:x1], y1 < mask.shape[0]),
+                (mask[y0:y1, x0:x0 + band], x0 > 0),
+                (mask[y0:y1, x1 - band:x1], x1 < mask.shape[1])):
+            if full and sl.size and sl.mean() > 0.012:
+                return False
+        return True
 
     def keeps(box) -> bool:
         x0, y0, x1, y1 = box
         if x1 - x0 < MIN_SIDE or y1 - y0 < MIN_SIDE:
             return False
-        return mask[y0:y1, x0:x1].sum() / total >= KEEP_INK
+        # a crop that throws away three quarters of the tile is not a crop, it
+        # is a different picture — usually a caption strip mistaken for a panel
+        if (x1 - x0) * (y1 - y0) < 0.25 * mask.shape[0] * mask.shape[1]:
+            return False
+        if mask[y0:y1, x0:x1].sum() / total < KEEP_INK:
+            return False
+        return clean_edges(box)
 
     # candidates, smallest (most aggressive) first
     cands = []

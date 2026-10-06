@@ -429,6 +429,9 @@ def cmd_extract(only: str | None = None) -> None:
                 crop.convert("RGB").save(ROOT / rel_out, quality=88, optimize=True)
                 cands.append({
                     "id": f"{slug}:p{pno:03d}:{idx}", "slug": slug, "source": name,
+                    "pdf": str(pdf.relative_to(ROOT)),
+                    "bbox": [round(bx[0] / SCALE, 2), round(bx[1] / SCALE, 2),
+                             round(bx[2] / SCALE, 2), round(bx[3] / SCALE, 2)],
                     "kind": kind, "page": pno, "file": rel_out,
                     "w": crop.width, "h": crop.height,
                     "std": round(std, 1), "ink": round(ink, 3),
